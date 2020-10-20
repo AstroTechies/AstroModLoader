@@ -10,18 +10,17 @@ namespace AstroModLoader
 {
     public partial class Form1 : Form
     {
+        public ModHandler ModManager;
+        public TableHandler TableManager;
+
         public DataGridView dataGridView1;
         public Panel footer;
         public Panel panel1;
 
-        public static readonly Version MOD_LOADER_VERSION = new Version(0, 1, 0);
-        public ModHandler ModManager;
-        public TableHandler TableManager;
-
         public Form1()
         {
             InitializeComponent();
-            this.Text = "AstroModLoader v" + MOD_LOADER_VERSION;
+            this.Text = "AstroModLoader v" + Application.ProductVersion;
 
             // Enable double buffering to look nicer
             if (!SystemInformation.TerminalServerSession)
@@ -176,6 +175,44 @@ namespace AstroModLoader
         private void exitButton_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            TextPrompt profileNamePrompt = new TextPrompt();
+            profileNamePrompt.StartPosition = FormStartPosition.Manual;
+            profileNamePrompt.Location = new Point((this.Location.X + this.Width / 2) - (profileNamePrompt.Width / 2), (this.Location.Y + this.Height / 2) - (profileNamePrompt.Height / 2));
+            profileNamePrompt.AllowBrowse = false;
+            profileNamePrompt.Width -= 100;
+            profileNamePrompt.DisplayText = "Name this profile:";
+            if (profileNamePrompt.ShowDialog(this) == DialogResult.OK)
+            {
+                if (ModManager.ProfileList.ContainsKey(profileNamePrompt.OutputText))
+                {
+                    DialogResult dialogResult = MessageBox.Show("A profile with this name already exists! Do you want to overwrite it?", "Uh oh!", MessageBoxButtons.YesNo);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        ModManager.ProfileList[profileNamePrompt.OutputText] = ModManager.GenerateProfile();
+                        ModManager.SyncConfigToDisk();
+                    }
+                    return;
+                }
+                ModManager.ProfileList.Add(profileNamePrompt.OutputText, ModManager.GenerateProfile());
+                ModManager.SyncConfigToDisk();
+            }
+        }
+
+        private void loadButton_Click(object sender, EventArgs e)
+        {
+            ProfileSelector selectorForm = new ProfileSelector();
+            selectorForm.StartPosition = FormStartPosition.Manual;
+            selectorForm.Location = new Point((this.Location.X + this.Width / 2) - (selectorForm.Width / 2), (this.Location.Y + this.Height / 2) - (selectorForm.Height / 2));
+            if (selectorForm.ShowDialog(this) == DialogResult.OK)
+            {
+                ModManager.ApplyProfile(selectorForm.SelectedProfile);
+                ModManager.FullUpdate();
+                TableManager.Refresh();
+            }
         }
     }
 }

@@ -11,24 +11,31 @@ using System.Windows.Forms;
 
 namespace AstroModLoader
 {
-    public partial class InitialPathPrompt : Form
+    public partial class TextPrompt : Form
     {
         public string DisplayText;
-        public string OutputPath;
+        public string OutputText;
+        public bool AllowBrowse = true;
 
-        public InitialPathPrompt()
+        public TextPrompt()
         {
             InitializeComponent();
         }
 
         private void InitialPathPrompt_Load(object sender, EventArgs e)
         {
+            mainLabel.Text = DisplayText;
             if (this.Owner is Form1 parentForm)
             {
                 this.Text = parentForm.Text;
                 AMLPalette.RefreshTheme(parentForm);
             }
             AMLPalette.RefreshTheme(this);
+            if (!AllowBrowse)
+            {
+                browseButton.Hide();
+                gamePathBox.Size = new Size(this.ClientSize.Width - 24, gamePathBox.ClientSize.Height);
+            }
         }
 
         private void browseButton_Click(object sender, EventArgs e)
@@ -55,14 +62,17 @@ namespace AstroModLoader
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            OutputPath = gamePathBox.Text;
-            this.DialogResult = DialogResult.OK;
-            this.Close();
+            if (gamePathBox.Text != null && gamePathBox.Text.Length > 0)
+            {
+                OutputText = gamePathBox.Text;
+                this.DialogResult = DialogResult.OK;
+                this.Close();
+            }
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
         {
-            OutputPath = null;
+            OutputText = null;
             this.DialogResult = DialogResult.Cancel;
             this.Close();
         }

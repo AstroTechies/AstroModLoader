@@ -52,7 +52,7 @@ namespace AstroModLoader
                 }
                 else
                 {
-                    InitialPathPrompt initialPathPrompt = new InitialPathPrompt
+                    TextPrompt initialPathPrompt = new TextPrompt
                     {
                         StartPosition = FormStartPosition.CenterScreen,
                         DisplayText = "Select your game installation directory"
@@ -60,7 +60,7 @@ namespace AstroModLoader
 
                     if (initialPathPrompt.ShowDialog(BaseForm) == DialogResult.OK)
                     {
-                        GamePath = initialPathPrompt.OutputPath;
+                        GamePath = initialPathPrompt.OutputText;
                     }
                     else
                     {
@@ -133,11 +133,10 @@ namespace AstroModLoader
             }
         }
 
-        public void DeterminePaths()
+        private void DeterminePaths()
         {
             if (!string.IsNullOrEmpty(Program.CommandLineOptions.BasePath))
             {
-                Debug.WriteLine("Param: " + Program.CommandLineOptions.BasePath);
                 BasePath = Program.CommandLineOptions.BasePath;
             }
             else
@@ -163,11 +162,6 @@ namespace AstroModLoader
                     return null;
                 }
             }
-        }
-
-        public string GeneratePriorityFromPositionInList(int pos)
-        {
-            return pos.ToString().PadLeft(3);
         }
 
         public void SyncModsFromDisk()
@@ -275,15 +269,8 @@ namespace AstroModLoader
                 return;
             }
             if (diskConfig == null) return;
-            if (diskConfig.ModsOnDisk == null) return;
-            foreach (KeyValuePair<string, Mod> entry in diskConfig.ModsOnDisk.ProfileData)
-            {
-                if (ModLookup.ContainsKey(entry.Key))
-                {
-                    ModLookup[entry.Key].Enabled = entry.Value.Enabled;
-                    if (entry.Value.InstalledVersion != null) ModLookup[entry.Key].InstalledVersion = entry.Value.InstalledVersion;
-                }
-            }
+            ApplyProfile(diskConfig.ModsOnDisk);
+            ProfileList = diskConfig.Profiles;
 
             if (!string.IsNullOrEmpty(diskConfig.AccentColor))
             {
@@ -297,22 +284,43 @@ namespace AstroModLoader
             AMLPalette.RefreshTheme(BaseForm);
 
             if (!string.IsNullOrEmpty(diskConfig.GamePath)) GamePath = diskConfig.GamePath;
-            if (!string.IsNullOrEmpty(diskConfig.BasePath)) BasePath = diskConfig.BasePath;
+        }
+
+        public void ApplyProfile(ModProfile prof)
+        {
+            if (prof == null) return;
+            foreach (KeyValuePair<string, Mod> entry in prof.ProfileData)
+            {
+                if (ModLookup.ContainsKey(entry.Key))
+                {
+                    ModLookup[entry.Key].Enabled = entry.Value.Enabled;
+                    if (entry.Value.InstalledVersion != null) ModLookup[entry.Key].InstalledVersion = entry.Value.InstalledVersion;
+                }
+            }
+        }
+
+        public ModProfile GenerateProfile()
+        {
+            var res = new ModProfile(new Dictionary<string, Mod>());
+            foreach (Mod mod in Mods)
+            {
+                var modClone = new Mod(null, mod.NameOnDisk);
+                modClone.AvailableVersions = mod.AvailableVersions;
+                modClone.InstalledVersion = mod.InstalledVersion;
+                modClone.Enabled = mod.Enabled;
+                res.ProfileData.Add(mod.ModData.ModID, modClone);
+            }
+            return res;
         }
 
         public void SyncConfigToDisk()
         {
             var newConfig = new ModConfig();
             newConfig.GamePath = GamePath;
-            newConfig.BasePath = BasePath;
             newConfig.Theme = AMLPalette.CurrentTheme;
             newConfig.AccentColor = AMLUtils.ColorToHTML(AMLPalette.AccentColor);
             newConfig.Profiles = ProfileList;
-            newConfig.ModsOnDisk = new ModProfile(new Dictionary<string, Mod>());
-            foreach (Mod mod in Mods)
-            {
-                newConfig.ModsOnDisk.ProfileData.Add(mod.ModData.ModID, mod);
-            }
+            newConfig.ModsOnDisk = GenerateProfile();
 
             File.WriteAllBytes(Path.Combine(DownloadPath, "modconfig.json"), Encoding.UTF8.GetBytes(AMLUtils.SerializeObject(newConfig)));
         }

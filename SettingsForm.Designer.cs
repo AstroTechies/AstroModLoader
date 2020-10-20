@@ -35,7 +35,7 @@
             this.setPathButton = new AstroModLoader.CoolButton();
             this.exitButton = new AstroModLoader.CoolButton();
             this.accentComboBox = new System.Windows.Forms.ComboBox();
-            this.themeBox = new System.Windows.Forms.ComboBox();
+            this.themeComboBox = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -73,7 +73,7 @@
             this.label3.Location = new System.Drawing.Point(69, 98);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(78, 15);
-            this.label3.TabIndex = 4;
+            this.label3.TabIndex = 6;
             this.label3.Text = "Accent Color:";
             // 
             // setPathButton
@@ -104,7 +104,7 @@
             this.exitButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.exitButton.Name = "exitButton";
             this.exitButton.Size = new System.Drawing.Size(75, 26);
-            this.exitButton.TabIndex = 7;
+            this.exitButton.TabIndex = 8;
             this.exitButton.Text = "Exit";
             this.exitButton.UseVisualStyleBackColor = false;
             this.exitButton.Click += new System.EventHandler(this.exitButton_Click);
@@ -115,19 +115,19 @@
             this.accentComboBox.Location = new System.Drawing.Point(153, 97);
             this.accentComboBox.Name = "accentComboBox";
             this.accentComboBox.Size = new System.Drawing.Size(151, 21);
-            this.accentComboBox.TabIndex = 8;
+            this.accentComboBox.TabIndex = 7;
             this.accentComboBox.SelectedIndexChanged += new System.EventHandler(this.accentComboBox_UpdateColor);
             this.accentComboBox.Leave += new System.EventHandler(this.accentComboBox_UpdateColor);
             // 
-            // themeBox
+            // themeComboBox
             // 
-            this.themeBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.themeBox.FormattingEnabled = true;
-            this.themeBox.Location = new System.Drawing.Point(153, 70);
-            this.themeBox.Name = "themeBox";
-            this.themeBox.Size = new System.Drawing.Size(151, 21);
-            this.themeBox.TabIndex = 9;
-            this.themeBox.SelectedIndexChanged += new System.EventHandler(this.themeBox_SelectedIndexChanged);
+            this.themeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.themeComboBox.FormattingEnabled = true;
+            this.themeComboBox.Location = new System.Drawing.Point(153, 70);
+            this.themeComboBox.Name = "themeComboBox";
+            this.themeComboBox.Size = new System.Drawing.Size(151, 21);
+            this.themeComboBox.TabIndex = 5;
+            this.themeComboBox.SelectedIndexChanged += new System.EventHandler(this.themeBox_SelectedIndexChanged);
             // 
             // label4
             // 
@@ -136,7 +136,7 @@
             this.label4.Location = new System.Drawing.Point(98, 71);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(49, 15);
-            this.label4.TabIndex = 10;
+            this.label4.TabIndex = 4;
             this.label4.Text = "Theme:";
             // 
             // SettingsForm
@@ -146,7 +146,7 @@
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(42)))), ((int)(((byte)(45)))));
             this.ClientSize = new System.Drawing.Size(413, 182);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.themeBox);
+            this.Controls.Add(this.themeComboBox);
             this.Controls.Add(this.accentComboBox);
             this.Controls.Add(this.exitButton);
             this.Controls.Add(this.setPathButton);
@@ -156,6 +156,7 @@
             this.Controls.Add(this.label1);
             this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "SettingsForm";
             this.Text = "Settings";
             this.Load += new System.EventHandler(this.SettingsForm_Load);
@@ -173,7 +174,7 @@
         private CoolButton setPathButton;
         private CoolButton exitButton;
         private System.Windows.Forms.ComboBox accentComboBox;
-        private System.Windows.Forms.ComboBox themeBox;
+        private System.Windows.Forms.ComboBox themeComboBox;
         private System.Windows.Forms.Label label4;
     }
 }

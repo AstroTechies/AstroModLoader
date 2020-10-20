@@ -48,8 +48,18 @@ namespace AstroModLoader
                     comboo.ForeColor = AMLPalette.ForeColor;
                     comboo.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Regular, GraphicsUnit.Point, (byte)0);
                 }
+                if (ctrl2 is ListBox listBox)
+                {
+                    listBox.BackColor = AMLPalette.BackColor;
+                    listBox.ForeColor = AMLPalette.ForeColor;
+                }
                 RefreshAllButtonsInControl(ctrl2);
             }
+        }
+
+        public static string GeneratePriorityFromPositionInList(int pos)
+        {
+            return pos.ToString().PadLeft(3);
         }
     }
 }

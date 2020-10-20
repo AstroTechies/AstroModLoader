@@ -56,10 +56,13 @@ namespace AstroModLoader
                 AMLPalette.RefreshTheme(parentForm);
                 UpdateColorBoxText();
             }
-            themeBox.DataSource = Enum.GetValues(typeof(ModLoaderTheme));
-            themeBox.SelectedIndex = (int)AMLPalette.CurrentTheme;
-            this.accentComboBox.Items.AddRange(AMLPalette.PresetMap.Keys.ToArray());
+            themeComboBox.DataSource = Enum.GetValues(typeof(ModLoaderTheme));
+            themeComboBox.SelectedIndex = (int)AMLPalette.CurrentTheme;
+            accentComboBox.Items.AddRange(AMLPalette.PresetMap.Keys.ToArray());
             AMLPalette.RefreshTheme(this);
+
+            gamePathBox.SelectionStart = 0;
+            accentComboBox.SelectionLength = 0;
             _readyToUpdateTheme = true;
         }
 
@@ -101,7 +104,7 @@ namespace AstroModLoader
         private void themeBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (!_readyToUpdateTheme) return;
-            Enum.TryParse(themeBox.SelectedValue.ToString(), out ModLoaderTheme nextTheme);
+            Enum.TryParse(themeComboBox.SelectedValue.ToString(), out ModLoaderTheme nextTheme);
             AMLPalette.CurrentTheme = nextTheme;
             if (this.Owner is Form1 parentForm)
             {

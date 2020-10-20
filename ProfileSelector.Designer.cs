@@ -1,6 +1,6 @@
 ﻿namespace AstroModLoader
 {
-    partial class InitialPathPrompt
+    partial class ProfileSelector
     {
         /// <summary>
         /// Required designer variable.
@@ -28,38 +28,45 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.mainLabel = new System.Windows.Forms.Label();
-            this.gamePathBox = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.listBox1 = new System.Windows.Forms.ListBox();
             this.okButton = new AstroModLoader.CoolButton();
-            this.browseButton = new AstroModLoader.CoolButton();
             this.cancelButton = new AstroModLoader.CoolButton();
             this.SuspendLayout();
             // 
-            // mainLabel
+            // label1
             // 
-            this.mainLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.mainLabel.Location = new System.Drawing.Point(12, 13);
-            this.mainLabel.Name = "mainLabel";
-            this.mainLabel.Size = new System.Drawing.Size(361, 20);
-            this.mainLabel.TabIndex = 4;
-            this.mainLabel.Text = "Select your game installation directory:";
-            this.mainLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.label1.Location = new System.Drawing.Point(1, 9);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(341, 23);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Profiles:";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // gamePathBox
+            // listBox1
             // 
-            this.gamePathBox.Location = new System.Drawing.Point(12, 47);
-            this.gamePathBox.Name = "gamePathBox";
-            this.gamePathBox.Size = new System.Drawing.Size(284, 20);
-            this.gamePathBox.TabIndex = 0;
+            this.listBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.listBox1.FormattingEnabled = true;
+            this.listBox1.ItemHeight = 16;
+            this.listBox1.Location = new System.Drawing.Point(12, 35);
+            this.listBox1.Name = "listBox1";
+            this.listBox1.Size = new System.Drawing.Size(319, 260);
+            this.listBox1.TabIndex = 1;
+            this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
             // okButton
             // 
+            this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.okButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
-            this.okButton.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.okButton.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(231)))), ((int)(((byte)(149)))));
             this.okButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.okButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.okButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.okButton.Location = new System.Drawing.Point(12, 79);
+            this.okButton.Location = new System.Drawing.Point(12, 322);
             this.okButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(49, 26);
@@ -68,30 +75,15 @@
             this.okButton.UseVisualStyleBackColor = false;
             this.okButton.Click += new System.EventHandler(this.okButton_Click);
             // 
-            // browseButton
-            // 
-            this.browseButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
-            this.browseButton.FlatAppearance.BorderColor = System.Drawing.Color.Black;
-            this.browseButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.browseButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.browseButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.browseButton.Location = new System.Drawing.Point(302, 44);
-            this.browseButton.MinimumSize = new System.Drawing.Size(0, 26);
-            this.browseButton.Name = "browseButton";
-            this.browseButton.Size = new System.Drawing.Size(75, 26);
-            this.browseButton.TabIndex = 1;
-            this.browseButton.Text = "Browse";
-            this.browseButton.UseVisualStyleBackColor = false;
-            this.browseButton.Click += new System.EventHandler(this.browseButton_Click);
-            // 
             // cancelButton
             // 
+            this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cancelButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
-            this.cancelButton.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.cancelButton.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(231)))), ((int)(((byte)(149)))));
             this.cancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cancelButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cancelButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.cancelButton.Location = new System.Drawing.Point(67, 79);
+            this.cancelButton.Location = new System.Drawing.Point(67, 322);
             this.cancelButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(67, 26);
@@ -100,32 +92,31 @@
             this.cancelButton.UseVisualStyleBackColor = false;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
             // 
-            // InitialPathPrompt
+            // ProfileSelector
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(42)))), ((int)(((byte)(45)))));
-            this.ClientSize = new System.Drawing.Size(385, 114);
-            this.Controls.Add(this.browseButton);
+            this.ClientSize = new System.Drawing.Size(343, 360);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.okButton);
-            this.Controls.Add(this.gamePathBox);
-            this.Controls.Add(this.mainLabel);
+            this.Controls.Add(this.listBox1);
+            this.Controls.Add(this.label1);
             this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.Name = "InitialPathPrompt";
-            this.Text = "InitialPathPrompt";
-            this.Load += new System.EventHandler(this.InitialPathPrompt_Load);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+            this.Name = "ProfileSelector";
+            this.Text = "ProfileSelector";
+            this.Load += new System.EventHandler(this.ProfileSelector_Load);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Label mainLabel;
-        private System.Windows.Forms.TextBox gamePathBox;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ListBox listBox1;
         private CoolButton okButton;
-        private CoolButton browseButton;
         private CoolButton cancelButton;
     }
 }

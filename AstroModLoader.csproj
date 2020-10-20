@@ -83,16 +83,22 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="InitialPathPrompt.cs">
+    <Compile Include="TextPrompt.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="InitialPathPrompt.Designer.cs">
-      <DependentUpon>InitialPathPrompt.cs</DependentUpon>
+    <Compile Include="TextPrompt.Designer.cs">
+      <DependentUpon>TextPrompt.cs</DependentUpon>
     </Compile>
     <Compile Include="Mod.cs" />
     <Compile Include="ModConfig.cs" />
     <Compile Include="ModHandler.cs" />
     <Compile Include="ModProfile.cs" />
+    <Compile Include="ProfileSelector.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProfileSelector.Designer.cs">
+      <DependentUpon>ProfileSelector.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SettingsForm.cs">
@@ -105,8 +111,11 @@
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="InitialPathPrompt.resx">
-      <DependentUpon>InitialPathPrompt.cs</DependentUpon>
+    <EmbeddedResource Include="TextPrompt.resx">
+      <DependentUpon>TextPrompt.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProfileSelector.resx">
+      <DependentUpon>ProfileSelector.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
