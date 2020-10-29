@@ -206,7 +206,7 @@ namespace AstroModLoader
                 else
                 {
                     Mod newMod = new Mod(ExtractMetadataFromPath(modPath), modNameOnDisk);
-                    if (newMod.Priority != "999")
+                    if (newMod.Priority < 999)
                     {
                         File.Copy(modPath, Path.Combine(DownloadPath, modNameOnDisk));
                         newMod.Enabled = true;
@@ -234,7 +234,7 @@ namespace AstroModLoader
                         string copyingPath = null;
                         foreach (string modPath in allMods)
                         {
-                            Mod testMod = new Mod(null, modPath);
+                            Mod testMod = new Mod(null, Path.GetFileName(modPath));
                             if (testMod.ModData.ModID == mod.ModData.ModID && testMod.InstalledVersion == mod.InstalledVersion)
                             {
                                 copyingPath = modPath;

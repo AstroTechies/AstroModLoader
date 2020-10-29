@@ -47,7 +47,7 @@ namespace AstroModLoader
         public string Author { get { return ModData.Author; } }
 
         [JsonIgnore]
-        public string Priority = "000";
+        public int Priority = 0;
 
         [JsonIgnore]
         public Metadata ModData;
@@ -71,20 +71,21 @@ namespace AstroModLoader
 
         public string ConstructName()
         {
-            return Priority + "-" + ModData.ModID + "-" + ModData.ModVersion + "_P.pak";
+            return AMLUtils.GeneratePriorityFromPositionInList(Priority) + "-" + ModData.ModID + "-" + ModData.ModVersion + "_P.pak";
         }
 
         private void PerformNameAnalysis()
         {
             if (string.IsNullOrEmpty(NameOnDisk)) return;
+            Debug.WriteLine(NameOnDisk);
             string[] nameData = NameOnDisk.Split('_')[0].Split('-');
             if (nameData.Length >= 1)
             {
-                Priority = nameData[0];
+                Priority = int.Parse(nameData[0]);
             }
             else
             {
-                Priority = "000";
+                Priority = 0;
             }
 
             if (string.IsNullOrEmpty(ModData.ModID))
