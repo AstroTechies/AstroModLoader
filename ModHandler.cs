@@ -23,9 +23,10 @@ namespace AstroModLoader
         internal string GamePath;
         public string BinaryFilePath;
         internal Dictionary<string, Mod> ModLookup;
-        public BindingList<Mod> Mods;
+        public List<Mod> Mods;
         public Dictionary<string, ModProfile> ProfileList;
-        private Form1 BaseForm;
+        public Form1 BaseForm;
+        public bool IsReadOnly = false;
 
         public ModHandler(Form1 baseForm)
         {
@@ -77,6 +78,9 @@ namespace AstroModLoader
                 mod.Dirty = true;
             }
             FullUpdate();
+            SortMods();
+            RefreshAllPriorites();
+            SyncConfigToDisk();
         }
 
         private static Regex acfEntryReader = new Regex(@"\s+""(\w+)""\s+""(\w+)""", RegexOptions.Compiled);
@@ -113,7 +117,7 @@ namespace AstroModLoader
                 }
             }
 
-            if (astroInstallDir != null)
+            if (!string.IsNullOrEmpty(astroInstallDir))
             {
                 string decidedAnswer = Path.Combine(decidedSteamPath, "steamapps", "common", astroInstallDir);
                 if (!Directory.Exists(decidedAnswer)) return null;
@@ -166,7 +170,7 @@ namespace AstroModLoader
 
         public void SyncModsFromDisk()
         {
-            Mods = new BindingList<Mod>();
+            Mods = new List<Mod>();
 
             string[] allMods = Directory.GetFiles(DownloadPath, "*.pak", SearchOption.TopDirectoryOnly);
             ModLookup = new Dictionary<string, Mod>();
@@ -202,6 +206,7 @@ namespace AstroModLoader
                     ModLookup[m.ModData.ModID].Enabled = true;
                     ModLookup[m.ModData.ModID].NameOnDisk = modNameOnDisk;
                     ModLookup[m.ModData.ModID].InstalledVersion = m.InstalledVersion;
+                    ModLookup[m.ModData.ModID].Priority = m.Priority;
                 }
                 else
                 {
@@ -215,21 +220,26 @@ namespace AstroModLoader
                     }
                 }
             }
-            Mods = new BindingList<Mod>(Mods.OrderBy(o => o.NameOnDisk).ToList());
-            Mods.AllowEdit = true;
+
+            SortMods();
+        }
+
+        public void SortMods()
+        {
+            Mods = new List<Mod>(Mods.OrderBy(o => o.NameOnDisk).ToList());
         }
 
         public void SyncModsToDisk()
         {
+            if (IsReadOnly) return;
             foreach (Mod mod in Mods)
             {
                 if (mod.Dirty)
                 {
                     string destinedName = mod.ConstructName();
+                    File.Delete(Path.Combine(InstallPath, mod.NameOnDisk));
                     if (mod.Enabled)
                     {
-                        File.Delete(Path.Combine(InstallPath, mod.NameOnDisk));
-
                         string[] allMods = Directory.GetFiles(DownloadPath, "*.pak", SearchOption.TopDirectoryOnly);
                         string copyingPath = null;
                         foreach (string modPath in allMods)
@@ -247,10 +257,6 @@ namespace AstroModLoader
                             File.Copy(copyingPath, Path.Combine(InstallPath, destinedName));
                             mod.NameOnDisk = destinedName;
                         }
-                    }
-                    else
-                    {
-                        File.Delete(Path.Combine(InstallPath, mod.NameOnDisk));
                     }
                     mod.Dirty = false;
                 }
@@ -295,6 +301,7 @@ namespace AstroModLoader
                 {
                     ModLookup[entry.Key].Enabled = entry.Value.Enabled;
                     if (entry.Value.InstalledVersion != null) ModLookup[entry.Key].InstalledVersion = entry.Value.InstalledVersion;
+                    ModLookup[entry.Key].Priority = entry.Value.Priority;
                 }
             }
         }
@@ -308,6 +315,7 @@ namespace AstroModLoader
                 modClone.AvailableVersions = mod.AvailableVersions;
                 modClone.InstalledVersion = mod.InstalledVersion;
                 modClone.Enabled = mod.Enabled;
+                modClone.Priority = mod.Priority;
                 res.ProfileData.Add(mod.ModData.ModID, modClone);
             }
             return res;
@@ -327,15 +335,54 @@ namespace AstroModLoader
 
         public void IntegrateMods()
         {
+            if (IsReadOnly) return;
             if (GamePath == null || InstallPath == null) return;
             ModIntegrator.IntegrateMods(InstallPath, Path.Combine(GamePath, "Astro", "Content", "Paks"));
         }
 
+        public void RefreshAllPriorites()
+        {
+            for (int i = 0; i < Mods.Count; i++) Mods[i].Priority = i;
+        }
+
+        public bool GetReadOnly()
+        {
+            try
+            {
+                string targetPath = Path.Combine(InstallPath, "999-AstroModIntegrator_P.pak");
+                if (!File.Exists(targetPath)) return false;
+                using (FileStream f = new FileStream(targetPath, FileMode.Open, FileAccess.Write, FileShare.None)) { }
+            }
+            catch (IOException)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public void UpdateReadOnlyStatus()
+        {
+            bool nextReadOnlyState = GetReadOnly();
+            if (nextReadOnlyState != IsReadOnly)
+            {
+                IsReadOnly = nextReadOnlyState;
+                BaseForm.FullRefresh();
+            }
+        }
+
         public void FullUpdate()
         {
-            SyncConfigToDisk();
-            SyncModsToDisk();
-            IntegrateMods();
+            UpdateReadOnlyStatus();
+            try
+            {
+                SyncConfigToDisk();
+                SyncModsToDisk();
+                IntegrateMods();
+            }
+            catch (IOException)
+            {
+                IsReadOnly = true;
+            }
         }
     }
 }

@@ -2,7 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
+using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -35,8 +35,6 @@ namespace AstroModLoader
             ModManager = new ModHandler(this);
             TableManager = new TableHandler(dataGridView1, ModManager);
 
-            //SizeChanged += frm_sizeChanged;
-            //dataGridView1.DataError += DataGridView1_DataError;
             dataGridView1.CellValueChanged += DataGridView1_CellValueChanged;
             dataGridView1.CellContentClick += DataGridView1_CellContentClick;
             dataGridView1.DataBindingComplete += DataGridView1_DataBindingComplete;
@@ -44,12 +42,48 @@ namespace AstroModLoader
             dataGridView1.SelectionChanged += new EventHandler(DataGridView1_SelectionChanged);
             footer.Paint += Footer_Paint;
             AMLPalette.RefreshTheme(this);
+
+            AllowDrop = true;
+            DragEnter += new DragEventHandler(Form1_DragEnter);
+            DragDrop += new DragEventHandler(Form1_DragDrop);
+            dataGridView1.DragEnter += new DragEventHandler(Form1_DragEnter);
+            dataGridView1.DragDrop += new DragEventHandler(Form1_DragDrop);
+
+            PeriodicCheckTimer.Enabled = true;
+        }
+
+        public void AdjustModInfoText(string txt)
+        {
+            this.modInfo.Text = txt;
+        }
+
+        private void Form1_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
+        }
+
+        private void Form1_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] installingModPaths = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (installingModPaths.Length > 0)
+            {
+                foreach (string newInstallingMod in installingModPaths)
+                {
+                    try
+                    {
+                        File.Copy(newInstallingMod, Path.Combine(ModManager.DownloadPath, Path.GetFileName(newInstallingMod)));
+                        File.Copy(newInstallingMod, Path.Combine(ModManager.InstallPath, Path.GetFileName(newInstallingMod)));
+                    }
+                    catch (IOException) { }
+                }
+                FullRefresh();
+                ModManager.FullUpdate();
+            }
         }
 
         private void DataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex == -1)
-                return;
+            if (e.RowIndex == -1) return;
 
             Type t = dataGridView1.GetType();
             FieldInfo viewSetter = t.GetField("latestEditingControl", BindingFlags.Default | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -71,6 +105,7 @@ namespace AstroModLoader
 
         private void DataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
+            if (ModManager.IsReadOnly) return;
             foreach (DataGridViewRow row in this.dataGridView1.Rows)
             {
                 if (row.Tag is Mod taggedMod)
@@ -99,6 +134,7 @@ namespace AstroModLoader
             }
 
             ForceResize();
+            ModManager.RefreshAllPriorites();
         }
 
         private void DataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -107,18 +143,58 @@ namespace AstroModLoader
             dataGridView1.CommitEdit(DataGridViewDataErrorContexts.Commit);
         }
 
+        private Mod previouslySelectedMod;
+        private bool canAdjustOrder = true;
         private void DataGridView1_SelectionChanged(object sender, EventArgs e)
         {
             Mod selectedMod = TableManager.GetCurrentlySelectedMod();
+
+            if (dataGridView1.SelectedRows.Count == 1)
+            {
+                DataGridViewRow selectedRow = dataGridView1.SelectedRows[0];
+
+                // If shift is held, that means we are changing the order
+                if (canAdjustOrder && ModifierKeys == Keys.Shift && selectedMod != null && previouslySelectedMod != null && previouslySelectedMod != selectedMod)
+                {
+                    // First we remove the old position of the mod we're changing
+                    for (int i = 0; i < ModManager.Mods.Count; i++)
+                    {
+                        if (Object.ReferenceEquals(ModManager.Mods[i], previouslySelectedMod))
+                        {
+                            ModManager.Mods.RemoveAt(i);
+                            break;
+                        }
+                    }
+
+                    int newModIndex = selectedRow.Index;
+                    ModManager.Mods.Insert(newModIndex, previouslySelectedMod); // Insert at the new location
+                    ModManager.RefreshAllPriorites(); // Refresh priority list
+                    foreach (Mod mod in ModManager.Mods) mod.Dirty = true; // Update all the priorities on disk to be safe
+                    ModManager.FullUpdate();
+
+                    previouslySelectedMod = null;
+                    canAdjustOrder = false;
+                    TableManager.Refresh();
+                    canAdjustOrder = true;
+
+                    dataGridView1.ClearSelection();
+                    dataGridView1.Rows[newModIndex].Selected = true;
+                    dataGridView1.CurrentCell = dataGridView1.Rows[newModIndex].Cells[0];
+                    selectedMod = ModManager.Mods[newModIndex];
+                }
+            }
+
+            previouslySelectedMod = selectedMod;
+
             if (selectedMod == null)
             {
-                this.modInfo.Text = "";
+                AdjustModInfoText("");
                 return;
             }
             string kosherDescription = string.IsNullOrEmpty(selectedMod.ModData.Description) ? "N/A" : selectedMod.ModData.Description;
             if (kosherDescription.Length > 80) kosherDescription = kosherDescription.Substring(0, 80) + "...";
             string kosherSync = "N/A";
-            switch(selectedMod.ModData.Sync)
+            switch (selectedMod.ModData.Sync)
             {
                 case SyncMode.ClientOnly:
                     kosherSync = "Client only";
@@ -131,26 +207,35 @@ namespace AstroModLoader
                     break;
             }
 
-            this.modInfo.Text = "Name: " + selectedMod.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync;
+            AdjustModInfoText("Name: " + selectedMod.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync);
         }
 
         public void ForceResize()
         {
-            //dataGridView1.AutoResizeColumns();
             footer.Width = this.Width;
         }
 
-        private void frm_sizeChanged(object sender, EventArgs e)
+        public void FullRefresh()
+        {
+            if (ModManager != null)
+            {
+                ModManager.SyncModsFromDisk();
+                ModManager.SyncConfigFromDisk();
+                ModManager.UpdateReadOnlyStatus();
+                ModManager.RefreshAllPriorites();
+            }
+            if (TableManager != null) TableManager.Refresh();
+            AMLPalette.RefreshTheme(this);
+        }
+
+        private void Form1_SizeChanged(object sender, EventArgs e)
         {
             ForceResize();
         }
 
         private void refresh_Click(object sender, EventArgs e)
         {
-            ModManager.SyncModsFromDisk();
-            ModManager.SyncConfigFromDisk();
-            TableManager.Refresh();
-            AMLPalette.RefreshTheme(this);
+            FullRefresh();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -213,6 +298,11 @@ namespace AstroModLoader
                 ModManager.FullUpdate();
                 TableManager.Refresh();
             }
+        }
+
+        private void PeriodicCheckTimer_Tick(object sender, EventArgs e)
+        {
+            ModManager.UpdateReadOnlyStatus();
         }
     }
 }

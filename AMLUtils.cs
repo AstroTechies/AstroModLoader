@@ -59,7 +59,7 @@ namespace AstroModLoader
 
         public static string GeneratePriorityFromPositionInList(int pos)
         {
-            return pos.ToString().PadLeft(3).Replace(' ', '0');
+            return pos.ToString().PadLeft(3, '0');
         }
     }
 }

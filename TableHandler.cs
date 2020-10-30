@@ -97,6 +97,12 @@ namespace AstroModLoader
             switch (CurrentView)
             {
                 case ModLoaderView.Mods:
+                    if (ModManager.Mods.Count == 0)
+                    {
+                        ModManager.BaseForm.AdjustModInfoText("You have no mods installed! Drop a .pak file onto this window to install a mod.");
+                        break;
+                    }
+
                     AddColumns(new List<Tuple<string, ColumnType>>
                     {
                         Tuple.Create("", ColumnType.CheckBox),
@@ -114,6 +120,20 @@ namespace AstroModLoader
                         row.Cells[0].Value = mod.Enabled;
                         row.Cells[1].Value = mod.Name;
 
+                        if (row.Cells[0] is DataGridViewCheckBoxCell checkCell)
+                        {
+                            if (ModManager.IsReadOnly)
+                            {
+                                checkCell.ReadOnly = true;
+                                checkCell.ThreeState = true;
+                                checkCell.Value = 2;
+                            }
+                            else
+                            {
+                                checkCell.ThreeState = false;
+                            }
+                        }
+
                         if (row.Cells[2] is DataGridViewComboBoxCell cbCell)
                         {
                             cbCell.DataSource = mod.AvailableVersions.Select(v => v.ToString()).ToList();
@@ -121,6 +141,7 @@ namespace AstroModLoader
                             cbCell.FlatStyle = FlatStyle.Flat;
                             cbCell.Style.BackColor = AMLPalette.DropDownBackgroundColor;
                             cbCell.Style.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Regular, GraphicsUnit.Point, (byte)0);
+                            cbCell.ReadOnly = ModManager.IsReadOnly;
                         }
 
                         row.Cells[3].Value = mod.Author;

@@ -46,7 +46,7 @@ namespace AstroModLoader
         [JsonIgnore]
         public string Author { get { return ModData.Author; } }
 
-        [JsonIgnore]
+        [JsonProperty("priority")]
         public int Priority = 0;
 
         [JsonIgnore]
@@ -77,7 +77,6 @@ namespace AstroModLoader
         private void PerformNameAnalysis()
         {
             if (string.IsNullOrEmpty(NameOnDisk)) return;
-            Debug.WriteLine(NameOnDisk);
             string[] nameData = NameOnDisk.Split('_')[0].Split('-');
             if (nameData.Length >= 1)
             {
@@ -98,7 +97,7 @@ namespace AstroModLoader
                 {
                     ModData.ModID = "UnknownMod" + new Random().Next(10000);
                 }
-                ModData.Name = ModData.ModID;
+                if (string.IsNullOrEmpty(ModData.Name)) ModData.Name = ModData.ModID;
             }
 
             if (ModData.ModVersion == null)
