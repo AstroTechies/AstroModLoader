@@ -1,12 +1,8 @@
 ﻿using AstroModIntegrator;
 using Microsoft.Win32;
-using Microsoft.WindowsAPICodePack.Dialogs;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -226,7 +222,7 @@ namespace AstroModLoader
 
         public void SortMods()
         {
-            Mods = new List<Mod>(Mods.OrderBy(o => o.NameOnDisk).ToList());
+            Mods = new List<Mod>(Mods.OrderBy(o => o.Priority).ToList());
         }
 
         public void SyncModsToDisk()
@@ -277,6 +273,7 @@ namespace AstroModLoader
             if (diskConfig == null) return;
             ApplyProfile(diskConfig.ModsOnDisk);
             ProfileList = diskConfig.Profiles;
+            if (ProfileList == null) ProfileList = new Dictionary<string, ModProfile>();
 
             if (!string.IsNullOrEmpty(diskConfig.AccentColor))
             {
@@ -342,7 +339,25 @@ namespace AstroModLoader
 
         public void RefreshAllPriorites()
         {
-            for (int i = 0; i < Mods.Count; i++) Mods[i].Priority = i;
+            for (int i = 0; i < Mods.Count; i++) Mods[i].Priority = i + 1; // The mod loader should never save a mod's priority as 0 to disk, so that external applications can use 0 to force a mod to always load first
+        }
+
+        public void SwapMod(Mod previouslySelectedMod, int newModIndex)
+        {
+            // First we remove the old position of the mod we're changing
+            for (int i = 0; i < Mods.Count; i++)
+            {
+                if (Object.ReferenceEquals(Mods[i], previouslySelectedMod))
+                {
+                    Mods.RemoveAt(i);
+                    break;
+                }
+            }
+
+            Mods.Insert(newModIndex, previouslySelectedMod); // Insert at the new location
+            RefreshAllPriorites(); // Refresh priority list
+            foreach (Mod mod in Mods) mod.Dirty = true; // Update all the priorities on disk to be safe
+            FullUpdate();
         }
 
         public bool GetReadOnly()

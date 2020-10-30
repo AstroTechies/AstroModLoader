@@ -156,21 +156,8 @@ namespace AstroModLoader
                 // If shift is held, that means we are changing the order
                 if (canAdjustOrder && ModifierKeys == Keys.Shift && selectedMod != null && previouslySelectedMod != null && previouslySelectedMod != selectedMod)
                 {
-                    // First we remove the old position of the mod we're changing
-                    for (int i = 0; i < ModManager.Mods.Count; i++)
-                    {
-                        if (Object.ReferenceEquals(ModManager.Mods[i], previouslySelectedMod))
-                        {
-                            ModManager.Mods.RemoveAt(i);
-                            break;
-                        }
-                    }
-
                     int newModIndex = selectedRow.Index;
-                    ModManager.Mods.Insert(newModIndex, previouslySelectedMod); // Insert at the new location
-                    ModManager.RefreshAllPriorites(); // Refresh priority list
-                    foreach (Mod mod in ModManager.Mods) mod.Dirty = true; // Update all the priorities on disk to be safe
-                    ModManager.FullUpdate();
+                    ModManager.SwapMod(previouslySelectedMod, newModIndex);
 
                     previouslySelectedMod = null;
                     canAdjustOrder = false;
@@ -222,7 +209,7 @@ namespace AstroModLoader
                 ModManager.SyncModsFromDisk();
                 ModManager.SyncConfigFromDisk();
                 ModManager.UpdateReadOnlyStatus();
-                ModManager.RefreshAllPriorites();
+                ModManager.SortMods();
             }
             if (TableManager != null) TableManager.Refresh();
             AMLPalette.RefreshTheme(this);
@@ -262,31 +249,6 @@ namespace AstroModLoader
             this.Close();
         }
 
-        private void saveButton_Click(object sender, EventArgs e)
-        {
-            TextPrompt profileNamePrompt = new TextPrompt();
-            profileNamePrompt.StartPosition = FormStartPosition.Manual;
-            profileNamePrompt.Location = new Point((this.Location.X + this.Width / 2) - (profileNamePrompt.Width / 2), (this.Location.Y + this.Height / 2) - (profileNamePrompt.Height / 2));
-            profileNamePrompt.AllowBrowse = false;
-            profileNamePrompt.Width -= 100;
-            profileNamePrompt.DisplayText = "Name this profile:";
-            if (profileNamePrompt.ShowDialog(this) == DialogResult.OK)
-            {
-                if (ModManager.ProfileList.ContainsKey(profileNamePrompt.OutputText))
-                {
-                    DialogResult dialogResult = MessageBox.Show("A profile with this name already exists! Do you want to overwrite it?", "Uh oh!", MessageBoxButtons.YesNo);
-                    if (dialogResult == DialogResult.Yes)
-                    {
-                        ModManager.ProfileList[profileNamePrompt.OutputText] = ModManager.GenerateProfile();
-                        ModManager.SyncConfigToDisk();
-                    }
-                    return;
-                }
-                ModManager.ProfileList.Add(profileNamePrompt.OutputText, ModManager.GenerateProfile());
-                ModManager.SyncConfigToDisk();
-            }
-        }
-
         private void loadButton_Click(object sender, EventArgs e)
         {
             ProfileSelector selectorForm = new ProfileSelector();
@@ -296,7 +258,7 @@ namespace AstroModLoader
             {
                 ModManager.ApplyProfile(selectorForm.SelectedProfile);
                 ModManager.FullUpdate();
-                TableManager.Refresh();
+                FullRefresh();
             }
         }
 

@@ -77,10 +77,13 @@ namespace AstroModLoader
         private void PerformNameAnalysis()
         {
             if (string.IsNullOrEmpty(NameOnDisk)) return;
-            string[] nameData = NameOnDisk.Split('_')[0].Split('-');
-            if (nameData.Length >= 1)
+            List<string> nameData = NameOnDisk.Split('_')[0].Split('-').ToList();
+            int origCount = nameData.Count;
+
+            if (origCount >= 1)
             {
                 Priority = int.Parse(nameData[0]);
+                nameData.RemoveAt(0);
             }
             else
             {
@@ -89,26 +92,22 @@ namespace AstroModLoader
 
             if (string.IsNullOrEmpty(ModData.ModID))
             {
-                if (nameData.Length >= 2 && !string.IsNullOrEmpty(nameData[1]))
+                ModData.ModID = "UnknownMod" + new Random().Next(10000);
+                if (origCount >= 2)
                 {
-                    ModData.ModID = nameData[1];
-                }
-                else
-                {
-                    ModData.ModID = "UnknownMod" + new Random().Next(10000);
+                    if (!string.IsNullOrEmpty(nameData[0])) ModData.ModID = nameData[0];
+                    nameData.RemoveAt(0);
                 }
                 if (string.IsNullOrEmpty(ModData.Name)) ModData.Name = ModData.ModID;
             }
 
             if (ModData.ModVersion == null)
             {
-                if (nameData.Length >= 3 && !string.IsNullOrEmpty(nameData[2]))
+                ModData.ModVersion = new Version(0, 1, 0);
+                if (origCount >= 3)
                 {
-                    ModData.ModVersion = new Version(nameData[2]);
-                }
-                else
-                {
-                    ModData.ModVersion = new Version(0, 1, 0);
+                    if (!string.IsNullOrEmpty(nameData[0])) ModData.ModVersion = new Version(nameData[0]);
+                    nameData.RemoveAt(0);
                 }
             }
         }

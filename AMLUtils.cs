@@ -36,6 +36,25 @@ namespace AstroModLoader
             return "#" + color.R.ToString("X2") + color.G.ToString("X2") + color.B.ToString("X2");
         }
 
+        public static int ShowBasicButton(this Form frm, string labelText, string button1text = "Yes", string button2text = "No", string button3text = "Cancel")
+        {
+            BasicButtonPopup basicButtonPrompt = new BasicButtonPopup();
+            basicButtonPrompt.StartPosition = FormStartPosition.Manual;
+            basicButtonPrompt.Location = new Point((frm.Location.X + frm.Width / 2) - (basicButtonPrompt.Width / 2), (frm.Location.Y + frm.Height / 2) - (basicButtonPrompt.Height / 2));
+            basicButtonPrompt.Text = frm.Text;
+
+            basicButtonPrompt.DisplayText = labelText;
+            basicButtonPrompt.button1.Text = button1text;
+            if (string.IsNullOrEmpty(button1text)) basicButtonPrompt.button1.Hide();
+            basicButtonPrompt.button2.Text = button2text;
+            if (string.IsNullOrEmpty(button2text)) basicButtonPrompt.button2.Hide();
+            basicButtonPrompt.button3.Text = button3text;
+            if (string.IsNullOrEmpty(button3text)) basicButtonPrompt.button3.Hide();
+
+            basicButtonPrompt.ShowDialog();
+            return basicButtonPrompt.ResultButton;
+        }
+
         public static void RefreshAllButtonsInControl(this Control ctrl)
         {
             foreach(Control ctrl2 in ctrl.Controls)
