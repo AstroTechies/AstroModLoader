@@ -18,6 +18,12 @@ namespace AstroModLoader
         [JsonProperty("accent")]
         public string AccentColor;
 
+        [JsonProperty("playfab_id")]
+        public string PlayFabCustomID;
+
+        [JsonProperty("playfab_token")]
+        public string PlayFabToken;
+
         [JsonProperty("current")]
         public ModProfile ModsOnDisk;
 

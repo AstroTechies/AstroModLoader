@@ -17,6 +17,7 @@ namespace AstroModLoader
             var jsonSerializer = JsonSerializer.CreateDefault();
             using (JsonTextWriter jsonWriter = new JsonTextWriter(sw))
             {
+                //jsonWriter.Formatting = Formatting.None;
                 jsonWriter.Formatting = Formatting.Indented; jsonWriter.IndentChar = ' '; jsonWriter.Indentation = 4;
                 jsonSerializer.Serialize(jsonWriter, value, typeof(T));
             }

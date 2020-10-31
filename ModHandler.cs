@@ -286,6 +286,8 @@ namespace AstroModLoader
             AMLPalette.CurrentTheme = diskConfig.Theme;
             AMLPalette.RefreshTheme(BaseForm);
 
+            if (!string.IsNullOrEmpty(diskConfig.PlayFabCustomID)) PlayFabAPI.CustomID = diskConfig.PlayFabCustomID;
+            if (!string.IsNullOrEmpty(diskConfig.PlayFabToken)) PlayFabAPI.Token = diskConfig.PlayFabToken;
             if (!string.IsNullOrEmpty(diskConfig.GamePath)) GamePath = diskConfig.GamePath;
         }
 
@@ -324,6 +326,8 @@ namespace AstroModLoader
             newConfig.GamePath = GamePath;
             newConfig.Theme = AMLPalette.CurrentTheme;
             newConfig.AccentColor = AMLUtils.ColorToHTML(AMLPalette.AccentColor);
+            newConfig.PlayFabCustomID = PlayFabAPI.CustomID;
+            newConfig.PlayFabToken = PlayFabAPI.Token;
             newConfig.Profiles = ProfileList;
             newConfig.ModsOnDisk = GenerateProfile();
 

@@ -1,9 +1,11 @@
 ﻿using AstroModIntegrator;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace AstroModLoader
@@ -251,6 +253,12 @@ namespace AstroModLoader
 
         private void loadButton_Click(object sender, EventArgs e)
         {
+            if (ModManager.IsReadOnly)
+            {
+                AMLUtils.ShowBasicButton(this, "You cannot edit profiles while the game is open!", "OK", null, null);
+                return;
+            }
+
             ProfileSelector selectorForm = new ProfileSelector();
             selectorForm.StartPosition = FormStartPosition.Manual;
             selectorForm.Location = new Point((this.Location.X + this.Width / 2) - (selectorForm.Width / 2), (this.Location.Y + this.Height / 2) - (selectorForm.Height / 2));
@@ -265,6 +273,55 @@ namespace AstroModLoader
         private void PeriodicCheckTimer_Tick(object sender, EventArgs e)
         {
             ModManager.UpdateReadOnlyStatus();
+        }
+
+        private void syncButton_Click(object sender, EventArgs e)
+        {
+            if (ModManager.IsReadOnly)
+            {
+                AMLUtils.ShowBasicButton(this, "You cannot sync mods while the game is open!", "OK", null, null);
+                return;
+            }
+
+            TextPrompt getIPPrompt = new TextPrompt();
+            getIPPrompt.DisplayText = "Enter an IP to sync with:";
+            getIPPrompt.Width -= 100;
+            getIPPrompt.AllowBrowse = false;
+            getIPPrompt.StartPosition = FormStartPosition.Manual;
+            getIPPrompt.Location = new Point((this.Location.X + this.Width / 2) - (getIPPrompt.Width / 2), (this.Location.Y + this.Height / 2) - (getIPPrompt.Height / 2));
+
+            if (getIPPrompt.ShowDialog(this) == DialogResult.OK)
+            {
+                var thread = new Thread(() =>
+                {
+                    AstroLauncherServerInfo serverInfo = PlayFabAPI.GetAstroLauncherData(getIPPrompt.OutputText);
+                    if (serverInfo == null)
+                    {
+                        AMLUtils.ShowBasicButton(this, "Failed to find an online AstroLauncher server with the requested IP!", "OK", null, null);
+                        return;
+                    }
+
+                    if (PlayFabAPI.Dirty)
+                    {
+                        ModManager.SyncConfigToDisk();
+                        PlayFabAPI.Dirty = false;
+                    }
+
+                    List<Mod> allMods = serverInfo.GetAllMods();
+                    string kosherServerName = serverInfo.ServerName;
+                    if (string.IsNullOrEmpty(kosherServerName) || kosherServerName == "Astroneer Dedicated Server") kosherServerName = getIPPrompt.OutputText;
+
+                    Debug.WriteLine("\n" + kosherServerName + " has " + allMods.Count + " mods installed.");
+                    foreach (Mod mod in allMods)
+                    {
+                        Debug.WriteLine("---");
+                        Debug.WriteLine(mod.Name);
+                        Debug.WriteLine(mod.InstalledVersion);
+                        Debug.WriteLine(mod.NameOnDisk);
+                    }
+                });
+                thread.Start();
+            }
         }
     }
 }

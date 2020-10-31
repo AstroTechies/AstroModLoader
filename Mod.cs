@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace AstroModLoader
 {
@@ -110,6 +112,33 @@ namespace AstroModLoader
                     nameData.RemoveAt(0);
                 }
             }
+        }
+
+        // TODO: actually call this method somewhere
+        public void ScanForAutoUpdate()
+        {
+            DownloadInfo di = ModData.Download;
+            if (di == null) return;
+
+            switch (di.Type)
+            {
+                case DownloadMode.IndexFile:
+                    string rawIndexFileData = "";
+                    using (var wb = new WebClient())
+                    {
+                        wb.Headers[HttpRequestHeader.UserAgent] = "AstroModLoader " + Application.ProductVersion;
+                        rawIndexFileData = wb.DownloadString(di.URL);
+                    }
+                    if (string.IsNullOrEmpty(rawIndexFileData)) break;
+
+                    IndexFile indexFile = JsonConvert.DeserializeObject<IndexFile>(rawIndexFileData);
+                    if (indexFile == null) break;
+
+                    // TODO: actually parse index file data
+
+                    break;
+            }
+
         }
 
         public override bool Equals(object obj)
