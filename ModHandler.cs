@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,11 +18,13 @@ namespace AstroModLoader
         internal string DownloadPath;
         internal string InstallPath;
         internal string GamePath;
-        public string BinaryFilePath;
         internal Dictionary<string, Mod> ModLookup;
+        internal string BinaryFilePath;
+        internal Form1 BaseForm;
+
         public List<Mod> Mods;
         public Dictionary<string, ModProfile> ProfileList;
-        public Form1 BaseForm;
+        public Version InstalledAstroBuild = null;
         public bool IsReadOnly = false;
 
         public ModHandler(Form1 baseForm)
@@ -67,7 +70,7 @@ namespace AstroModLoader
                 
             }
 
-            DetermineBinaryFilePath();
+            ApplyGamePathDerivatives();
 
             foreach (Mod mod in Mods)
             {
@@ -123,13 +126,31 @@ namespace AstroModLoader
             return null;
         }
 
-        public void DetermineBinaryFilePath()
+        private static Regex AstroBuildRegex = new Regex(@"^(\d+\.\d+\.\d+\.\d) Shipping"); 
+        public void ApplyGamePathDerivatives()
         {
+            // BinaryFilePath
             if (GamePath != null)
             {
                 BinaryFilePath = null;
                 string[] allExes = Directory.GetFiles(Path.Combine(GamePath, "Astro", "Binaries"), "*.exe", SearchOption.AllDirectories);
                 if (allExes.Length > 0) BinaryFilePath = allExes[0];
+            }
+
+            // Get astroneer version
+            InstalledAstroBuild = null;
+            try
+            {
+                using (StreamReader f = new StreamReader(Path.Combine(GamePath, "build.version")))
+                {
+                    string fullBuildData = f.ReadToEnd();
+                    Match m = AstroBuildRegex.Match(fullBuildData);
+                    if (m.Groups.Count == 2) InstalledAstroBuild = new Version(m.Groups[1].Value);
+                }
+            }
+            catch (IOException)
+            {
+                InstalledAstroBuild = null;
             }
         }
 
@@ -173,14 +194,15 @@ namespace AstroModLoader
             foreach (string modPath in allMods)
             {
                 Mod newMod = new Mod(ExtractMetadataFromPath(modPath), Path.GetFileName(modPath));
-                if (ModLookup.ContainsKey(newMod.ModData.ModID))
+                if (ModLookup.ContainsKey(newMod.CurrentModData.ModID))
                 {
-                    ModLookup[newMod.ModData.ModID].AvailableVersions.Add(newMod.InstalledVersion);
+                    ModLookup[newMod.CurrentModData.ModID].AvailableVersions.Add(newMod.InstalledVersion);
+                    ModLookup[newMod.CurrentModData.ModID].AllModData.Add(newMod.InstalledVersion, newMod.CurrentModData);
                 }
                 else
                 {
                     Mods.Add(newMod);
-                    ModLookup.Add(newMod.ModData.ModID, newMod);
+                    ModLookup.Add(newMod.CurrentModData.ModID, newMod);
                 }
             }
 
@@ -197,12 +219,18 @@ namespace AstroModLoader
                 var modNameOnDisk = Path.GetFileName(modPath);
                 var m = new Mod(null, modNameOnDisk);
 
-                if (ModLookup.ContainsKey(m.ModData.ModID))
+                if (ModLookup.ContainsKey(m.CurrentModData.ModID))
                 {
-                    ModLookup[m.ModData.ModID].Enabled = true;
-                    ModLookup[m.ModData.ModID].NameOnDisk = modNameOnDisk;
-                    ModLookup[m.ModData.ModID].InstalledVersion = m.InstalledVersion;
-                    ModLookup[m.ModData.ModID].Priority = m.Priority;
+                    // TODO: copy if new version is in Paks folder but not Mods
+                    ModLookup[m.CurrentModData.ModID].Enabled = true;
+                    ModLookup[m.CurrentModData.ModID].NameOnDisk = modNameOnDisk;
+                    ModLookup[m.CurrentModData.ModID].InstalledVersion = m.InstalledVersion;
+                    ModLookup[m.CurrentModData.ModID].Priority = m.Priority;
+                    if (!ModLookup[m.CurrentModData.ModID].AvailableVersions.Contains(m.InstalledVersion))
+                    {
+                        ModLookup[m.CurrentModData.ModID].AvailableVersions.Add(m.InstalledVersion);
+                        ModLookup[m.CurrentModData.ModID].AllModData.Add(m.InstalledVersion, m.CurrentModData);
+                    }
                 }
                 else
                 {
@@ -212,7 +240,7 @@ namespace AstroModLoader
                         File.Copy(modPath, Path.Combine(DownloadPath, modNameOnDisk));
                         newMod.Enabled = true;
                         Mods.Add(newMod);
-                        ModLookup.Add(newMod.ModData.ModID, newMod);
+                        ModLookup.Add(newMod.CurrentModData.ModID, newMod);
                     }
                 }
             }
@@ -241,7 +269,7 @@ namespace AstroModLoader
                         foreach (string modPath in allMods)
                         {
                             Mod testMod = new Mod(null, Path.GetFileName(modPath));
-                            if (testMod.ModData.ModID == mod.ModData.ModID && testMod.InstalledVersion == mod.InstalledVersion)
+                            if (testMod.CurrentModData.ModID == mod.CurrentModData.ModID && testMod.InstalledVersion == mod.InstalledVersion)
                             {
                                 copyingPath = modPath;
                                 break;
@@ -315,7 +343,7 @@ namespace AstroModLoader
                 modClone.InstalledVersion = mod.InstalledVersion;
                 modClone.Enabled = mod.Enabled;
                 modClone.Priority = mod.Priority;
-                res.ProfileData.Add(mod.ModData.ModID, modClone);
+                res.ProfileData.Add(mod.CurrentModData.ModID, modClone);
             }
             return res;
         }
@@ -351,7 +379,7 @@ namespace AstroModLoader
             // First we remove the old position of the mod we're changing
             for (int i = 0; i < Mods.Count; i++)
             {
-                if (Object.ReferenceEquals(Mods[i], previouslySelectedMod))
+                if (object.ReferenceEquals(Mods[i], previouslySelectedMod))
                 {
                     Mods.RemoveAt(i);
                     break;

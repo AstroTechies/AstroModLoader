@@ -23,7 +23,7 @@ namespace AstroModLoader
             if (this.Owner is Form1 parentForm)
             {
                 parentForm.ModManager.GamePath = gamePathBox.Text;
-                parentForm.ModManager.DetermineBinaryFilePath();
+                parentForm.ModManager.ApplyGamePathDerivatives();
                 parentForm.ModManager.SyncConfigToDisk();
             }
         }

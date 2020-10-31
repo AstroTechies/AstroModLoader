@@ -1,2 +1,2 @@
 # AstroModLoader
-Astroneer mod loader rewritten in C#. Lorem ipsum dolor sit amet
+AstroModLoader is a community-made open-source mod manager for Astroneer mods. It includes support for mod profiles, customizable mod priority, and easily swapping between multiple mod versions so that you can worry less about configuration and more about playing.

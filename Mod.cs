@@ -34,90 +34,102 @@ namespace AstroModLoader
             }
         }
 
-        [JsonIgnore]
-        public string Name { get { return ModData.Name; } }
-
         [JsonConverter(typeof(VersionConverter))]
         [DisplayName("Version")]
         [JsonProperty("version")]
-        public Version InstalledVersion { get { return ModData.ModVersion; } set { ModData.ModVersion = value; } }
+        public Version InstalledVersion { get; set; }
 
         [JsonIgnore]
         public List<Version> AvailableVersions { get; set; }
-
-        [JsonIgnore]
-        public string Author { get { return ModData.Author; } }
 
         [JsonProperty("priority")]
         public int Priority = 0;
 
         [JsonIgnore]
-        public Metadata ModData;
+        public Dictionary<Version, Metadata> AllModData;
+
+        [JsonIgnore]
+        public Metadata CurrentModData {
+            get
+            {
+                return AllModData[InstalledVersion];
+            }
+        }
 
         [JsonIgnore]
         public string NameOnDisk;
 
         public Mod(Metadata modData, string nameOnDisk)
         {
-            ModData = modData;
-            if (ModData == null)
-            {
-                ModData = JsonConvert.DeserializeObject<Metadata>("{}");
-                ModData.Sync = SyncMode.ClientOnly;
-            }
+            if (modData == null && nameOnDisk == null) return;
+            if (AllModData == null) AllModData = new Dictionary<Version, Metadata>();
             NameOnDisk = nameOnDisk;
             PerformNameAnalysis();
+
+            Priority = newPriority;
+            InstalledVersion = newModVersion;
+
+            AllModData[InstalledVersion] = modData;
+            if (modData == null)
+            {
+                AllModData[InstalledVersion] = JsonConvert.DeserializeObject<Metadata>("{}");
+                AllModData[InstalledVersion].Sync = SyncMode.ClientOnly;
+            }
+
+            if (!string.IsNullOrEmpty(newModID) && string.IsNullOrEmpty(CurrentModData.ModID))
+            {
+                CurrentModData.ModID = newModID;
+            }
+            if (string.IsNullOrEmpty(CurrentModData.Name)) CurrentModData.Name = CurrentModData.ModID;
+
+            NameOnDisk = nameOnDisk;
             AvailableVersions = new List<Version>();
             if (InstalledVersion != null && !AvailableVersions.Contains(InstalledVersion)) AvailableVersions.Add(InstalledVersion);
         }
 
         public string ConstructName()
         {
-            return AMLUtils.GeneratePriorityFromPositionInList(Priority) + "-" + ModData.ModID + "-" + ModData.ModVersion + "_P.pak";
+            return AMLUtils.GeneratePriorityFromPositionInList(Priority) + "-" + CurrentModData.ModID + "-" + InstalledVersion + "_P.pak";
         }
 
+        private int newPriority;
+        private string newModID;
+        private Version newModVersion;
         private void PerformNameAnalysis()
         {
-            if (string.IsNullOrEmpty(NameOnDisk)) return;
+            if (NameOnDisk == null) NameOnDisk = "";
             List<string> nameData = NameOnDisk.Split('_')[0].Split('-').ToList();
             int origCount = nameData.Count;
 
             if (origCount >= 1)
             {
-                Priority = int.Parse(nameData[0]);
+                newPriority = int.Parse(nameData[0]);
                 nameData.RemoveAt(0);
             }
             else
             {
-                Priority = 0;
+                newPriority = 1;
             }
 
-            if (string.IsNullOrEmpty(ModData.ModID))
+            newModID = "UnknownMod" + new Random().Next(10000);
+            if (origCount >= 2)
             {
-                ModData.ModID = "UnknownMod" + new Random().Next(10000);
-                if (origCount >= 2)
-                {
-                    if (!string.IsNullOrEmpty(nameData[0])) ModData.ModID = nameData[0];
-                    nameData.RemoveAt(0);
-                }
-                if (string.IsNullOrEmpty(ModData.Name)) ModData.Name = ModData.ModID;
+                if (!string.IsNullOrEmpty(nameData[0])) newModID = nameData[0];
+                nameData.RemoveAt(0);
             }
 
-            if (ModData.ModVersion == null)
+            newModVersion = new Version(0, 1, 0);
+            if (origCount >= 3)
             {
-                ModData.ModVersion = new Version(0, 1, 0);
-                if (origCount >= 3)
-                {
-                    if (!string.IsNullOrEmpty(nameData[0])) ModData.ModVersion = new Version(nameData[0]);
-                    nameData.RemoveAt(0);
-                }
+                if (!string.IsNullOrEmpty(nameData[0])) newModVersion = new Version(nameData[0]);
+                nameData.RemoveAt(0);
             }
         }
 
         // TODO: actually call this method somewhere
         public void ScanForAutoUpdate()
         {
-            DownloadInfo di = ModData.Download;
+            DownloadInfo di = CurrentModData.Download;
             if (di == null) return;
 
             switch (di.Type)

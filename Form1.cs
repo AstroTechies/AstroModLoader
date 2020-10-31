@@ -120,6 +120,7 @@ namespace AstroModLoader
                 }
             }
             ModManager.FullUpdate();
+            TableManager.Refresh();
         }
 
         private void DataGridView1_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
@@ -180,10 +181,10 @@ namespace AstroModLoader
                 AdjustModInfoText("");
                 return;
             }
-            string kosherDescription = string.IsNullOrEmpty(selectedMod.ModData.Description) ? "N/A" : selectedMod.ModData.Description;
+            string kosherDescription = string.IsNullOrEmpty(selectedMod.CurrentModData.Description) ? "N/A" : selectedMod.CurrentModData.Description;
             if (kosherDescription.Length > 80) kosherDescription = kosherDescription.Substring(0, 80) + "...";
             string kosherSync = "N/A";
-            switch (selectedMod.ModData.Sync)
+            switch (selectedMod.CurrentModData.Sync)
             {
                 case SyncMode.ClientOnly:
                     kosherSync = "Client only";
@@ -196,7 +197,7 @@ namespace AstroModLoader
                     break;
             }
 
-            AdjustModInfoText("Name: " + selectedMod.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync);
+            AdjustModInfoText("Name: " + selectedMod.CurrentModData.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync);
         }
 
         public void ForceResize()
@@ -315,7 +316,7 @@ namespace AstroModLoader
                     foreach (Mod mod in allMods)
                     {
                         Debug.WriteLine("---");
-                        Debug.WriteLine(mod.Name);
+                        Debug.WriteLine(mod.CurrentModData.Name);
                         Debug.WriteLine(mod.InstalledVersion);
                         Debug.WriteLine(mod.NameOnDisk);
                     }

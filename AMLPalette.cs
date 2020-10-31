@@ -27,6 +27,7 @@ namespace AstroModLoader
         public static Color DropDownBackgroundColor = Color.FromArgb(55, 55, 55);
         public static Color HighlightColor = Color.FromArgb(85, 85, 85);
         public static Color AccentColor = Color.FromArgb(255, 231, 149);
+        public static Color WarningColor = Color.FromArgb(232, 119, 34);
         public static ModLoaderTheme CurrentTheme = ModLoaderTheme.Dark;
 
         public static readonly Dictionary<string, Color> PresetMap = new Dictionary<string, Color>
@@ -64,6 +65,7 @@ namespace AstroModLoader
                     break;
             }
 
+            frm.Icon = Properties.Resources.icon;
             frm.BackColor = AMLPalette.BackColor;
             frm.ForeColor = AMLPalette.ForeColor;
             if (frm is Form1 frm1)
