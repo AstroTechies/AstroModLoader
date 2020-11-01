@@ -1,9 +1,11 @@
 ﻿using AstroModIntegrator;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
@@ -52,8 +54,81 @@ namespace AstroModLoader
             dataGridView1.DragDrop += new DragEventHandler(Form1_DragDrop);
 
             PeriodicCheckTimer.Enabled = true;
+            ForceRefreshTimer.Enabled = false; // might remove this later
+
+            autoUpdater = new BackgroundWorker();
+            autoUpdater.DoWork += new DoWorkEventHandler(AutoUpdater_DoWork);
+            autoUpdater.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Simple_Refresh_RunWorkerCompleted);
+            autoUpdater.RunWorkerAsync();
         }
 
+        // Background workers
+        private BackgroundWorker autoUpdater;
+
+        private void AutoUpdater_DoWork(object sender, DoWorkEventArgs e)
+        {
+            ModManager.AggregateIndexFiles();
+        }
+
+        private void Simple_Refresh_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            TableManager.Refresh();
+        }
+
+        private BackgroundWorker versionSwitcher; // Version switcher's e.Argument should be Tuple<Mod, Version>
+
+        public void SwitchVersionSync(Mod thisMod, Version newVersion)
+        {
+            if (!thisMod.AllModData.ContainsKey(newVersion))
+            {
+                try
+                {
+                    if (!ModManager.GlobalIndexFile.ContainsKey(thisMod.CurrentModData.ModID)) throw new IndexFileException("Can't find index file entry for mod with invalid version");
+                    Dictionary<Version, IndexVersionData> allVerData = ModManager.GlobalIndexFile[thisMod.CurrentModData.ModID].AllVersions;
+                    if (!allVerData.ContainsKey(newVersion)) throw new IndexFileException("Failed to find the requested version in the mod's index file");
+
+                    using (var wb = new WebClient())
+                    {
+                        wb.Headers[HttpRequestHeader.UserAgent] = "AstroModLoader " + Application.ProductVersion;
+
+                        string kosherFileName = AMLUtils.SanitizeFilename(allVerData[newVersion].Filename);
+                        if (kosherFileName.Substring(kosherFileName.Length - 6, 6) != "_P.pak") kosherFileName += "_P.pak";
+                        wb.DownloadFile(allVerData[newVersion].URL, Path.Combine(ModManager.DownloadPath, kosherFileName));
+                        ModManager.SyncSingleModFromDisk(Path.Combine(ModManager.DownloadPath, kosherFileName));
+                    }
+                }
+                catch (WebException)
+                {
+                    throw;
+                }
+                thisMod.InstalledVersion = newVersion;
+                thisMod.Dirty = true;
+                ModManager.FullUpdate();
+                return;
+            }
+
+            thisMod.InstalledVersion = newVersion;
+            thisMod.Dirty = true;
+        }
+
+        private void VersionSwitcher_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Tuple<Mod, Version> us = (Tuple<Mod, Version>)e.Argument;
+            Mod thisMod = us.Item1;
+            Version newVersion = us.Item2;
+
+            SwitchVersionSync(thisMod, newVersion);
+        }
+
+        public void SwitchVersion(Mod mod, Version newVersion, bool refreshAfterwards = true)
+        {
+            versionSwitcher = new BackgroundWorker();
+            versionSwitcher.DoWork += new DoWorkEventHandler(VersionSwitcher_DoWork);
+            if (refreshAfterwards) versionSwitcher.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Simple_Refresh_RunWorkerCompleted);
+            versionSwitcher.RunWorkerAsync(Tuple.Create(mod, newVersion));
+        }
+
+        // The rest
         public void AdjustModInfoText(string txt)
         {
             this.modInfo.Text = txt;
@@ -115,12 +190,23 @@ namespace AstroModLoader
                     taggedMod.Enabled = (bool)row.Cells[0].Value;
                     if (row.Cells[2].Value is string strVal)
                     {
-                        taggedMod.InstalledVersion = new Version((string)row.Cells[2].Value);
+                        Version changingVer = null;
+                        if (strVal.Contains("Latest"))
+                        {
+                            taggedMod.ForceLatest = true;
+                            changingVer = taggedMod.AvailableVersions[0];
+                        }
+                        else
+                        {
+                            taggedMod.ForceLatest = false;
+                            changingVer = new Version(strVal);
+                        }
+
+                        SwitchVersion(taggedMod, changingVer);
                     }
                 }
             }
             ModManager.FullUpdate();
-            TableManager.Refresh();
         }
 
         private void DataGridView1_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
@@ -274,6 +360,11 @@ namespace AstroModLoader
         private void PeriodicCheckTimer_Tick(object sender, EventArgs e)
         {
             ModManager.UpdateReadOnlyStatus();
+        }
+
+        private void ForceRefreshTimer_Tick(object sender, EventArgs e)
+        {
+            TableManager.Refresh();
         }
 
         private void syncButton_Click(object sender, EventArgs e)

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -32,6 +33,15 @@ namespace AstroModLoader
                 _enabled = value;
                 Dirty = true;
             }
+        }
+
+        [JsonProperty("force_latest")]
+        [DefaultValue(false)]
+        public bool ForceLatest;
+
+        public bool ShouldSerializeForceLatest()
+        {
+            return ForceLatest;
         }
 
         [JsonConverter(typeof(VersionConverter))]
@@ -126,31 +136,36 @@ namespace AstroModLoader
             }
         }
 
-        // TODO: actually call this method somewhere
-        public void ScanForAutoUpdate()
+        public IndexFile GetIndexFile(List<string> duplicateURLs)
         {
             DownloadInfo di = CurrentModData.Download;
-            if (di == null) return;
+            if (di == null) return null;
 
-            switch (di.Type)
+            try
             {
-                case DownloadMode.IndexFile:
+                if (di.Type == DownloadMode.IndexFile && !string.IsNullOrEmpty(di.URL))
+                {
+                    if (duplicateURLs != null && duplicateURLs.Contains(di.URL)) return null;
                     string rawIndexFileData = "";
                     using (var wb = new WebClient())
                     {
                         wb.Headers[HttpRequestHeader.UserAgent] = "AstroModLoader " + Application.ProductVersion;
                         rawIndexFileData = wb.DownloadString(di.URL);
                     }
-                    if (string.IsNullOrEmpty(rawIndexFileData)) break;
+                    if (string.IsNullOrEmpty(rawIndexFileData)) return null;
 
                     IndexFile indexFile = JsonConvert.DeserializeObject<IndexFile>(rawIndexFileData);
-                    if (indexFile == null) break;
-
-                    // TODO: actually parse index file data
-
-                    break;
+                    indexFile.OriginalURL = di.URL;
+                    return indexFile;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex is WebException || ex is JsonException) return null;
+                throw;
             }
 
+            return null;
         }
 
         public override bool Equals(object obj)

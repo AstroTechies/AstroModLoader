@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace AstroModLoader
@@ -24,6 +25,7 @@ namespace AstroModLoader
 
         public List<Mod> Mods;
         public Dictionary<string, ModProfile> ProfileList;
+        public Dictionary<string, IndexMod> GlobalIndexFile;
         public Version InstalledAstroBuild = null;
         public bool IsReadOnly = false;
 
@@ -185,6 +187,71 @@ namespace AstroModLoader
             }
         }
 
+        public void AggregateIndexFiles()
+        {
+            GlobalIndexFile = null;
+            var NewGlobalIndexFile = new Dictionary<string, IndexMod>();
+            List<string> DuplicateURLs = new List<string>();
+            foreach (Mod mod in Mods)
+            {
+                IndexFile thisIndexFile = mod.GetIndexFile(DuplicateURLs);
+                if (thisIndexFile != null)
+                {
+                    thisIndexFile.Mods.ToList().ForEach(x => NewGlobalIndexFile[x.Key] = x.Value);
+                    DuplicateURLs.Add(thisIndexFile.OriginalURL);
+                }
+            }
+            GlobalIndexFile = NewGlobalIndexFile;
+
+            foreach (Mod mod in Mods)
+            {
+                Version latestVersion = null;
+                if (mod.AvailableVersions.Count > 0) latestVersion = mod.AvailableVersions[0];
+                if (GlobalIndexFile.ContainsKey(mod.CurrentModData.ModID))
+                {
+                    IndexMod indexMod = GlobalIndexFile[mod.CurrentModData.ModID];
+                    mod.AvailableVersions.AddRange(indexMod.AllVersions.Keys.Except(mod.AvailableVersions));
+                    mod.AvailableVersions.Sort();
+                    mod.AvailableVersions.Reverse();
+                    latestVersion = mod.AvailableVersions[0];
+                    //if (indexMod.LatestVersion != null) latestVersion = indexMod.LatestVersion;
+                }
+
+                if (mod.ForceLatest && latestVersion != null) BaseForm.SwitchVersionSync(mod, latestVersion);
+            }
+        }
+
+        public void SortVersions()
+        {
+            foreach (Mod mod in Mods)
+            {
+                mod.AvailableVersions.Sort();
+                mod.AvailableVersions.Reverse();
+                mod.InstalledVersion = mod.AvailableVersions[0];
+            }
+        }
+
+        public void SyncSingleModFromDisk(string modPath, bool updateSort = true)
+        {
+            Mod newMod = new Mod(ExtractMetadataFromPath(modPath), Path.GetFileName(modPath));
+            if (ModLookup.ContainsKey(newMod.CurrentModData.ModID))
+            {
+                ModLookup[newMod.CurrentModData.ModID].AvailableVersions.Add(newMod.InstalledVersion);
+                ModLookup[newMod.CurrentModData.ModID].AllModData.Add(newMod.InstalledVersion, newMod.CurrentModData);
+            }
+            else
+            {
+                Mods.Add(newMod);
+                ModLookup.Add(newMod.CurrentModData.ModID, newMod);
+            }
+
+            if (updateSort)
+            {
+                SortVersions();
+                SortMods();
+            }
+        }
+
         public void SyncModsFromDisk()
         {
             Mods = new List<Mod>();
@@ -193,25 +260,10 @@ namespace AstroModLoader
             ModLookup = new Dictionary<string, Mod>();
             foreach (string modPath in allMods)
             {
-                Mod newMod = new Mod(ExtractMetadataFromPath(modPath), Path.GetFileName(modPath));
-                if (ModLookup.ContainsKey(newMod.CurrentModData.ModID))
-                {
-                    ModLookup[newMod.CurrentModData.ModID].AvailableVersions.Add(newMod.InstalledVersion);
-                    ModLookup[newMod.CurrentModData.ModID].AllModData.Add(newMod.InstalledVersion, newMod.CurrentModData);
-                }
-                else
-                {
-                    Mods.Add(newMod);
-                    ModLookup.Add(newMod.CurrentModData.ModID, newMod);
-                }
+                SyncSingleModFromDisk(modPath, false);
             }
 
-            foreach (Mod mod in Mods)
-            {
-                mod.AvailableVersions.Sort();
-                mod.AvailableVersions.Reverse();
-                mod.InstalledVersion = mod.AvailableVersions[0];
-            }
+            SortVersions();
 
             string[] installedMods = Directory.GetFiles(InstallPath, "*.pak", SearchOption.TopDirectoryOnly);
             foreach (string modPath in installedMods)
@@ -329,6 +381,11 @@ namespace AstroModLoader
                     ModLookup[entry.Key].Enabled = entry.Value.Enabled;
                     if (entry.Value.InstalledVersion != null) ModLookup[entry.Key].InstalledVersion = entry.Value.InstalledVersion;
                     ModLookup[entry.Key].Priority = entry.Value.Priority;
+                    ModLookup[entry.Key].ForceLatest = entry.Value.ForceLatest;
+                    if (entry.Value.ForceLatest)
+                    {
+                        ModLookup[entry.Key].InstalledVersion = ModLookup[entry.Key].AvailableVersions[0];
+                    }
                 }
             }
         }
@@ -341,6 +398,7 @@ namespace AstroModLoader
                 var modClone = new Mod(null, mod.NameOnDisk);
                 modClone.AvailableVersions = mod.AvailableVersions;
                 modClone.InstalledVersion = mod.InstalledVersion;
+                modClone.ForceLatest = mod.ForceLatest;
                 modClone.Enabled = mod.Enabled;
                 modClone.Priority = mod.Priority;
                 res.ProfileData.Add(mod.CurrentModData.ModID, modClone);

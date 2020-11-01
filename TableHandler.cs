@@ -129,8 +129,20 @@ namespace AstroModLoader
 
                 if (row.Cells[2] is DataGridViewComboBoxCell cbCell)
                 {
-                    cbCell.DataSource = mod.AvailableVersions.Select(v => v.ToString()).ToList();
-                    cbCell.Value = mod.InstalledVersion.ToString();
+                    cbCell.Items.Add("Latest (" + mod.InstalledVersion + ")");
+                    foreach (Version ver in mod.AvailableVersions)
+                    {
+                        cbCell.Items.Add(ver.ToString());
+                    }
+
+                    if (mod.ForceLatest)
+                    {
+                        cbCell.Value = "Latest (" + mod.InstalledVersion + ")";
+                    }
+                    else
+                    {
+                        cbCell.Value = mod.InstalledVersion.ToString();
+                    }
                     cbCell.FlatStyle = FlatStyle.Flat;
                     cbCell.Style.BackColor = AMLPalette.DropDownBackgroundColor;
                     cbCell.Style.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Regular, GraphicsUnit.Point, (byte)0);

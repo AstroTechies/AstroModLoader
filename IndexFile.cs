@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,19 @@ using System.Threading.Tasks;
 
 namespace AstroModLoader
 {
+    public class IndexFileException : Exception
+    {
+        public IndexFileException()
+        {
+
+        }
+
+        public IndexFileException(string msg) : base(msg)
+        {
+
+        }
+    }
+
     public class IndexVersionData
     {
         [JsonProperty("download_url")]
@@ -19,7 +33,8 @@ namespace AstroModLoader
     public class IndexMod
     {
         [JsonProperty("latest_version")]
-        public string LatestVersion;
+        [JsonConverter(typeof(VersionConverter))]
+        public Version LatestVersion;
 
         [JsonProperty("versions")]
         public Dictionary<Version, IndexVersionData> AllVersions;
@@ -29,5 +44,8 @@ namespace AstroModLoader
     {
         [JsonProperty("mods")]
         public Dictionary<string, IndexMod> Mods;
+
+        [JsonIgnore]
+        public string OriginalURL;
     }
 }

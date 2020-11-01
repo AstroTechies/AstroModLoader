@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace AstroModLoader
@@ -80,6 +82,17 @@ namespace AstroModLoader
         public static string GeneratePriorityFromPositionInList(int pos)
         {
             return pos.ToString().PadLeft(3, '0');
+        }
+
+        public static string SanitizeFilename(string name)
+        {
+            string invalidCharactersRegex = string.Format(@"([{0}]*\.+$)|([{0}]+)", Regex.Escape(new string(Path.GetInvalidFileNameChars())));
+            return Regex.Replace(name, invalidCharactersRegex, "_");
+        }
+
+        public static void CheckThreadState()
+        {
+            if (System.Threading.SynchronizationContext.Current == null) throw new InvalidOperationException("This is not the UI thread!");
         }
     }
 }
