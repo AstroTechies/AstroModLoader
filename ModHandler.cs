@@ -187,22 +187,8 @@ namespace AstroModLoader
             }
         }
 
-        public void AggregateIndexFiles()
+        public void UpdateAvailableVersionsFromIndexFiles()
         {
-            GlobalIndexFile = null;
-            var NewGlobalIndexFile = new Dictionary<string, IndexMod>();
-            List<string> DuplicateURLs = new List<string>();
-            foreach (Mod mod in Mods)
-            {
-                IndexFile thisIndexFile = mod.GetIndexFile(DuplicateURLs);
-                if (thisIndexFile != null)
-                {
-                    thisIndexFile.Mods.ToList().ForEach(x => NewGlobalIndexFile[x.Key] = x.Value);
-                    DuplicateURLs.Add(thisIndexFile.OriginalURL);
-                }
-            }
-            GlobalIndexFile = NewGlobalIndexFile;
-
             foreach (Mod mod in Mods)
             {
                 Version latestVersion = null;
@@ -221,6 +207,25 @@ namespace AstroModLoader
             }
         }
 
+        public void AggregateIndexFiles()
+        {
+            GlobalIndexFile = null;
+            var NewGlobalIndexFile = new Dictionary<string, IndexMod>();
+            List<string> DuplicateURLs = new List<string>();
+            foreach (Mod mod in Mods)
+            {
+                IndexFile thisIndexFile = mod.GetIndexFile(DuplicateURLs);
+                if (thisIndexFile != null)
+                {
+                    thisIndexFile.Mods.ToList().ForEach(x => NewGlobalIndexFile[x.Key] = x.Value);
+                    DuplicateURLs.Add(thisIndexFile.OriginalURL);
+                }
+            }
+            GlobalIndexFile = NewGlobalIndexFile;
+
+            UpdateAvailableVersionsFromIndexFiles();
+        }
+
         public void SortVersions()
         {
             foreach (Mod mod in Mods)
@@ -236,8 +241,8 @@ namespace AstroModLoader
             Mod newMod = new Mod(ExtractMetadataFromPath(modPath), Path.GetFileName(modPath));
             if (ModLookup.ContainsKey(newMod.CurrentModData.ModID))
             {
-                ModLookup[newMod.CurrentModData.ModID].AvailableVersions.Add(newMod.InstalledVersion);
-                ModLookup[newMod.CurrentModData.ModID].AllModData.Add(newMod.InstalledVersion, newMod.CurrentModData);
+                if (!ModLookup[newMod.CurrentModData.ModID].AvailableVersions.Contains(newMod.InstalledVersion)) ModLookup[newMod.CurrentModData.ModID].AvailableVersions.Add(newMod.InstalledVersion);
+                ModLookup[newMod.CurrentModData.ModID].AllModData[newMod.InstalledVersion] = newMod.CurrentModData;
             }
             else
             {

@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading;
@@ -77,30 +78,41 @@ namespace AstroModLoader
 
         private BackgroundWorker versionSwitcher; // Version switcher's e.Argument should be Tuple<Mod, Version>
 
+        public bool DownloadVersionSync(Mod thisMod, Version newVersion)
+        {
+            try
+            {
+                if (!ModManager.GlobalIndexFile.ContainsKey(thisMod.CurrentModData.ModID)) throw new IndexFileException("Can't find index file entry for mod");
+                Dictionary<Version, IndexVersionData> allVerData = ModManager.GlobalIndexFile[thisMod.CurrentModData.ModID].AllVersions;
+                if (!allVerData.ContainsKey(newVersion)) throw new IndexFileException("Failed to find the requested version in the mod's index file");
+
+                using (var wb = new WebClient())
+                {
+                    wb.Headers[HttpRequestHeader.UserAgent] = "AstroModLoader " + Application.ProductVersion;
+
+                    string kosherFileName = AMLUtils.SanitizeFilename(allVerData[newVersion].Filename);
+                    if (kosherFileName.Substring(kosherFileName.Length - 6, 6) != "_P.pak") kosherFileName += "_P.pak";
+                    wb.DownloadFile(allVerData[newVersion].URL, Path.Combine(ModManager.DownloadPath, kosherFileName));
+                    ModManager.SyncSingleModFromDisk(Path.Combine(ModManager.DownloadPath, kosherFileName));
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex is WebException || ex is IndexFileException)
+                {
+                    Debug.WriteLine(ex.ToString());
+                    return false;
+                }
+                throw;
+            }
+            return true;
+        }
+
         public void SwitchVersionSync(Mod thisMod, Version newVersion)
         {
             if (!thisMod.AllModData.ContainsKey(newVersion))
             {
-                try
-                {
-                    if (!ModManager.GlobalIndexFile.ContainsKey(thisMod.CurrentModData.ModID)) throw new IndexFileException("Can't find index file entry for mod with invalid version");
-                    Dictionary<Version, IndexVersionData> allVerData = ModManager.GlobalIndexFile[thisMod.CurrentModData.ModID].AllVersions;
-                    if (!allVerData.ContainsKey(newVersion)) throw new IndexFileException("Failed to find the requested version in the mod's index file");
-
-                    using (var wb = new WebClient())
-                    {
-                        wb.Headers[HttpRequestHeader.UserAgent] = "AstroModLoader " + Application.ProductVersion;
-
-                        string kosherFileName = AMLUtils.SanitizeFilename(allVerData[newVersion].Filename);
-                        if (kosherFileName.Substring(kosherFileName.Length - 6, 6) != "_P.pak") kosherFileName += "_P.pak";
-                        wb.DownloadFile(allVerData[newVersion].URL, Path.Combine(ModManager.DownloadPath, kosherFileName));
-                        ModManager.SyncSingleModFromDisk(Path.Combine(ModManager.DownloadPath, kosherFileName));
-                    }
-                }
-                catch (WebException)
-                {
-                    throw;
-                }
+                if (!DownloadVersionSync(thisMod, newVersion)) return;
                 thisMod.InstalledVersion = newVersion;
                 thisMod.Dirty = true;
                 ModManager.FullUpdate();
@@ -120,7 +132,7 @@ namespace AstroModLoader
             SwitchVersionSync(thisMod, newVersion);
         }
 
-        public void SwitchVersion(Mod mod, Version newVersion, bool refreshAfterwards = true)
+        public void SwitchVersionAsync(Mod mod, Version newVersion, bool refreshAfterwards = true)
         {
             versionSwitcher = new BackgroundWorker();
             versionSwitcher.DoWork += new DoWorkEventHandler(VersionSwitcher_DoWork);
@@ -202,7 +214,7 @@ namespace AstroModLoader
                             changingVer = new Version(strVal);
                         }
 
-                        SwitchVersion(taggedMod, changingVer);
+                        SwitchVersionAsync(taggedMod, changingVer);
                     }
                 }
             }
@@ -403,14 +415,53 @@ namespace AstroModLoader
                     string kosherServerName = serverInfo.ServerName;
                     if (string.IsNullOrEmpty(kosherServerName) || kosherServerName == "Astroneer Dedicated Server") kosherServerName = getIPPrompt.OutputText;
 
-                    Debug.WriteLine("\n" + kosherServerName + " has " + allMods.Count + " mods installed.");
+                    ModProfile creatingProfile = new ModProfile();
+                    creatingProfile.ProfileData = new Dictionary<string, Mod>();
+                    int failedDownloadCount = 0;
+
+                    // Add our current mods into the index, and specify that they should be disabled
+                    ModProfile currentProf = ModManager.GenerateProfile();
+                    foreach (KeyValuePair<string, Mod> entry in currentProf.ProfileData)
+                    {
+                        entry.Value.Enabled = false;
+                        creatingProfile.ProfileData[entry.Value.CurrentModData.ModID] = entry.Value;
+                    }
+
+                    // Incorporate newly synced index files into the global index
+                    List<string> DuplicateURLs = new List<string>();
                     foreach (Mod mod in allMods)
                     {
-                        Debug.WriteLine("---");
-                        Debug.WriteLine(mod.CurrentModData.Name);
-                        Debug.WriteLine(mod.InstalledVersion);
-                        Debug.WriteLine(mod.NameOnDisk);
+                        IndexFile thisIndexFile = mod.GetIndexFile(DuplicateURLs);
+                        if (thisIndexFile != null)
+                        {
+                            thisIndexFile.Mods.ToList().ForEach(x => ModManager.GlobalIndexFile[x.Key] = x.Value);
+                            DuplicateURLs.Add(thisIndexFile.OriginalURL);
+                        }
                     }
+
+                    // Download server mods from the newly incorporated index files
+                    foreach (Mod mod in allMods)
+                    {
+                        bool didDownloadMod = DownloadVersionSync(mod, mod.InstalledVersion);
+                        if (didDownloadMod)
+                        {
+                            creatingProfile.ProfileData[mod.CurrentModData.ModID] = mod;
+                        }
+                        else
+                        {
+                            failedDownloadCount++;
+                        }
+                        mod.Enabled = true;
+                        mod.ForceLatest = false;
+                    }
+
+                    // Update available versions list to make the syncing seamless
+                    ModManager.UpdateAvailableVersionsFromIndexFiles();
+
+                    // Add the new profile to the list
+                    string kosherProfileName = kosherServerName + " Synced Mods";
+                    ModManager.ProfileList[kosherProfileName] = creatingProfile;
+                    AMLUtils.ShowBasicButton(this, "Added a new profile named \"" + kosherProfileName + "\". " + failedDownloadCount + " mods failed to sync.", "OK", null, null);
                 });
                 thread.Start();
             }

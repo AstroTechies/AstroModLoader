@@ -54,7 +54,7 @@
             this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button1.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.button1.Location = new System.Drawing.Point(12, 48);
+            this.button1.Location = new System.Drawing.Point(12, 51);
             this.button1.MinimumSize = new System.Drawing.Size(0, 26);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(65, 26);
@@ -71,7 +71,7 @@
             this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button2.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.button2.Location = new System.Drawing.Point(83, 48);
+            this.button2.Location = new System.Drawing.Point(83, 51);
             this.button2.MinimumSize = new System.Drawing.Size(0, 26);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(65, 26);
@@ -88,7 +88,7 @@
             this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button3.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.button3.Location = new System.Drawing.Point(272, 48);
+            this.button3.Location = new System.Drawing.Point(272, 51);
             this.button3.MinimumSize = new System.Drawing.Size(0, 26);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 26);
@@ -102,7 +102,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(42)))), ((int)(((byte)(45)))));
-            this.ClientSize = new System.Drawing.Size(359, 86);
+            this.ClientSize = new System.Drawing.Size(359, 89);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);

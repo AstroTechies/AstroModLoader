@@ -129,7 +129,7 @@ namespace AstroModLoader
 
                 if (row.Cells[2] is DataGridViewComboBoxCell cbCell)
                 {
-                    cbCell.Items.Add("Latest (" + mod.InstalledVersion + ")");
+                    cbCell.Items.Add("Latest (" + mod.AvailableVersions[0] + ")");
                     foreach (Version ver in mod.AvailableVersions)
                     {
                         cbCell.Items.Add(ver.ToString());
@@ -137,7 +137,7 @@ namespace AstroModLoader
 
                     if (mod.ForceLatest)
                     {
-                        cbCell.Value = "Latest (" + mod.InstalledVersion + ")";
+                        cbCell.Value = "Latest (" + mod.AvailableVersions[0] + ")";
                     }
                     else
                     {

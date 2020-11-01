@@ -90,9 +90,9 @@ namespace AstroModLoader
             return Regex.Replace(name, invalidCharactersRegex, "_");
         }
 
-        public static void CheckThreadState()
+        /*public static void CheckThreadState()
         {
             if (System.Threading.SynchronizationContext.Current == null) throw new InvalidOperationException("This is not the UI thread!");
-        }
+        }*/
     }
 }
