@@ -14,7 +14,7 @@ using System.Windows.Forms;
 
 namespace AstroModLoader
 {
-    public class Mod
+    public class Mod : ICloneable
     {
         private bool _enabled;
         [JsonIgnore]
@@ -194,6 +194,18 @@ namespace AstroModLoader
         public override string ToString()
         {
             return Enabled.ToString();
+        }
+
+        public object Clone()
+        {
+            var modClone = new Mod(null, this.NameOnDisk);
+            modClone.AvailableVersions = this.AvailableVersions.ToList();
+            modClone.AvailableVersions.ForEach(x => x.Clone());
+            modClone.InstalledVersion = (Version)this.InstalledVersion.Clone();
+            modClone.ForceLatest = this.ForceLatest;
+            modClone.Enabled = this.Enabled;
+            modClone.Priority = this.Priority;
+            return modClone;
         }
     }
 }

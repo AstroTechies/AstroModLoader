@@ -8,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AstroModLoader
@@ -55,7 +55,6 @@ namespace AstroModLoader
             dataGridView1.DragDrop += new DragEventHandler(Form1_DragDrop);
 
             PeriodicCheckTimer.Enabled = true;
-            ForceRefreshTimer.Enabled = false; // might remove this later
 
             autoUpdater = new BackgroundWorker();
             autoUpdater.DoWork += new DoWorkEventHandler(AutoUpdater_DoWork);
@@ -63,7 +62,7 @@ namespace AstroModLoader
             autoUpdater.RunWorkerAsync();
         }
 
-        // Background workers
+        // Async operations
         private BackgroundWorker autoUpdater;
 
         private void AutoUpdater_DoWork(object sender, DoWorkEventArgs e)
@@ -75,8 +74,6 @@ namespace AstroModLoader
         {
             TableManager.Refresh();
         }
-
-        private BackgroundWorker versionSwitcher; // Version switcher's e.Argument should be Tuple<Mod, Version>
 
         public bool DownloadVersionSync(Mod thisMod, Version newVersion)
         {
@@ -113,10 +110,6 @@ namespace AstroModLoader
             if (!thisMod.AllModData.ContainsKey(newVersion))
             {
                 if (!DownloadVersionSync(thisMod, newVersion)) return;
-                thisMod.InstalledVersion = newVersion;
-                thisMod.Dirty = true;
-                ModManager.FullUpdate();
-                return;
             }
 
             thisMod.InstalledVersion = newVersion;
@@ -132,15 +125,39 @@ namespace AstroModLoader
             SwitchVersionSync(thisMod, newVersion);
         }
 
-        public void SwitchVersionAsync(Mod mod, Version newVersion, bool refreshAfterwards = true)
+        // The rest
+        private void DataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            versionSwitcher = new BackgroundWorker();
-            versionSwitcher.DoWork += new DoWorkEventHandler(VersionSwitcher_DoWork);
-            if (refreshAfterwards) versionSwitcher.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Simple_Refresh_RunWorkerCompleted);
-            versionSwitcher.RunWorkerAsync(Tuple.Create(mod, newVersion));
+            Task.Run(() =>
+            {
+                if (ModManager.IsReadOnly) return;
+                foreach (DataGridViewRow row in this.dataGridView1.Rows)
+                {
+                    if (row.Tag is Mod taggedMod)
+                    {
+                        taggedMod.Enabled = (bool)row.Cells[0].Value;
+                        if (row.Cells[2].Value is string strVal)
+                        {
+                            Version changingVer = null;
+                            if (strVal.Contains("Latest"))
+                            {
+                                taggedMod.ForceLatest = true;
+                                changingVer = taggedMod.AvailableVersions[0];
+                            }
+                            else
+                            {
+                                taggedMod.ForceLatest = false;
+                                changingVer = new Version(strVal);
+                            }
+
+                            SwitchVersionSync(taggedMod, changingVer);
+                        }
+                    }
+                }
+                ModManager.FullUpdate();
+            });
         }
 
-        // The rest
         public void AdjustModInfoText(string txt)
         {
             this.modInfo.Text = txt;
@@ -190,35 +207,6 @@ namespace AstroModLoader
             {
                 e.Graphics.DrawLine(p, new Point(0, 0), new Point(footer.ClientSize.Width, 0));
             }
-        }
-
-        private void DataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
-        {
-            if (ModManager.IsReadOnly) return;
-            foreach (DataGridViewRow row in this.dataGridView1.Rows)
-            {
-                if (row.Tag is Mod taggedMod)
-                {
-                    taggedMod.Enabled = (bool)row.Cells[0].Value;
-                    if (row.Cells[2].Value is string strVal)
-                    {
-                        Version changingVer = null;
-                        if (strVal.Contains("Latest"))
-                        {
-                            taggedMod.ForceLatest = true;
-                            changingVer = taggedMod.AvailableVersions[0];
-                        }
-                        else
-                        {
-                            taggedMod.ForceLatest = false;
-                            changingVer = new Version(strVal);
-                        }
-
-                        SwitchVersionAsync(taggedMod, changingVer);
-                    }
-                }
-            }
-            ModManager.FullUpdate();
         }
 
         private void DataGridView1_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
@@ -396,7 +384,7 @@ namespace AstroModLoader
 
             if (getIPPrompt.ShowDialog(this) == DialogResult.OK)
             {
-                var thread = new Thread(() =>
+                Task.Run(() =>
                 {
                     AstroLauncherServerInfo serverInfo = PlayFabAPI.GetAstroLauncherData(getIPPrompt.OutputText);
                     if (serverInfo == null)
@@ -442,6 +430,7 @@ namespace AstroModLoader
                     // Download server mods from the newly incorporated index files
                     foreach (Mod mod in allMods)
                     {
+                        if (mod.CurrentModData.Sync != SyncMode.ServerAndClient) continue;
                         bool didDownloadMod = DownloadVersionSync(mod, mod.InstalledVersion);
                         if (didDownloadMod)
                         {
@@ -463,7 +452,6 @@ namespace AstroModLoader
                     ModManager.ProfileList[kosherProfileName] = creatingProfile;
                     AMLUtils.ShowBasicButton(this, "Added a new profile named \"" + kosherProfileName + "\". " + failedDownloadCount + " mods failed to sync.", "OK", null, null);
                 });
-                thread.Start();
             }
         }
     }

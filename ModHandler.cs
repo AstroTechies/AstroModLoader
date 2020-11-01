@@ -232,7 +232,6 @@ namespace AstroModLoader
             {
                 mod.AvailableVersions.Sort();
                 mod.AvailableVersions.Reverse();
-                mod.InstalledVersion = mod.AvailableVersions[0];
             }
         }
 
@@ -269,6 +268,10 @@ namespace AstroModLoader
             }
 
             SortVersions();
+            foreach (Mod mod in Mods)
+            {
+                mod.InstalledVersion = mod.AvailableVersions[0];
+            }
 
             string[] installedMods = Directory.GetFiles(InstallPath, "*.pak", SearchOption.TopDirectoryOnly);
             foreach (string modPath in installedMods)
@@ -387,7 +390,7 @@ namespace AstroModLoader
                     if (entry.Value.InstalledVersion != null) ModLookup[entry.Key].InstalledVersion = entry.Value.InstalledVersion;
                     ModLookup[entry.Key].Priority = entry.Value.Priority;
                     ModLookup[entry.Key].ForceLatest = entry.Value.ForceLatest;
-                    if (entry.Value.ForceLatest)
+                    if (entry.Value.ForceLatest || !ModLookup[entry.Key].AvailableVersions.Contains(ModLookup[entry.Key].InstalledVersion))
                     {
                         ModLookup[entry.Key].InstalledVersion = ModLookup[entry.Key].AvailableVersions[0];
                     }
@@ -400,13 +403,7 @@ namespace AstroModLoader
             var res = new ModProfile(new Dictionary<string, Mod>());
             foreach (Mod mod in Mods)
             {
-                var modClone = new Mod(null, mod.NameOnDisk);
-                modClone.AvailableVersions = mod.AvailableVersions;
-                modClone.InstalledVersion = mod.InstalledVersion;
-                modClone.ForceLatest = mod.ForceLatest;
-                modClone.Enabled = mod.Enabled;
-                modClone.Priority = mod.Priority;
-                res.ProfileData.Add(mod.CurrentModData.ModID, modClone);
+                res.ProfileData.Add(mod.CurrentModData.ModID, (Mod)mod.Clone());
             }
             return res;
         }
@@ -427,9 +424,13 @@ namespace AstroModLoader
 
         public void IntegrateMods()
         {
-            if (IsReadOnly) return;
-            if (GamePath == null || InstallPath == null) return;
-            ModIntegrator.IntegrateMods(InstallPath, Path.Combine(GamePath, "Astro", "Content", "Paks"));
+            Thread thr = new Thread(() =>
+            {
+                if (IsReadOnly) return;
+                if (GamePath == null || InstallPath == null) return;
+                ModIntegrator.IntegrateMods(InstallPath, Path.Combine(GamePath, "Astro", "Content", "Paks"));
+            });
+            thr.Start();
         }
 
         public void RefreshAllPriorites()
