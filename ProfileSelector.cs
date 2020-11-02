@@ -44,6 +44,7 @@ namespace AstroModLoader
         private void RefreshBox()
         {
             if (OurParentForm == null) return;
+            if (OurParentForm.ModManager.ProfileList == null) OurParentForm.ModManager.ProfileList = new Dictionary<string, ModProfile>();
             if (OurParentForm.ModManager.ProfileList.Count > 0)
             {
                 listBox1.DisplayMember = "Key";

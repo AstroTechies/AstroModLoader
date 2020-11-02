@@ -37,6 +37,8 @@ namespace AstroModLoader
             }
             dataGridView1.Select();
 
+            if (Program.CommandLineOptions.ServerMode) syncButton.Hide();
+
             ModManager = new ModHandler(this);
             TableManager = new TableHandler(dataGridView1, ModManager);
 
@@ -178,12 +180,27 @@ namespace AstroModLoader
                     try
                     {
                         File.Copy(newInstallingMod, Path.Combine(ModManager.DownloadPath, Path.GetFileName(newInstallingMod)));
-                        File.Copy(newInstallingMod, Path.Combine(ModManager.InstallPath, Path.GetFileName(newInstallingMod)));
+                        //File.Copy(newInstallingMod, Path.Combine(ModManager.InstallPath, Path.GetFileName(newInstallingMod)));
                     }
                     catch (IOException) { }
                 }
+
                 FullRefresh();
+
+                foreach (Mod mod in ModManager.Mods)
+                {
+                    mod.Dirty = true;
+                    mod.Enabled = true;
+                    if ((ModManager.InstalledAstroBuild != null && mod.CurrentModData.AstroBuild != null && ModManager.InstalledAstroBuild != mod.CurrentModData.AstroBuild) || (Program.CommandLineOptions.ServerMode && mod.CurrentModData.Sync == SyncMode.ClientOnly))
+                    {
+                        mod.Enabled = false;
+                    }
+                }
+
                 ModManager.FullUpdate();
+                ModManager.AggregateIndexFiles();
+                TableManager.Refresh();
+                autoUpdater.RunWorkerAsync();
             }
         }
 
@@ -321,8 +338,9 @@ namespace AstroModLoader
 
         private void playButton_Click(object sender, EventArgs e)
         {
+            if (ModManager.BinaryFilePath == null) return;
             ModManager.FullUpdate();
-            if (ModManager.BinaryFilePath != null) Process.Start(ModManager.BinaryFilePath);
+            Process.Start(ModManager.BinaryFilePath, Program.CommandLineOptions.ServerMode ? "-log" : "");
         }
 
         private void settingsButton_Click(object sender, EventArgs e)
@@ -430,18 +448,20 @@ namespace AstroModLoader
                     // Download server mods from the newly incorporated index files
                     foreach (Mod mod in allMods)
                     {
-                        if (mod.CurrentModData.Sync != SyncMode.ServerAndClient) continue;
-                        bool didDownloadMod = DownloadVersionSync(mod, mod.InstalledVersion);
-                        if (didDownloadMod)
+                        if (mod.CurrentModData.Sync == SyncMode.ServerAndClient || mod.CurrentModData.Sync == SyncMode.ClientOnly)
                         {
-                            creatingProfile.ProfileData[mod.CurrentModData.ModID] = mod;
+                            bool didDownloadMod = DownloadVersionSync(mod, mod.InstalledVersion);
+                            if (didDownloadMod)
+                            {
+                                creatingProfile.ProfileData[mod.CurrentModData.ModID] = mod;
+                            }
+                            else
+                            {
+                                failedDownloadCount++;
+                            }
+                            mod.Enabled = true;
+                            mod.ForceLatest = false;
                         }
-                        else
-                        {
-                            failedDownloadCount++;
-                        }
-                        mod.Enabled = true;
-                        mod.ForceLatest = false;
                     }
 
                     // Update available versions list to make the syncing seamless

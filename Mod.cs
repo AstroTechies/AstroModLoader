@@ -83,7 +83,7 @@ namespace AstroModLoader
             if (modData == null)
             {
                 AllModData[InstalledVersion] = JsonConvert.DeserializeObject<Metadata>("{}");
-                AllModData[InstalledVersion].Sync = SyncMode.ClientOnly;
+                AllModData[InstalledVersion].Sync = SyncMode.None;
             }
 
             if (!string.IsNullOrEmpty(newModID) && string.IsNullOrEmpty(CurrentModData.ModID))

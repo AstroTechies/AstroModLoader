@@ -8,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AstroModLoader
@@ -32,6 +32,7 @@ namespace AstroModLoader
         public ModHandler(Form1 baseForm)
         {
             BaseForm = baseForm;
+
             DeterminePaths();
             SyncModsFromDisk();
             SyncConfigFromDisk();
@@ -41,7 +42,21 @@ namespace AstroModLoader
                 string automaticSteamPath = null;
                 try
                 {
-                    automaticSteamPath = CheckRegistryForSteamPath();
+                    if (Program.CommandLineOptions.ServerMode)
+                    {
+                        if (Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Astro")))
+                        {
+                            automaticSteamPath = Directory.GetCurrentDirectory();
+                        }
+                        else
+                        {
+                            automaticSteamPath = CheckRegistryForSteamPath(728470); // 728470
+                        }
+                    }
+                    else
+                    {
+                        automaticSteamPath = CheckRegistryForSteamPath(361420);
+                    }
                 }
                 catch (UnauthorizedAccessException)
                 {
@@ -66,10 +81,10 @@ namespace AstroModLoader
                     }
                     else
                     {
-                        MessageBox.Show("Mod integration will be disabled until you select your game installation directory!", "Uh oh!");
+                        //MessageBox.Show("Mod integration will be disabled until you select your game installation directory!", "Uh oh!");
+                        Environment.Exit(0);
                     }
                 }
-                
             }
 
             ApplyGamePathDerivatives();
@@ -84,8 +99,8 @@ namespace AstroModLoader
             SyncConfigToDisk();
         }
 
-        private static Regex acfEntryReader = new Regex(@"\s+""(\w+)""\s+""(\w+)""", RegexOptions.Compiled);
-        private string CheckRegistryForSteamPath()
+        private static Regex acfEntryReader = new Regex(@"\s+""(\w+)""\s+""([\w ]+)""", RegexOptions.Compiled);
+        private string CheckRegistryForSteamPath(int appID)
         {
             string decidedSteamPath = null;
             RegistryKey key1 = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\Valve\Steam");
@@ -104,20 +119,27 @@ namespace AstroModLoader
             if (decidedSteamPath == null) return null;
 
             string astroInstallDir = null;
-            using (StreamReader f = new StreamReader(Path.Combine(decidedSteamPath, "steamapps", "appmanifest_361420.acf")))
+            try
             {
-                string acfEntry = null;
-                while ((acfEntry = f.ReadLine()) != null)
+                using (StreamReader f = new StreamReader(Path.Combine(decidedSteamPath, "steamapps", "appmanifest_" + appID + ".acf")))
                 {
-                    Match m = acfEntryReader.Match(acfEntry);
-                    if (m.Groups.Count == 3 && m.Groups[1].Value == "installdir")
+                    string acfEntry = null;
+                    while ((acfEntry = f.ReadLine()) != null)
                     {
-                        astroInstallDir = m.Groups[2].Value;
-                        break;
+                        Match m = acfEntryReader.Match(acfEntry);
+                        if (m.Groups.Count == 3 && m.Groups[1].Value == "installdir")
+                        {
+                            astroInstallDir = m.Groups[2].Value;
+                            break;
+                        }
                     }
                 }
             }
-
+            catch (IOException)
+            {
+                astroInstallDir = null;
+            }
+            
             if (!string.IsNullOrEmpty(astroInstallDir))
             {
                 string decidedAnswer = Path.Combine(decidedSteamPath, "steamapps", "common", astroInstallDir);
@@ -132,11 +154,17 @@ namespace AstroModLoader
         public void ApplyGamePathDerivatives()
         {
             // BinaryFilePath
-            if (GamePath != null)
+            if (GamePath == null) return;
+
+            BinaryFilePath = null;
+            try
             {
-                BinaryFilePath = null;
                 string[] allExes = Directory.GetFiles(Path.Combine(GamePath, "Astro", "Binaries"), "*.exe", SearchOption.AllDirectories);
                 if (allExes.Length > 0) BinaryFilePath = allExes[0];
+            }
+            catch (IOException)
+            {
+                BinaryFilePath = null;
             }
 
             // Get astroneer version
@@ -158,14 +186,29 @@ namespace AstroModLoader
 
         private void DeterminePaths()
         {
-            if (!string.IsNullOrEmpty(Program.CommandLineOptions.BasePath))
+            BasePath = null;
+            if (!string.IsNullOrEmpty(Program.CommandLineOptions.LocalDataPath))
             {
-                BasePath = Program.CommandLineOptions.BasePath;
+                BasePath = Path.Combine(Program.CommandLineOptions.LocalDataPath, "Astro");
             }
             else
             {
-                BasePath = Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Astro");
+                if (Program.CommandLineOptions.ServerMode)
+                {
+                    BasePath = Path.Combine(GamePath != null ? GamePath : Directory.GetCurrentDirectory(), "Astro");
+                }
+                else
+                {
+                    BasePath = Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Astro");
+                }
             }
+
+            if (BasePath == null || !Directory.Exists(BasePath))
+            {
+                MessageBox.Show("Unable to find the local data directory. Please specify one with the --data parameter.", "Uh oh!");
+                Environment.Exit(0);
+            }
+
             DownloadPath = Path.Combine(BasePath, "Saved", "Mods");
             Directory.CreateDirectory(DownloadPath);
             InstallPath = Path.Combine(BasePath, "Saved", "Paks");
@@ -209,19 +252,17 @@ namespace AstroModLoader
 
         public void AggregateIndexFiles()
         {
-            GlobalIndexFile = null;
-            var NewGlobalIndexFile = new Dictionary<string, IndexMod>();
+            if (GlobalIndexFile == null) GlobalIndexFile = new Dictionary<string, IndexMod>();
             List<string> DuplicateURLs = new List<string>();
             foreach (Mod mod in Mods)
             {
                 IndexFile thisIndexFile = mod.GetIndexFile(DuplicateURLs);
                 if (thisIndexFile != null)
                 {
-                    thisIndexFile.Mods.ToList().ForEach(x => NewGlobalIndexFile[x.Key] = x.Value);
+                    thisIndexFile.Mods.ToList().ForEach(x => GlobalIndexFile[x.Key] = x.Value);
                     DuplicateURLs.Add(thisIndexFile.OriginalURL);
                 }
             }
-            GlobalIndexFile = NewGlobalIndexFile;
 
             UpdateAvailableVersionsFromIndexFiles();
         }
@@ -238,6 +279,7 @@ namespace AstroModLoader
         public void SyncSingleModFromDisk(string modPath, bool updateSort = true)
         {
             Mod newMod = new Mod(ExtractMetadataFromPath(modPath), Path.GetFileName(modPath));
+            if (Program.CommandLineOptions.ServerMode && newMod.CurrentModData.Sync == SyncMode.ClientOnly) return;
             if (ModLookup.ContainsKey(newMod.CurrentModData.ModID))
             {
                 if (!ModLookup[newMod.CurrentModData.ModID].AvailableVersions.Contains(newMod.InstalledVersion)) ModLookup[newMod.CurrentModData.ModID].AvailableVersions.Add(newMod.InstalledVersion);
@@ -254,6 +296,7 @@ namespace AstroModLoader
                 SortVersions();
                 SortMods();
             }
+            return;
         }
 
         public void SyncModsFromDisk()
@@ -295,6 +338,7 @@ namespace AstroModLoader
                 else
                 {
                     Mod newMod = new Mod(ExtractMetadataFromPath(modPath), modNameOnDisk);
+                    if (Program.CommandLineOptions.ServerMode && newMod.CurrentModData.Sync == SyncMode.ClientOnly) continue;
                     if (newMod.Priority < 999)
                     {
                         File.Copy(modPath, Path.Combine(DownloadPath, modNameOnDisk));
@@ -424,13 +468,12 @@ namespace AstroModLoader
 
         public void IntegrateMods()
         {
-            Thread thr = new Thread(() =>
+            Task.Run(() =>
             {
                 if (IsReadOnly) return;
                 if (GamePath == null || InstallPath == null) return;
                 ModIntegrator.IntegrateMods(InstallPath, Path.Combine(GamePath, "Astro", "Content", "Paks"));
             });
-            thr.Start();
         }
 
         public void RefreshAllPriorites()

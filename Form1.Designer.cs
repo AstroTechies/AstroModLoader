@@ -29,20 +29,20 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.label1 = new System.Windows.Forms.Label();
             this.modInfo = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.footer = new System.Windows.Forms.Panel();
-            this.exitButton = new AstroModLoader.CoolButton();
-            this.settingsButton = new AstroModLoader.CoolButton();
-            this.playButton = new AstroModLoader.CoolButton();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.PeriodicCheckTimer = new System.Windows.Forms.Timer(this.components);
             this.refresh = new AstroModLoader.CoolButton();
             this.loadButton = new AstroModLoader.CoolButton();
             this.syncButton = new AstroModLoader.CoolButton();
-            this.PeriodicCheckTimer = new System.Windows.Forms.Timer(this.components);
+            this.exitButton = new AstroModLoader.CoolButton();
+            this.settingsButton = new AstroModLoader.CoolButton();
+            this.playButton = new AstroModLoader.CoolButton();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel1.SuspendLayout();
             this.footer.SuspendLayout();
@@ -62,14 +62,14 @@
             this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridView1.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.dataGridView1.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(42)))), ((int)(((byte)(45)))));
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(85)))), ((int)(((byte)(85)))), ((int)(((byte)(85)))));
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(42)))), ((int)(((byte)(45)))));
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(85)))), ((int)(((byte)(85)))), ((int)(((byte)(85)))));
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.DefaultCellStyle = this.dataGridView1.ColumnHeadersDefaultCellStyle;
             this.dataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
@@ -79,7 +79,7 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(415, 226);
+            this.dataGridView1.Size = new System.Drawing.Size(414, 226);
             this.dataGridView1.TabIndex = 0;
             // 
             // label1
@@ -99,7 +99,7 @@
             // 
             this.modInfo.AutoSize = true;
             this.modInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.modInfo.Location = new System.Drawing.Point(12, 323);
+            this.modInfo.Location = new System.Drawing.Point(17, 323);
             this.modInfo.MaximumSize = new System.Drawing.Size(350, 0);
             this.modInfo.Name = "modInfo";
             this.modInfo.Size = new System.Drawing.Size(0, 17);
@@ -111,7 +111,7 @@
             this.panel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.panel1.BackColor = System.Drawing.Color.Black;
             this.panel1.Controls.Add(this.dataGridView1);
-            this.panel1.Location = new System.Drawing.Point(7, 4);
+            this.panel1.Location = new System.Drawing.Point(9, 4);
             this.panel1.Name = "panel1";
             this.panel1.Padding = new System.Windows.Forms.Padding(1);
             this.panel1.Size = new System.Drawing.Size(416, 228);
@@ -131,6 +131,73 @@
             this.footer.Size = new System.Drawing.Size(458, 53);
             this.footer.TabIndex = 5;
             // 
+            // panel2
+            // 
+            this.panel2.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.panel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.panel2.BackColor = System.Drawing.Color.Transparent;
+            this.panel2.Controls.Add(this.panel1);
+            this.panel2.Controls.Add(this.refresh);
+            this.panel2.Controls.Add(this.loadButton);
+            this.panel2.Controls.Add(this.syncButton);
+            this.panel2.Location = new System.Drawing.Point(11, 35);
+            this.panel2.Name = "panel2";
+            this.panel2.Padding = new System.Windows.Forms.Padding(1);
+            this.panel2.Size = new System.Drawing.Size(436, 270);
+            this.panel2.TabIndex = 1;
+            // 
+            // PeriodicCheckTimer
+            // 
+            this.PeriodicCheckTimer.Interval = 8000;
+            this.PeriodicCheckTimer.Tick += new System.EventHandler(this.PeriodicCheckTimer_Tick);
+            // 
+            // refresh
+            // 
+            this.refresh.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.refresh.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
+            this.refresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.refresh.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.refresh.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
+            this.refresh.Location = new System.Drawing.Point(9, 236);
+            this.refresh.MinimumSize = new System.Drawing.Size(0, 26);
+            this.refresh.Name = "refresh";
+            this.refresh.Size = new System.Drawing.Size(75, 26);
+            this.refresh.TabIndex = 1;
+            this.refresh.Text = "Refresh";
+            this.refresh.UseVisualStyleBackColor = false;
+            this.refresh.Click += new System.EventHandler(this.refresh_Click);
+            // 
+            // loadButton
+            // 
+            this.loadButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
+            this.loadButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.loadButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.loadButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
+            this.loadButton.Location = new System.Drawing.Point(90, 236);
+            this.loadButton.MinimumSize = new System.Drawing.Size(0, 26);
+            this.loadButton.Name = "loadButton";
+            this.loadButton.Size = new System.Drawing.Size(75, 26);
+            this.loadButton.TabIndex = 5;
+            this.loadButton.Text = "Profiles...";
+            this.loadButton.UseVisualStyleBackColor = false;
+            this.loadButton.Click += new System.EventHandler(this.loadButton_Click);
+            // 
+            // syncButton
+            // 
+            this.syncButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.syncButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
+            this.syncButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.syncButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.syncButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
+            this.syncButton.Location = new System.Drawing.Point(318, 236);
+            this.syncButton.MinimumSize = new System.Drawing.Size(0, 26);
+            this.syncButton.Name = "syncButton";
+            this.syncButton.Size = new System.Drawing.Size(109, 26);
+            this.syncButton.TabIndex = 2;
+            this.syncButton.Text = "Sync from IP";
+            this.syncButton.UseVisualStyleBackColor = false;
+            this.syncButton.Click += new System.EventHandler(this.syncButton_Click);
+            // 
             // exitButton
             // 
             this.exitButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
@@ -138,7 +205,7 @@
             this.exitButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.exitButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.exitButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.exitButton.Location = new System.Drawing.Point(367, 12);
+            this.exitButton.Location = new System.Drawing.Point(363, 12);
             this.exitButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.exitButton.Name = "exitButton";
             this.exitButton.Size = new System.Drawing.Size(75, 26);
@@ -178,73 +245,6 @@
             this.playButton.Text = "Play";
             this.playButton.UseVisualStyleBackColor = false;
             this.playButton.Click += new System.EventHandler(this.playButton_Click);
-            // 
-            // panel2
-            // 
-            this.panel2.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.panel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.panel2.BackColor = System.Drawing.Color.Transparent;
-            this.panel2.Controls.Add(this.panel1);
-            this.panel2.Controls.Add(this.refresh);
-            this.panel2.Controls.Add(this.loadButton);
-            this.panel2.Controls.Add(this.syncButton);
-            this.panel2.Location = new System.Drawing.Point(15, 35);
-            this.panel2.Name = "panel2";
-            this.panel2.Padding = new System.Windows.Forms.Padding(1);
-            this.panel2.Size = new System.Drawing.Size(432, 270);
-            this.panel2.TabIndex = 1;
-            // 
-            // refresh
-            // 
-            this.refresh.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.refresh.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
-            this.refresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.refresh.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.refresh.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.refresh.Location = new System.Drawing.Point(7, 236);
-            this.refresh.MinimumSize = new System.Drawing.Size(0, 26);
-            this.refresh.Name = "refresh";
-            this.refresh.Size = new System.Drawing.Size(75, 26);
-            this.refresh.TabIndex = 1;
-            this.refresh.Text = "Refresh";
-            this.refresh.UseVisualStyleBackColor = false;
-            this.refresh.Click += new System.EventHandler(this.refresh_Click);
-            // 
-            // loadButton
-            // 
-            this.loadButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
-            this.loadButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.loadButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.loadButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.loadButton.Location = new System.Drawing.Point(88, 236);
-            this.loadButton.MinimumSize = new System.Drawing.Size(0, 26);
-            this.loadButton.Name = "loadButton";
-            this.loadButton.Size = new System.Drawing.Size(75, 26);
-            this.loadButton.TabIndex = 5;
-            this.loadButton.Text = "Profiles...";
-            this.loadButton.UseVisualStyleBackColor = false;
-            this.loadButton.Click += new System.EventHandler(this.loadButton_Click);
-            // 
-            // syncButton
-            // 
-            this.syncButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.syncButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
-            this.syncButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.syncButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.syncButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.syncButton.Location = new System.Drawing.Point(316, 236);
-            this.syncButton.MinimumSize = new System.Drawing.Size(0, 26);
-            this.syncButton.Name = "syncButton";
-            this.syncButton.Size = new System.Drawing.Size(109, 26);
-            this.syncButton.TabIndex = 2;
-            this.syncButton.Text = "Sync from IP";
-            this.syncButton.UseVisualStyleBackColor = false;
-            this.syncButton.Click += new System.EventHandler(this.syncButton_Click);
-            // 
-            // PeriodicCheckTimer
-            // 
-            this.PeriodicCheckTimer.Interval = 8000;
-            this.PeriodicCheckTimer.Tick += new System.EventHandler(this.PeriodicCheckTimer_Tick);
             // 
             // Form1
             // 

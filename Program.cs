@@ -12,8 +12,11 @@ namespace AstroModLoader
 {
     public class Options
     {
-        [Option("base", Required = false, HelpText = "Specifies the local Astro folder (the parent of the SaveGames directory).")]
-        public string BasePath { get; set; }
+        [Option("server", Required = false, HelpText = "Specifies whether or not AstroModLoader is being ran for a server.")]
+        public bool ServerMode { get; set; }
+
+        [Option("data", Required = false, HelpText = "Specifies the %localappdata% folder, or the equivalent of it.")]
+        public string LocalDataPath { get; set; }
     }
 
     public static class Program
