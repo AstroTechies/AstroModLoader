@@ -1,21 +1,23 @@
-﻿using Microsoft.WindowsAPICodePack.Dialogs;
+﻿using Ookii.Dialogs.WinForms;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AstroModLoader
 {
+    public enum BrowseMode
+    {
+        File,
+        Folder
+    }
+
+
     public partial class TextPrompt : Form
     {
         public string DisplayText;
         public string OutputText;
         public bool AllowBrowse = true;
+        public BrowseMode BrowseMode = BrowseMode.Folder;
 
         public TextPrompt()
         {
@@ -40,14 +42,26 @@ namespace AstroModLoader
 
         private void browseButton_Click(object sender, EventArgs e)
         {
-            if (CommonFileDialog.IsPlatformSupported)
+            if (VistaFolderBrowserDialog.IsVistaFolderDialogSupported)
             {
-                var dialog = new CommonOpenFileDialog();
-                dialog.Title = DisplayText;
-                dialog.IsFolderPicker = true;
-                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                if (BrowseMode == BrowseMode.File)
                 {
-                    gamePathBox.Text = dialog.FileName;
+                    var dialog = new VistaOpenFileDialog();
+                    dialog.Title = DisplayText;
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        gamePathBox.Text = dialog.FileName;
+                    }
+                }
+                else
+                {
+                    var dialog = new VistaFolderBrowserDialog();
+                    dialog.Description = DisplayText;
+                    dialog.UseDescriptionForTitle = true;
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        gamePathBox.Text = dialog.SelectedPath;
+                    }
                 }
             }
             else

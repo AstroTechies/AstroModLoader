@@ -207,6 +207,7 @@ namespace AstroModLoader
         private void DataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex == -1) return;
+            if (AMLUtils.IsLinux) return;
 
             Type t = dataGridView1.GetType();
             FieldInfo viewSetter = t.GetField("latestEditingControl", BindingFlags.Default | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -338,9 +339,46 @@ namespace AstroModLoader
 
         private void playButton_Click(object sender, EventArgs e)
         {
-            if (ModManager.BinaryFilePath == null) return;
             ModManager.FullUpdate();
-            Process.Start(ModManager.BinaryFilePath, Program.CommandLineOptions.ServerMode ? "-log" : "");
+
+            if (Program.CommandLineOptions.ServerMode && string.IsNullOrEmpty(ModManager.LaunchCommand))
+            {
+                TextPrompt initialPathPrompt = new TextPrompt
+                {
+                    StartPosition = FormStartPosition.CenterScreen,
+                    DisplayText = "Select a file to run",
+                    AllowBrowse = true,
+                    BrowseMode = BrowseMode.File
+                };
+
+                if (initialPathPrompt.ShowDialog(this) == DialogResult.OK)
+                {
+                    ModManager.LaunchCommand = initialPathPrompt.OutputText;
+                    ModManager.SyncConfigToDisk();
+                }
+            }
+
+            if ((!Program.CommandLineOptions.ServerMode || string.IsNullOrEmpty(ModManager.LaunchCommand)) && ModManager.BinaryFilePath != null)
+            {
+                Process.Start(ModManager.BinaryFilePath, Program.CommandLineOptions.ServerMode ? "-log" : "");
+            }
+            else
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo()
+                    {
+                        WorkingDirectory = Path.GetDirectoryName(ModManager.LaunchCommand),
+                        FileName = ModManager.LaunchCommand
+                    });
+                }
+                catch (ArgumentException)
+                {
+                    AMLUtils.ShowBasicButton(this, "Invalid path: \"" + ModManager.LaunchCommand + "\"", "OK", null, null);
+                    ModManager.LaunchCommand = null;
+                }
+                
+            }
         }
 
         private void settingsButton_Click(object sender, EventArgs e)

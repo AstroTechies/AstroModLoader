@@ -127,15 +127,17 @@ namespace AstroModLoader
 
                 row.Cells[1].Value = mod.CurrentModData.Name;
 
+                bool hasAutoUpdate = ModManager.GlobalIndexFile != null && ModManager.GlobalIndexFile.ContainsKey(mod.CurrentModData.ModID);
+
                 if (row.Cells[2] is DataGridViewComboBoxCell cbCell)
                 {
-                    cbCell.Items.Add("Latest (" + mod.AvailableVersions[0] + ")");
+                    if (hasAutoUpdate) cbCell.Items.Add("Latest (" + mod.AvailableVersions[0] + ")");
                     foreach (Version ver in mod.AvailableVersions)
                     {
                         cbCell.Items.Add(ver.ToString());
                     }
 
-                    if (mod.ForceLatest)
+                    if (hasAutoUpdate && mod.ForceLatest)
                     {
                         cbCell.Value = "Latest (" + mod.AvailableVersions[0] + ")";
                     }

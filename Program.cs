@@ -23,6 +23,9 @@ namespace AstroModLoader
     {
         public static Options CommandLineOptions;
 
+        [DllImport("user32.dll")]
+        private static extern bool SetProcessDPIAware();
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -34,6 +37,7 @@ namespace AstroModLoader
             {
                 CommandLineOptions = o;
 
+                if (Environment.OSVersion.Version.Major >= 6) SetProcessDPIAware();
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 

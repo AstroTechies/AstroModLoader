@@ -11,6 +11,9 @@ namespace AstroModLoader
         [DefaultValue("")]
         public string GamePath;
 
+        [JsonProperty("launch_command")]
+        public string LaunchCommand;
+
         [JsonProperty("theme")]
         [JsonConverter(typeof(StringEnumConverter))]
         public ModLoaderTheme Theme;

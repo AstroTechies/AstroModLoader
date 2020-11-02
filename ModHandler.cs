@@ -19,6 +19,7 @@ namespace AstroModLoader
         internal string DownloadPath;
         internal string InstallPath;
         internal string GamePath;
+        internal string LaunchCommand;
         internal Dictionary<string, Mod> ModLookup;
         internal string BinaryFilePath;
         internal Form1 BaseForm;
@@ -50,19 +51,20 @@ namespace AstroModLoader
                         }
                         else
                         {
-                            automaticSteamPath = CheckRegistryForSteamPath(728470); // 728470
+                            automaticSteamPath = CheckRegistryForSteamPath(728470); // Astroneer Dedicated Server: 728470
                         }
                     }
                     else
                     {
-                        automaticSteamPath = CheckRegistryForSteamPath(361420);
+                        automaticSteamPath = CheckRegistryForSteamPath(361420); // Astroneer: 361420
                     }
                 }
-                catch (UnauthorizedAccessException)
+                catch //(UnauthorizedAccessException)
                 {
                     automaticSteamPath = null;
                 }
 
+                automaticSteamPath = null;
                 if (automaticSteamPath != null)
                 {
                     GamePath = automaticSteamPath;
@@ -150,17 +152,18 @@ namespace AstroModLoader
             return null;
         }
 
-        private static Regex AstroBuildRegex = new Regex(@"^(\d+\.\d+\.\d+\.\d) Shipping"); 
+        private static Regex AstroBuildRegex = new Regex(@"^(\d+\.\d+\.\d+\.\d) \w+"); 
         public void ApplyGamePathDerivatives()
         {
-            // BinaryFilePath
             if (GamePath == null) return;
 
+            // BinaryFilePath
             BinaryFilePath = null;
+
             try
             {
                 string[] allExes = Directory.GetFiles(Path.Combine(GamePath, "Astro", "Binaries"), "*.exe", SearchOption.AllDirectories);
-                if (allExes.Length > 0) BinaryFilePath = allExes[0];
+                if (allExes.Length > 0) BinaryFilePath = allExes[0];                
             }
             catch (IOException)
             {
@@ -199,7 +202,8 @@ namespace AstroModLoader
                 }
                 else
                 {
-                    BasePath = Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Astro");
+                    string lappdata = Environment.GetEnvironmentVariable("LocalAppData");
+                    if (lappdata != null) BasePath = Path.Combine(lappdata, "Astro");
                 }
             }
 
@@ -418,6 +422,7 @@ namespace AstroModLoader
             AMLPalette.CurrentTheme = diskConfig.Theme;
             AMLPalette.RefreshTheme(BaseForm);
 
+            if (!string.IsNullOrEmpty(diskConfig.LaunchCommand)) LaunchCommand = diskConfig.LaunchCommand;
             if (!string.IsNullOrEmpty(diskConfig.PlayFabCustomID)) PlayFabAPI.CustomID = diskConfig.PlayFabCustomID;
             if (!string.IsNullOrEmpty(diskConfig.PlayFabToken)) PlayFabAPI.Token = diskConfig.PlayFabToken;
             if (!string.IsNullOrEmpty(diskConfig.GamePath)) GamePath = diskConfig.GamePath;
@@ -456,6 +461,7 @@ namespace AstroModLoader
         {
             var newConfig = new ModConfig();
             newConfig.GamePath = GamePath;
+            newConfig.LaunchCommand = LaunchCommand;
             newConfig.Theme = AMLPalette.CurrentTheme;
             newConfig.AccentColor = AMLUtils.ColorToHTML(AMLPalette.AccentColor);
             newConfig.PlayFabCustomID = PlayFabAPI.CustomID;
