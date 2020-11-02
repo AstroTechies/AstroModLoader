@@ -15,7 +15,7 @@ namespace AstroModLoader
         [Option("server", Required = false, HelpText = "Specifies whether or not AstroModLoader is being ran for a server.")]
         public bool ServerMode { get; set; }
 
-        [Option("data", Required = false, HelpText = "Specifies the %localappdata% folder, or the equivalent of it.")]
+        [Option("data", Required = false, HelpText = "Specifies the %localappdata% folder or the local equivalent of it.")]
         public string LocalDataPath { get; set; }
     }
 
