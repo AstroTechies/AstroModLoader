@@ -430,7 +430,7 @@ namespace AstroModLoader
             }
 
             TextPrompt getIPPrompt = new TextPrompt();
-            getIPPrompt.DisplayText = "Enter an IP to sync with:";
+            getIPPrompt.DisplayText = "Enter an IP:Port to sync with:";
             getIPPrompt.Width -= 100;
             getIPPrompt.AllowBrowse = false;
             getIPPrompt.StartPosition = FormStartPosition.Manual;
