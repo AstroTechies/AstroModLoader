@@ -191,7 +191,7 @@ namespace AstroModLoader
                 {
                     mod.Dirty = true;
                     mod.Enabled = true;
-                    if ((ModManager.InstalledAstroBuild != null && mod.CurrentModData.AstroBuild != null && ModManager.InstalledAstroBuild != mod.CurrentModData.AstroBuild) || (Program.CommandLineOptions.ServerMode && mod.CurrentModData.Sync == SyncMode.ClientOnly))
+                    if ((ModManager.InstalledAstroBuild != null && mod.CurrentModData.AstroBuild != null && !ModManager.InstalledAstroBuild.AcceptablySimilar(mod.CurrentModData.AstroBuild)) || (Program.CommandLineOptions.ServerMode && mod.CurrentModData.Sync == SyncMode.ClientOnly))
                     {
                         mod.Enabled = false;
                     }
@@ -341,7 +341,9 @@ namespace AstroModLoader
         {
             ModManager.FullUpdate();
 
-            if (Program.CommandLineOptions.ServerMode && string.IsNullOrEmpty(ModManager.LaunchCommand))
+            ModManager.BinaryFilePath = null;
+
+            if ((Program.CommandLineOptions.ServerMode || ModManager.BinaryFilePath == null) && string.IsNullOrEmpty(ModManager.LaunchCommand))
             {
                 TextPrompt initialPathPrompt = new TextPrompt
                 {
@@ -358,12 +360,13 @@ namespace AstroModLoader
                 }
             }
 
-            if ((!Program.CommandLineOptions.ServerMode || string.IsNullOrEmpty(ModManager.LaunchCommand)) && ModManager.BinaryFilePath != null)
+            if (string.IsNullOrEmpty(ModManager.LaunchCommand) && ModManager.BinaryFilePath != null)
             {
                 Process.Start(ModManager.BinaryFilePath, Program.CommandLineOptions.ServerMode ? "-log" : "");
             }
             else
             {
+                if (string.IsNullOrEmpty(ModManager.LaunchCommand)) return;
                 try
                 {
                     Process.Start(new ProcessStartInfo()
@@ -372,9 +375,9 @@ namespace AstroModLoader
                         FileName = ModManager.LaunchCommand
                     });
                 }
-                catch (ArgumentException)
+                catch
                 {
-                    AMLUtils.ShowBasicButton(this, "Invalid path: \"" + ModManager.LaunchCommand + "\"", "OK", null, null);
+                    AMLUtils.ShowBasicButton(this, "Invalid path to file: \"" + ModManager.LaunchCommand + "\"", "OK", null, null);
                     ModManager.LaunchCommand = null;
                 }
                 
@@ -405,12 +408,7 @@ namespace AstroModLoader
             ProfileSelector selectorForm = new ProfileSelector();
             selectorForm.StartPosition = FormStartPosition.Manual;
             selectorForm.Location = new Point((this.Location.X + this.Width / 2) - (selectorForm.Width / 2), (this.Location.Y + this.Height / 2) - (selectorForm.Height / 2));
-            if (selectorForm.ShowDialog(this) == DialogResult.OK)
-            {
-                ModManager.ApplyProfile(selectorForm.SelectedProfile);
-                ModManager.FullUpdate();
-                FullRefresh();
-            }
+            selectorForm.ShowDialog(this);
         }
 
         private void PeriodicCheckTimer_Tick(object sender, EventArgs e)

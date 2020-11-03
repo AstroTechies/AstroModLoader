@@ -31,10 +31,12 @@
             this.label1 = new System.Windows.Forms.Label();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.listBoxPanel = new System.Windows.Forms.Panel();
+            this.saveButton = new AstroModLoader.CoolButton();
             this.deleteProfileButton = new AstroModLoader.CoolButton();
             this.newProfileButton = new AstroModLoader.CoolButton();
             this.cancelButton = new AstroModLoader.CoolButton();
             this.okButton = new AstroModLoader.CoolButton();
+            this.statusLabel = new System.Windows.Forms.Label();
             this.listBoxPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -42,7 +44,7 @@
             // 
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.label1.Location = new System.Drawing.Point(1, 9);
+            this.label1.Location = new System.Drawing.Point(13, 9);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(341, 23);
             this.label1.TabIndex = 0;
@@ -51,7 +53,8 @@
             // 
             // listBox1
             // 
-            this.listBox1.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.listBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.listBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.listBox1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.listBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
@@ -67,22 +70,39 @@
             // 
             this.listBoxPanel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.listBoxPanel.Controls.Add(this.listBox1);
-            this.listBoxPanel.Location = new System.Drawing.Point(12, 35);
+            this.listBoxPanel.Location = new System.Drawing.Point(24, 35);
             this.listBoxPanel.Margin = new System.Windows.Forms.Padding(0);
             this.listBoxPanel.Name = "listBoxPanel";
             this.listBoxPanel.Padding = new System.Windows.Forms.Padding(1);
             this.listBoxPanel.Size = new System.Drawing.Size(319, 254);
             this.listBoxPanel.TabIndex = 4;
             // 
+            // saveButton
+            // 
+            this.saveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.saveButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
+            this.saveButton.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(231)))), ((int)(((byte)(149)))));
+            this.saveButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.saveButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.saveButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
+            this.saveButton.Location = new System.Drawing.Point(76, 335);
+            this.saveButton.MinimumSize = new System.Drawing.Size(0, 26);
+            this.saveButton.Name = "saveButton";
+            this.saveButton.Size = new System.Drawing.Size(60, 26);
+            this.saveButton.TabIndex = 7;
+            this.saveButton.Text = "Save";
+            this.saveButton.UseVisualStyleBackColor = false;
+            this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
+            // 
             // deleteProfileButton
             // 
-            this.deleteProfileButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.deleteProfileButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.deleteProfileButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
             this.deleteProfileButton.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(231)))), ((int)(((byte)(149)))));
             this.deleteProfileButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.deleteProfileButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.deleteProfileButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.deleteProfileButton.Location = new System.Drawing.Point(142, 319);
+            this.deleteProfileButton.Location = new System.Drawing.Point(222, 335);
             this.deleteProfileButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.deleteProfileButton.Name = "deleteProfileButton";
             this.deleteProfileButton.Size = new System.Drawing.Size(61, 26);
@@ -99,7 +119,7 @@
             this.newProfileButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.newProfileButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.newProfileButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.newProfileButton.Location = new System.Drawing.Point(76, 319);
+            this.newProfileButton.Location = new System.Drawing.Point(142, 335);
             this.newProfileButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.newProfileButton.Name = "newProfileButton";
             this.newProfileButton.Size = new System.Drawing.Size(60, 26);
@@ -110,13 +130,13 @@
             // 
             // cancelButton
             // 
-            this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
             this.cancelButton.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(231)))), ((int)(((byte)(149)))));
             this.cancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cancelButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cancelButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.cancelButton.Location = new System.Drawing.Point(266, 319);
+            this.cancelButton.Location = new System.Drawing.Point(289, 335);
             this.cancelButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(65, 26);
@@ -133,7 +153,7 @@
             this.okButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.okButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.okButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.okButton.Location = new System.Drawing.Point(13, 319);
+            this.okButton.Location = new System.Drawing.Point(13, 335);
             this.okButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(57, 26);
@@ -142,12 +162,23 @@
             this.okButton.UseVisualStyleBackColor = false;
             this.okButton.Click += new System.EventHandler(this.okButton_Click);
             // 
+            // statusLabel
+            // 
+            this.statusLabel.AutoSize = true;
+            this.statusLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.statusLabel.Location = new System.Drawing.Point(22, 301);
+            this.statusLabel.Name = "statusLabel";
+            this.statusLabel.Size = new System.Drawing.Size(0, 17);
+            this.statusLabel.TabIndex = 8;
+            // 
             // ProfileSelector
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(42)))), ((int)(((byte)(45)))));
-            this.ClientSize = new System.Drawing.Size(343, 357);
+            this.ClientSize = new System.Drawing.Size(367, 373);
+            this.Controls.Add(this.statusLabel);
+            this.Controls.Add(this.saveButton);
             this.Controls.Add(this.deleteProfileButton);
             this.Controls.Add(this.newProfileButton);
             this.Controls.Add(this.listBoxPanel);
@@ -162,6 +193,7 @@
             this.Load += new System.EventHandler(this.ProfileSelector_Load);
             this.listBoxPanel.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -174,5 +206,7 @@
         public System.Windows.Forms.Panel listBoxPanel;
         private CoolButton newProfileButton;
         private CoolButton deleteProfileButton;
+        private CoolButton saveButton;
+        private System.Windows.Forms.Label statusLabel;
     }
 }

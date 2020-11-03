@@ -81,6 +81,8 @@ namespace AstroModLoader
         {
             Mod selectedMod = GetCurrentlySelectedMod();
 
+            GridView.DataSource = null;
+            GridView.EndEdit();
             GridView.Visible = true;
             GridView.Columns.Clear();
             GridView.Rows.Clear();
@@ -160,7 +162,7 @@ namespace AstroModLoader
                 else
                 {
                     row.Cells[4].Value = mod.CurrentModData.AstroBuild;
-                    if (ModManager.InstalledAstroBuild != null && mod.CurrentModData.AstroBuild != ModManager.InstalledAstroBuild)
+                    if (ModManager.InstalledAstroBuild != null && !mod.CurrentModData.AstroBuild.AcceptablySimilar(ModManager.InstalledAstroBuild))
                     {
                         row.Cells[4].Style.ForeColor = AMLPalette.WarningColor;
                         row.Cells[4].Style.SelectionForeColor = AMLPalette.WarningColor;

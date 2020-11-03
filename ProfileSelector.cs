@@ -14,7 +14,7 @@ namespace AstroModLoader
     public partial class ProfileSelector : Form
     {
         private Form1 OurParentForm;
-        public ModProfile SelectedProfile; 
+        public ModProfile SelectedProfile = null; 
 
         public ProfileSelector()
         {
@@ -75,6 +75,7 @@ namespace AstroModLoader
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            statusLabel.Text = "";
             string kosherKey = listBox1.SelectedValue as string;
             if (string.IsNullOrEmpty(kosherKey)) return;
             SelectedProfile = OurParentForm.ModManager.ProfileList[kosherKey];
@@ -82,14 +83,21 @@ namespace AstroModLoader
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.OK;
-            this.Close();
+            if (SelectedProfile == null)
+            {
+                AMLUtils.ShowBasicButton(this, "Please select a profile to load it.", "OK", null, null);
+                return;
+            }
+            OurParentForm.ModManager.ApplyProfile(SelectedProfile);
+            OurParentForm.ModManager.FullUpdate();
+            OurParentForm.FullRefresh();
+            statusLabel.Text = "Successfully loaded from profile.";
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
         {
             SelectedProfile = null;
-            this.DialogResult = DialogResult.Cancel;
+            this.DialogResult = DialogResult.OK;
             this.Close();
         }
 
@@ -115,12 +123,14 @@ namespace AstroModLoader
                         OurParentForm.ModManager.ProfileList[profileNamePrompt.OutputText] = OurParentForm.ModManager.GenerateProfile();
                         OurParentForm.ModManager.SyncConfigToDisk();
                         RefreshBox();
+                        statusLabel.Text = "Successfully overwrote profile.";
                     }
                     return;
                 }
                 OurParentForm.ModManager.ProfileList.Add(profileNamePrompt.OutputText, OurParentForm.ModManager.GenerateProfile());
                 OurParentForm.ModManager.SyncConfigToDisk();
                 RefreshBox();
+                statusLabel.Text = "Successfully created profile.";
             }
         }
 
@@ -133,7 +143,21 @@ namespace AstroModLoader
                 OurParentForm.ModManager.ProfileList.Remove(listBox1.SelectedValue as string);
                 OurParentForm.ModManager.SyncConfigToDisk();
                 RefreshBox();
+                statusLabel.Text = "Successfully deleted profile.";
             }
+        }
+
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            if (SelectedProfile == null)
+            {
+                AMLUtils.ShowBasicButton(this, "Please select a profile to save to it.", "OK", null, null);
+                return;
+            }
+            OurParentForm.ModManager.ProfileList[listBox1.SelectedValue as string] = OurParentForm.ModManager.GenerateProfile();
+            OurParentForm.ModManager.SyncConfigToDisk();
+            RefreshBox();
+            statusLabel.Text = "Successfully saved to profile.";
         }
     }
 }
