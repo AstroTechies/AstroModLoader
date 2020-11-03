@@ -341,8 +341,6 @@ namespace AstroModLoader
         {
             ModManager.FullUpdate();
 
-            ModManager.BinaryFilePath = null;
-
             if ((Program.CommandLineOptions.ServerMode || ModManager.BinaryFilePath == null) && string.IsNullOrEmpty(ModManager.LaunchCommand))
             {
                 TextPrompt initialPathPrompt = new TextPrompt
