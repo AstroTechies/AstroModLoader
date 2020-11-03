@@ -43,6 +43,7 @@ namespace AstroModLoader
 
         private void RefreshBox()
         {
+            string currentlySelected = listBox1.SelectedValue as string;
             if (OurParentForm == null) return;
             if (OurParentForm.ModManager.ProfileList == null) OurParentForm.ModManager.ProfileList = new Dictionary<string, ModProfile>();
             if (OurParentForm.ModManager.ProfileList.Count > 0)
@@ -59,6 +60,19 @@ namespace AstroModLoader
             this.RefreshTheme();
             AMLPalette.RefreshTheme(OurParentForm);
             this.listBox1.Refresh();
+
+            for (int i = 0; i < this.listBox1.Items.Count; i++)
+            {
+                object thisItem = this.listBox1.Items[i];
+                if (thisItem is KeyValuePair<string, ModProfile> thisKVP)
+                {
+                    if (thisKVP.Key == currentlySelected)
+                    {
+                        this.listBox1.SelectedIndex = i;
+                        break;
+                    }
+                }
+            }
         }
 
         private void ProfileSelector_Load(object sender, EventArgs e)
@@ -124,6 +138,10 @@ namespace AstroModLoader
                         OurParentForm.ModManager.SyncConfigToDisk();
                         RefreshBox();
                         statusLabel.Text = "Successfully overwrote profile.";
+                    }
+                    else
+                    {
+                        statusLabel.Text = "";
                     }
                     return;
                 }
