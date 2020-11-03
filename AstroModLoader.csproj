@@ -160,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="AstroModIntegrator.dll" />
+    <Content Include="UAssetAPI.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.4.0.2\build\Fody.targets" Condition="Exists('..\packages\Fody.4.0.2\build\Fody.targets')" />
