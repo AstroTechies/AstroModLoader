@@ -377,6 +377,7 @@ namespace AstroModLoader
                 {
                     AMLUtils.ShowBasicButton(this, "Invalid path to file: \"" + ModManager.LaunchCommand + "\"", "OK", null, null);
                     ModManager.LaunchCommand = null;
+                    ModManager.SyncConfigToDisk();
                 }
                 
             }
