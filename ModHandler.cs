@@ -221,16 +221,16 @@ namespace AstroModLoader
 
         private Metadata ExtractMetadataFromPath(string modPath)
         {
-            using (FileStream f = new FileStream(modPath, FileMode.Open, FileAccess.Read))
+            try
             {
-                try
+                using (FileStream f = new FileStream(modPath, FileMode.Open, FileAccess.Read))
                 {
                     return new PakExtractor(new BinaryReader(f)).ReadMetadata();
                 }
-                catch
-                {
-                    return null;
-                }
+            }
+            catch (IOException)
+            {
+                return null;
             }
         }
 

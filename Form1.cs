@@ -69,7 +69,7 @@ namespace AstroModLoader
 
         private void AutoUpdater_DoWork(object sender, DoWorkEventArgs e)
         {
-            ModManager.AggregateIndexFiles();
+            if (ModManager != null) ModManager.AggregateIndexFiles();
         }
 
         private void Simple_Refresh_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -111,20 +111,15 @@ namespace AstroModLoader
         {
             if (!thisMod.AllModData.ContainsKey(newVersion))
             {
-                if (!DownloadVersionSync(thisMod, newVersion)) return;
+                thisMod.CannotCurrentlyUpdate = true;
+                bool outcome = DownloadVersionSync(thisMod, newVersion);
+                thisMod.CannotCurrentlyUpdate = false;
+
+                if (!outcome) return;
             }
 
             thisMod.InstalledVersion = newVersion;
             thisMod.Dirty = true;
-        }
-
-        private void VersionSwitcher_DoWork(object sender, DoWorkEventArgs e)
-        {
-            Tuple<Mod, Version> us = (Tuple<Mod, Version>)e.Argument;
-            Mod thisMod = us.Item1;
-            Version newVersion = us.Item2;
-
-            SwitchVersionSync(thisMod, newVersion);
         }
 
         // The rest
@@ -137,6 +132,7 @@ namespace AstroModLoader
                 {
                     if (row.Tag is Mod taggedMod)
                     {
+                        if (taggedMod.CannotCurrentlyUpdate) continue;
                         taggedMod.Enabled = (bool)row.Cells[0].Value;
                         if (row.Cells[2].Value is string strVal)
                         {
@@ -198,9 +194,7 @@ namespace AstroModLoader
                 }
 
                 ModManager.FullUpdate();
-                ModManager.AggregateIndexFiles();
                 TableManager.Refresh();
-                autoUpdater.RunWorkerAsync();
             }
         }
 
@@ -317,6 +311,7 @@ namespace AstroModLoader
                 ModManager.SyncConfigFromDisk();
                 ModManager.UpdateReadOnlyStatus();
                 ModManager.SortMods();
+                autoUpdater.RunWorkerAsync();
             }
             if (TableManager != null) TableManager.Refresh();
             AMLPalette.RefreshTheme(this);
@@ -429,7 +424,7 @@ namespace AstroModLoader
             }
 
             TextPrompt getIPPrompt = new TextPrompt();
-            getIPPrompt.DisplayText = "Enter an IP:Port to sync with:";
+            getIPPrompt.DisplayText = "Enter a server address to sync with:";
             getIPPrompt.Width -= 100;
             getIPPrompt.AllowBrowse = false;
             getIPPrompt.StartPosition = FormStartPosition.Manual;
@@ -442,7 +437,7 @@ namespace AstroModLoader
                     AstroLauncherServerInfo serverInfo = PlayFabAPI.GetAstroLauncherData(getIPPrompt.OutputText);
                     if (serverInfo == null)
                     {
-                        AMLUtils.ShowBasicButton(this, "Failed to find an online AstroLauncher server with the requested IP!", "OK", null, null);
+                        AMLUtils.ShowBasicButton(this, "Failed to find an online AstroLauncher server with the requested address!", "OK", null, null);
                         return;
                     }
 

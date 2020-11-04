@@ -69,6 +69,9 @@ namespace AstroModLoader
         [JsonIgnore]
         public string NameOnDisk;
 
+        [JsonIgnore]
+        internal bool CannotCurrentlyUpdate = false;
+
         public Mod(Metadata modData, string nameOnDisk)
         {
             if (modData == null && nameOnDisk == null) return;

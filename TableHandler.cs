@@ -168,6 +168,8 @@ namespace AstroModLoader
                         row.Cells[4].Style.SelectionForeColor = AMLPalette.WarningColor;
                     }
                 }
+
+                row.ReadOnly = false;
                 newRows.Add(row);
             }
             GridView.Rows.AddRange(newRows.ToArray());
