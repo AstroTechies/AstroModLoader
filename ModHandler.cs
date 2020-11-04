@@ -228,7 +228,7 @@ namespace AstroModLoader
                     return new PakExtractor(new BinaryReader(f)).ReadMetadata();
                 }
             }
-            catch (IOException)
+            catch
             {
                 return null;
             }
