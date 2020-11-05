@@ -84,9 +84,9 @@ namespace AstroModLoader
 
                 frm1.modInfo.LinkColor = AMLPalette.LinkColor;
                 frm1.modInfo.ActiveLinkColor = AMLPalette.LinkColor;
-                frm1.footer.BackColor = AMLPalette.FooterColor;
+                frm1.footerPanel.BackColor = AMLPalette.FooterColor;
                 frm1.dataGridView1.GridColor = AMLPalette.AccentColor;
-                frm1.panel1.BackColor = AMLPalette.AccentColor;
+                frm1.tablePanel.BackColor = AMLPalette.AccentColor;
             }
             frm.RefreshAllButtonsInControl();
         }
