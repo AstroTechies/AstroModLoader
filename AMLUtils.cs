@@ -108,7 +108,6 @@ namespace AstroModLoader
 
         public static bool AcceptablySimilar(this Version v1, Version v2)
         {
-            //return v1 == v2;
             return v1.Major == v2.Major && v1.Minor == v2.Minor; // no sense in warning if the current version is 1.16.70.0 and the mod is for 1.16.60.0, who cares
         }
     }

@@ -64,7 +64,7 @@ namespace AstroModLoader
                     automaticSteamPath = null;
                 }
 
-                automaticSteamPath = null;
+                // automaticSteamPath = null;
                 if (automaticSteamPath != null)
                 {
                     GamePath = automaticSteamPath;

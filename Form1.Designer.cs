@@ -100,7 +100,7 @@
             this.modInfo.ActiveLinkColor = System.Drawing.Color.Red;
             this.modInfo.AutoSize = true;
             this.modInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.5F);
-            this.modInfo.Location = new System.Drawing.Point(17, 323);
+            this.modInfo.Location = new System.Drawing.Point(12, 320);
             this.modInfo.MaximumSize = new System.Drawing.Size(400, 0);
             this.modInfo.Name = "modInfo";
             this.modInfo.Size = new System.Drawing.Size(0, 17);

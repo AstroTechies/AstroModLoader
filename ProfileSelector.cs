@@ -87,12 +87,21 @@ namespace AstroModLoader
             AMLPalette.RefreshTheme(this);
         }
 
+        private void ForceRefreshSelectedProfile()
+        {
+            string kosherKey = listBox1.SelectedValue as string;
+            if (string.IsNullOrEmpty(kosherKey) || !OurParentForm.ModManager.ProfileList.ContainsKey(kosherKey))
+            {
+                SelectedProfile = null;
+                return;
+            }
+            SelectedProfile = OurParentForm.ModManager.ProfileList[kosherKey];
+        }
+
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             statusLabel.Text = "";
-            string kosherKey = listBox1.SelectedValue as string;
-            if (string.IsNullOrEmpty(kosherKey)) return;
-            SelectedProfile = OurParentForm.ModManager.ProfileList[kosherKey];
+            ForceRefreshSelectedProfile();
         }
 
         private void okButton_Click(object sender, EventArgs e)
@@ -106,6 +115,7 @@ namespace AstroModLoader
             OurParentForm.ModManager.FullUpdate();
             OurParentForm.FullRefresh();
             statusLabel.Text = "Successfully loaded from profile.";
+            ForceRefreshSelectedProfile();
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
@@ -163,6 +173,7 @@ namespace AstroModLoader
                 RefreshBox();
                 statusLabel.Text = "Successfully deleted profile.";
             }
+            ForceRefreshSelectedProfile();
         }
 
         private void saveButton_Click(object sender, EventArgs e)
@@ -176,6 +187,7 @@ namespace AstroModLoader
             OurParentForm.ModManager.SyncConfigToDisk();
             RefreshBox();
             statusLabel.Text = "Successfully saved to profile.";
+            ForceRefreshSelectedProfile();
         }
     }
 }
