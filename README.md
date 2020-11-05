@@ -6,4 +6,4 @@
 
 AstroModLoader is a community-made, open-source mod manager for Astroneer mods. It includes support for mod profiles, automatic update integration, and the ability to easily swap between multiple mod versions so that you can worry less about setup and more about playing.
 
-It is currently under active development, so pre-built binaries are not yet available.
+Visit the [Releases tab](https://github.com/AstroTechies/AstroModLoader/releases) to download AstroModLoader.
