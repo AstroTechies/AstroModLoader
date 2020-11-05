@@ -19,8 +19,8 @@ namespace AstroModLoader
         public TableHandler TableManager;
 
         public DataGridView dataGridView1;
-        public Panel footer;
-        public Panel panel1;
+        public Panel footerPanel;
+        public Panel tablePanel;
 
         public Form1()
         {
@@ -47,7 +47,7 @@ namespace AstroModLoader
             dataGridView1.DataBindingComplete += DataGridView1_DataBindingComplete;
             dataGridView1.CellEndEdit += DataGridView1_CellEndEdit;
             dataGridView1.SelectionChanged += new EventHandler(DataGridView1_SelectionChanged);
-            footer.Paint += Footer_Paint;
+            footerPanel.Paint += Footer_Paint;
             AMLPalette.RefreshTheme(this);
 
             AllowDrop = true;
@@ -218,7 +218,7 @@ namespace AstroModLoader
         {
             using (Pen p = new Pen(AMLPalette.FooterLineColor, 1))
             {
-                e.Graphics.DrawLine(p, new Point(0, 0), new Point(footer.ClientSize.Width, 0));
+                e.Graphics.DrawLine(p, new Point(0, 0), new Point(footerPanel.ClientSize.Width, 0));
             }
         }
 
@@ -297,7 +297,7 @@ namespace AstroModLoader
             }
 
             bool hasHomepage = !string.IsNullOrEmpty(selectedMod.CurrentModData.Homepage) && AMLUtils.IsValidUri(selectedMod.CurrentModData.Homepage);
-            AdjustModInfoText("Name: " + selectedMod.CurrentModData.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync + "\n", (hasHomepage ? "Click here for more info" : ""));
+            AdjustModInfoText("Name: " + selectedMod.CurrentModData.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync + "\n", (hasHomepage ? "Homepage" : ""));
         }
 
         private void modInfo_LinkClicked(object sender, EventArgs e)
@@ -308,7 +308,7 @@ namespace AstroModLoader
 
         public void ForceResize()
         {
-            footer.Width = this.Width;
+            footerPanel.Width = this.Width;
         }
 
         public void FullRefresh()
