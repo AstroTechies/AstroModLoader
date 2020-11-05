@@ -377,7 +377,7 @@ namespace AstroModLoader
                         foreach (string modPath in allMods)
                         {
                             Mod testMod = new Mod(null, Path.GetFileName(modPath));
-                            if (testMod.CurrentModData.ModID == mod.CurrentModData.ModID && testMod.InstalledVersion == mod.InstalledVersion)
+                            if ((testMod.CurrentModData.ModID == mod.CurrentModData.ModID || testMod.NameOnDisk == mod.NameOnDisk) && testMod.InstalledVersion == mod.InstalledVersion)
                             {
                                 copyingPath = modPath;
                                 break;

@@ -77,7 +77,13 @@ namespace AstroModLoader
             if (modData == null && nameOnDisk == null) return;
             if (AllModData == null) AllModData = new Dictionary<Version, Metadata>();
             NameOnDisk = nameOnDisk;
+
             PerformNameAnalysis();
+
+            if (modData != null)
+            {
+                if (modData.ModVersion != null) InstalledVersion = modData.ModVersion;
+            }
 
             Priority = newPriority;
             InstalledVersion = newModVersion;
@@ -116,7 +122,14 @@ namespace AstroModLoader
 
             if (origCount >= 1)
             {
-                newPriority = int.Parse(nameData[0]);
+                try
+                {
+                    newPriority = int.Parse(nameData[0]);
+                }
+                catch (FormatException)
+                {
+                    newPriority = 1;
+                }
                 nameData.RemoveAt(0);
             }
             else
@@ -124,11 +137,14 @@ namespace AstroModLoader
                 newPriority = 1;
             }
 
-            newModID = "UnknownMod" + new Random().Next(10000);
             if (origCount >= 2)
             {
                 if (!string.IsNullOrEmpty(nameData[0])) newModID = nameData[0];
                 nameData.RemoveAt(0);
+            }
+            else
+            {
+                newModID = NameOnDisk;
             }
 
             newModVersion = new Version(0, 1, 0);

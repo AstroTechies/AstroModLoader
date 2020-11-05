@@ -156,9 +156,10 @@ namespace AstroModLoader
             });
         }
 
-        public void AdjustModInfoText(string txt)
+        public void AdjustModInfoText(string txt, string linkText = "")
         {
-            this.modInfo.Text = txt;
+            this.modInfo.Text = txt + linkText;
+            this.modInfo.LinkArea = new LinkArea(txt.Length, linkText.Length);
         }
 
         private void Form1_DragEnter(object sender, DragEventArgs e)
@@ -215,7 +216,7 @@ namespace AstroModLoader
 
         private void Footer_Paint(object sender, PaintEventArgs e)
         {
-            using (Pen p = new Pen(Color.FromArgb(60, 60, 60), 1))
+            using (Pen p = new Pen(AMLPalette.FooterLineColor, 1))
             {
                 e.Graphics.DrawLine(p, new Point(0, 0), new Point(footer.ClientSize.Width, 0));
             }
@@ -295,7 +296,14 @@ namespace AstroModLoader
                     break;
             }
 
-            AdjustModInfoText("Name: " + selectedMod.CurrentModData.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync);
+            bool hasHomepage = !string.IsNullOrEmpty(selectedMod.CurrentModData.Homepage) && AMLUtils.IsValidUri(selectedMod.CurrentModData.Homepage);
+            AdjustModInfoText("Name: " + selectedMod.CurrentModData.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync + "\n", (hasHomepage ? "Click here for more info" : ""));
+        }
+
+        private void modInfo_LinkClicked(object sender, EventArgs e)
+        {
+            Mod selectedMod = TableManager.GetCurrentlySelectedMod();
+            if (selectedMod != null && !string.IsNullOrEmpty(selectedMod.CurrentModData.Homepage) && AMLUtils.IsValidUri(selectedMod.CurrentModData.Homepage)) Process.Start(selectedMod.CurrentModData.Homepage);
         }
 
         public void ForceResize()
@@ -311,7 +319,7 @@ namespace AstroModLoader
                 ModManager.SyncConfigFromDisk();
                 ModManager.UpdateReadOnlyStatus();
                 ModManager.SortMods();
-                autoUpdater.RunWorkerAsync();
+                if (!autoUpdater.IsBusy) autoUpdater.RunWorkerAsync();
             }
             if (TableManager != null) TableManager.Refresh();
             AMLPalette.RefreshTheme(this);

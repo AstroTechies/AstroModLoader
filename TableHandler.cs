@@ -121,10 +121,6 @@ namespace AstroModLoader
                         checkCell.ThreeState = true;
                         checkCell.Value = 2;
                     }
-                    else
-                    {
-                        checkCell.ThreeState = false;
-                    }
                 }
 
                 row.Cells[1].Value = mod.CurrentModData.Name;

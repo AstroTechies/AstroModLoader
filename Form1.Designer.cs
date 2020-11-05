@@ -29,10 +29,10 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.label1 = new System.Windows.Forms.Label();
-            this.modInfo = new System.Windows.Forms.Label();
+            this.modInfo = new System.Windows.Forms.LinkLabel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.footer = new System.Windows.Forms.Panel();
             this.exitButton = new AstroModLoader.CoolButton();
@@ -62,14 +62,14 @@
             this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridView1.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.dataGridView1.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(42)))), ((int)(((byte)(45)))));
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(85)))), ((int)(((byte)(85)))), ((int)(((byte)(85)))));
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(42)))), ((int)(((byte)(45)))));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(85)))), ((int)(((byte)(85)))), ((int)(((byte)(85)))));
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.DefaultCellStyle = this.dataGridView1.ColumnHeadersDefaultCellStyle;
             this.dataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
@@ -97,13 +97,15 @@
             // 
             // modInfo
             // 
+            this.modInfo.ActiveLinkColor = System.Drawing.Color.Red;
             this.modInfo.AutoSize = true;
-            this.modInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.modInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.5F);
             this.modInfo.Location = new System.Drawing.Point(17, 323);
-            this.modInfo.MaximumSize = new System.Drawing.Size(350, 0);
+            this.modInfo.MaximumSize = new System.Drawing.Size(400, 0);
             this.modInfo.Name = "modInfo";
             this.modInfo.Size = new System.Drawing.Size(0, 17);
             this.modInfo.TabIndex = 3;
+            this.modInfo.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.modInfo_LinkClicked);
             // 
             // panel1
             // 
@@ -126,7 +128,7 @@
             this.footer.Controls.Add(this.exitButton);
             this.footer.Controls.Add(this.settingsButton);
             this.footer.Controls.Add(this.playButton);
-            this.footer.Location = new System.Drawing.Point(0, 414);
+            this.footer.Location = new System.Drawing.Point(0, 422);
             this.footer.Name = "footer";
             this.footer.Size = new System.Drawing.Size(458, 53);
             this.footer.TabIndex = 5;
@@ -251,7 +253,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(42)))), ((int)(((byte)(45)))));
-            this.ClientSize = new System.Drawing.Size(459, 467);
+            this.ClientSize = new System.Drawing.Size(459, 475);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.footer);
             this.Controls.Add(this.modInfo);
@@ -274,7 +276,6 @@
 
         private System.Windows.Forms.Label label1;
         private AstroModLoader.CoolButton refresh;
-        private System.Windows.Forms.Label modInfo;
         private AstroModLoader.CoolButton playButton;
         private AstroModLoader.CoolButton loadButton;
         private AstroModLoader.CoolButton syncButton;
@@ -282,6 +283,7 @@
         private CoolButton exitButton;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Timer PeriodicCheckTimer;
+        public System.Windows.Forms.LinkLabel modInfo;
     }
 }
 
