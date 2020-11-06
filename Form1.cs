@@ -87,7 +87,7 @@ namespace AstroModLoader
 
                 using (var wb = new WebClient())
                 {
-                    wb.Headers[HttpRequestHeader.UserAgent] = "AstroModLoader " + Application.ProductVersion;
+                    wb.Headers[HttpRequestHeader.UserAgent] = AMLUtils.UserAgent;
 
                     string kosherFileName = AMLUtils.SanitizeFilename(allVerData[newVersion].Filename);
                     if (kosherFileName.Substring(kosherFileName.Length - 6, 6) != "_P.pak") kosherFileName += "_P.pak";
@@ -378,7 +378,7 @@ namespace AstroModLoader
                 }
                 catch
                 {
-                    AMLUtils.ShowBasicButton(this, "Invalid path to file: \"" + ModManager.LaunchCommand + "\"", "OK", null, null);
+                    this.ShowBasicButton("Invalid path to file: \"" + ModManager.LaunchCommand + "\"", "OK", null, null);
                     ModManager.LaunchCommand = null;
                     ModManager.SyncConfigToDisk();
                 }
@@ -403,7 +403,7 @@ namespace AstroModLoader
         {
             if (ModManager.IsReadOnly)
             {
-                AMLUtils.ShowBasicButton(this, "You cannot edit profiles while the game is open!", "OK", null, null);
+                this.ShowBasicButton("You cannot edit profiles while the game is open!", "OK", null, null);
                 return;
             }
 
@@ -427,7 +427,7 @@ namespace AstroModLoader
         {
             if (ModManager.IsReadOnly)
             {
-                AMLUtils.ShowBasicButton(this, "You cannot sync mods while the game is open!", "OK", null, null);
+                this.ShowBasicButton("You cannot sync mods while the game is open!", "OK", null, null);
                 return;
             }
 
@@ -445,7 +445,7 @@ namespace AstroModLoader
                     AstroLauncherServerInfo serverInfo = PlayFabAPI.GetAstroLauncherData(getIPPrompt.OutputText);
                     if (serverInfo == null)
                     {
-                        AMLUtils.ShowBasicButton(this, "Failed to find an online AstroLauncher server with the requested address!", "OK", null, null);
+                        this.ShowBasicButton("Failed to find an online AstroLauncher server with the requested address!", "OK", null, null);
                         return;
                     }
 
@@ -508,7 +508,7 @@ namespace AstroModLoader
                     // Add the new profile to the list
                     string kosherProfileName = kosherServerName + " Synced Mods";
                     ModManager.ProfileList[kosherProfileName] = creatingProfile;
-                    AMLUtils.ShowBasicButton(this, "Added a new profile named \"" + kosherProfileName + "\". " + failedDownloadCount + " mods failed to sync.", "OK", null, null);
+                    this.ShowBasicButton("Added a new profile named \"" + kosherProfileName + "\". " + failedDownloadCount + " mods failed to sync.", "OK", null, null);
                 });
             }
         }

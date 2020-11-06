@@ -168,7 +168,7 @@ namespace AstroModLoader
                     string rawIndexFileData = "";
                     using (var wb = new WebClient())
                     {
-                        wb.Headers[HttpRequestHeader.UserAgent] = "AstroModLoader " + Application.ProductVersion;
+                        wb.Headers[HttpRequestHeader.UserAgent] = AMLUtils.UserAgent;
                         rawIndexFileData = wb.DownloadString(di.URL);
                     }
                     if (string.IsNullOrEmpty(rawIndexFileData)) return null;

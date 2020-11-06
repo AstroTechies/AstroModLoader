@@ -108,7 +108,7 @@ namespace AstroModLoader
         {
             if (SelectedProfile == null)
             {
-                AMLUtils.ShowBasicButton(this, "Please select a profile to load it.", "OK", null, null);
+                this.ShowBasicButton("Please select a profile to load it.", "OK", null, null);
                 return;
             }
             OurParentForm.ModManager.ApplyProfile(SelectedProfile);
@@ -141,7 +141,7 @@ namespace AstroModLoader
                 if (string.IsNullOrEmpty(profileNamePrompt.OutputText)) return;
                 if (OurParentForm.ModManager.ProfileList.ContainsKey(profileNamePrompt.OutputText))
                 {
-                    int dialogResult = AMLUtils.ShowBasicButton(this, "Do you want to overwrite this profile?", "Yes", "No", null);
+                    int dialogResult = this.ShowBasicButton("Do you want to overwrite this profile?", "Yes", "No", null);
                     if (dialogResult == 0)
                     {
                         OurParentForm.ModManager.ProfileList[profileNamePrompt.OutputText] = OurParentForm.ModManager.GenerateProfile();
@@ -165,7 +165,7 @@ namespace AstroModLoader
         private void deleteProfileButton_Click(object sender, EventArgs e)
         {
             if (listBox1.SelectedValue == null) return;
-            int dialogResult = AMLUtils.ShowBasicButton(this, "Are you sure you want to delete this profile?", "Yes", "No", null);
+            int dialogResult = this.ShowBasicButton("Are you sure you want to delete this profile?", "Yes", "No", null);
             if (dialogResult == 0)
             {
                 OurParentForm.ModManager.ProfileList.Remove(listBox1.SelectedValue as string);
@@ -180,7 +180,7 @@ namespace AstroModLoader
         {
             if (SelectedProfile == null)
             {
-                AMLUtils.ShowBasicButton(this, "Please select a profile to save to it.", "OK", null, null);
+                this.ShowBasicButton("Please select a profile to save to it.", "OK", null, null);
                 return;
             }
             OurParentForm.ModManager.ProfileList[listBox1.SelectedValue as string] = OurParentForm.ModManager.GenerateProfile();

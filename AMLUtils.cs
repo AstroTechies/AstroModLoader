@@ -20,6 +20,14 @@ namespace AstroModLoader
             }
         }
 
+        public static string UserAgent
+        {
+            get
+            {
+                return "AstroModLoader/" + Application.ProductVersion;
+            }
+        }
+
         public static string SerializeObject<T>(T value)
         {
             StringBuilder sb = new StringBuilder(256);
@@ -48,7 +56,7 @@ namespace AstroModLoader
             return "#" + color.R.ToString("X2") + color.G.ToString("X2") + color.B.ToString("X2");
         }
 
-        public static int ShowBasicButton(this Form frm, string labelText, string button1text = "Yes", string button2text = "No", string button3text = "Cancel")
+        public static int ShowBasicButton(this Form frm, string labelText, string button1text, string button2text, string button3text)
         {
             BasicButtonPopup basicButtonPrompt = new BasicButtonPopup();
             basicButtonPrompt.StartPosition = FormStartPosition.Manual;

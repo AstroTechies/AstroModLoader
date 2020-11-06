@@ -35,7 +35,7 @@ namespace AstroModLoader
         public static readonly Dictionary<string, Color> PresetMap = new Dictionary<string, Color>
         {
             { "Sleek Yellow", Color.FromArgb(255, 231, 149) },
-            { "Fun Green", Color.FromArgb(171, 238, 151) },
+            { "Fern Green", Color.FromArgb(171, 238, 151) },
             { "Soft Pink", Color.FromArgb(245, 140, 175) },
             { "Astro Blue", Color.FromArgb(18, 154, 240) },
             { "Alert Red", Color.FromArgb(227, 55, 24) },

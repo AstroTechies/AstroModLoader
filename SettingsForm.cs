@@ -95,7 +95,7 @@ namespace AstroModLoader
             }
             catch
             {
-                AMLUtils.ShowBasicButton(this, "Invalid color!", "OK", null, null);
+                this.ShowBasicButton("Invalid color!", "OK", null, null);
                 AMLPalette.AccentColor = backupColor;
                 UpdateColorBoxText();
             }
