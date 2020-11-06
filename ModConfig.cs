@@ -14,6 +14,11 @@ namespace AstroModLoader
         [JsonProperty("launch_command")]
         public string LaunchCommand;
 
+        public bool ShouldSerializeLaunchCommand()
+        {
+            return !string.IsNullOrEmpty(LaunchCommand);
+        }
+
         [JsonProperty("theme")]
         [JsonConverter(typeof(StringEnumConverter))]
         public ModLoaderTheme Theme;

@@ -297,7 +297,7 @@ namespace AstroModLoader
             }
 
             bool hasHomepage = !string.IsNullOrEmpty(selectedMod.CurrentModData.Homepage) && AMLUtils.IsValidUri(selectedMod.CurrentModData.Homepage);
-            AdjustModInfoText("Name: " + selectedMod.CurrentModData.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync + "\n", (hasHomepage ? "Click here for more info" : ""));
+            AdjustModInfoText("Name: " + selectedMod.CurrentModData.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync + "\n" + (hasHomepage ? "Website: " : ""), (hasHomepage ? selectedMod.CurrentModData.Homepage : ""));
         }
 
         private void modInfo_LinkClicked(object sender, EventArgs e)
@@ -463,7 +463,7 @@ namespace AstroModLoader
                     creatingProfile.ProfileData = new Dictionary<string, Mod>();
                     int failedDownloadCount = 0;
 
-                    // Add our current mods into the index, and specify that they should be disabled
+                    // Add our current mods into the brand new profile, and specify that they are disabled
                     ModProfile currentProf = ModManager.GenerateProfile();
                     foreach (KeyValuePair<string, Mod> entry in currentProf.ProfileData)
                     {
