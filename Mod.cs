@@ -220,6 +220,7 @@ namespace AstroModLoader
             var modClone = new Mod(null, this.NameOnDisk);
             modClone.AvailableVersions = this.AvailableVersions.ToList();
             modClone.AvailableVersions.ForEach(x => x.Clone());
+            modClone.AllModData = this.AllModData.ToDictionary(entry => (Version)entry.Key.Clone(), entry => (Metadata)entry.Value.Clone());
             modClone.InstalledVersion = (Version)this.InstalledVersion.Clone();
             modClone.ForceLatest = this.ForceLatest;
             modClone.Enabled = this.Enabled;

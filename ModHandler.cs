@@ -431,6 +431,11 @@ namespace AstroModLoader
         public void ApplyProfile(ModProfile prof)
         {
             if (prof == null) return;
+            foreach (KeyValuePair<string, Mod> rawEntry in ModLookup)
+            {
+                ModLookup[rawEntry.Key].Enabled = false;
+            }
+
             foreach (KeyValuePair<string, Mod> entry in prof.ProfileData)
             {
                 if (ModLookup.ContainsKey(entry.Key))

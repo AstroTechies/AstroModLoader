@@ -285,6 +285,9 @@ namespace AstroModLoader
             string kosherSync = "N/A";
             switch (selectedMod.CurrentModData.Sync)
             {
+                case SyncMode.None:
+                    kosherSync = "None";
+                    break;
                 case SyncMode.ClientOnly:
                     kosherSync = "Client only";
                     break;
@@ -297,7 +300,7 @@ namespace AstroModLoader
             }
 
             bool hasHomepage = !string.IsNullOrEmpty(selectedMod.CurrentModData.Homepage) && AMLUtils.IsValidUri(selectedMod.CurrentModData.Homepage);
-            AdjustModInfoText("Name: " + selectedMod.CurrentModData.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync + "\n" + (hasHomepage ? "Website: " : ""), (hasHomepage ? selectedMod.CurrentModData.Homepage : ""));
+            AdjustModInfoText("Name: " + selectedMod.CurrentModData.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync + (hasHomepage ? "\nWebsite: " : ""), hasHomepage ? selectedMod.CurrentModData.Homepage : "");
         }
 
         private void modInfo_LinkClicked(object sender, EventArgs e)
@@ -442,74 +445,91 @@ namespace AstroModLoader
             {
                 Task.Run(() =>
                 {
-                    AstroLauncherServerInfo serverInfo = PlayFabAPI.GetAstroLauncherData(getIPPrompt.OutputText);
-                    if (serverInfo == null)
+                    try
                     {
-                        this.ShowBasicButton("Failed to find an online AstroLauncher server with the requested address!", "OK", null, null);
-                        return;
-                    }
-
-                    if (PlayFabAPI.Dirty)
-                    {
-                        ModManager.SyncConfigToDisk();
-                        PlayFabAPI.Dirty = false;
-                    }
-
-                    List<Mod> allMods = serverInfo.GetAllMods();
-                    string kosherServerName = serverInfo.ServerName;
-                    if (string.IsNullOrEmpty(kosherServerName) || kosherServerName == "Astroneer Dedicated Server") kosherServerName = getIPPrompt.OutputText;
-
-                    ModProfile creatingProfile = new ModProfile();
-                    creatingProfile.ProfileData = new Dictionary<string, Mod>();
-                    int failedDownloadCount = 0;
-
-                    // Add our current mods into the brand new profile, and specify that they are disabled
-                    ModProfile currentProf = ModManager.GenerateProfile();
-                    foreach (KeyValuePair<string, Mod> entry in currentProf.ProfileData)
-                    {
-                        entry.Value.Enabled = false;
-                        creatingProfile.ProfileData[entry.Value.CurrentModData.ModID] = entry.Value;
-                    }
-
-                    // Incorporate newly synced index files into the global index
-                    List<string> DuplicateURLs = new List<string>();
-                    foreach (Mod mod in allMods)
-                    {
-                        IndexFile thisIndexFile = mod.GetIndexFile(DuplicateURLs);
-                        if (thisIndexFile != null)
+                        AstroLauncherServerInfo serverInfo = PlayFabAPI.GetAstroLauncherData(getIPPrompt.OutputText);
+                        if (serverInfo == null)
                         {
-                            thisIndexFile.Mods.ToList().ForEach(x => ModManager.GlobalIndexFile[x.Key] = x.Value);
-                            DuplicateURLs.Add(thisIndexFile.OriginalURL);
+                            this.ShowBasicButton("Failed to find an online AstroLauncher server with the requested address!", "OK", null, null);
+                            return;
                         }
-                    }
 
-                    // Download server mods from the newly incorporated index files
-                    foreach (Mod mod in allMods)
-                    {
-                        if (mod.CurrentModData.Sync == SyncMode.ServerAndClient || mod.CurrentModData.Sync == SyncMode.ClientOnly)
+                        if (PlayFabAPI.Dirty)
                         {
-                            bool didDownloadMod = DownloadVersionSync(mod, mod.InstalledVersion);
-                            if (didDownloadMod)
-                            {
-                                creatingProfile.ProfileData[mod.CurrentModData.ModID] = mod;
-                            }
-                            else
-                            {
-                                failedDownloadCount++;
-                            }
-                            mod.Enabled = true;
-                            mod.ForceLatest = false;
+                            ModManager.SyncConfigToDisk();
+                            PlayFabAPI.Dirty = false;
                         }
+
+                        List<Mod> allMods = serverInfo.GetAllMods();
+                        string kosherServerName = serverInfo.ServerName;
+                        if (string.IsNullOrEmpty(kosherServerName) || kosherServerName == "Astroneer Dedicated Server") kosherServerName = getIPPrompt.OutputText;
+
+                        ModProfile creatingProfile = new ModProfile();
+                        creatingProfile.ProfileData = new Dictionary<string, Mod>();
+                        int failedDownloadCount = 0;
+
+                        // Add our current mods into the brand new profile, and specify that they are disabled
+                        ModProfile currentProf = ModManager.GenerateProfile();
+                        foreach (KeyValuePair<string, Mod> entry in currentProf.ProfileData)
+                        {
+                            entry.Value.Enabled = false;
+                            creatingProfile.ProfileData[entry.Key] = entry.Value;
+                        }
+
+                        // Incorporate newly synced index files into the global index
+                        List<string> DuplicateURLs = new List<string>();
+                        foreach (Mod mod in allMods)
+                        {
+                            IndexFile thisIndexFile = mod.GetIndexFile(DuplicateURLs);
+                            if (thisIndexFile != null)
+                            {
+                                thisIndexFile.Mods.ToList().ForEach(x => ModManager.GlobalIndexFile[x.Key] = x.Value);
+                                DuplicateURLs.Add(thisIndexFile.OriginalURL);
+                            }
+                        }
+
+                        // Download server mods from the newly incorporated index files
+                        foreach (Mod mod in allMods)
+                        {
+                            if (mod.CurrentModData.Sync == SyncMode.ServerAndClient || mod.CurrentModData.Sync == SyncMode.ClientOnly)
+                            {
+                                bool didDownloadMod = DownloadVersionSync(mod, mod.InstalledVersion);
+                                if (didDownloadMod)
+                                {
+                                    creatingProfile.ProfileData[mod.CurrentModData.ModID] = mod;
+                                }
+                                else
+                                {
+                                    failedDownloadCount++;
+                                }
+                                mod.Enabled = true;
+                                mod.ForceLatest = false;
+                            }
+                        }
+
+                        // Update available versions list to make the syncing seamless
+                        ModManager.UpdateAvailableVersionsFromIndexFiles();
+
+                        // Add the new profile to the list
+                        if (ModManager.ProfileList == null) ModManager.ProfileList = new Dictionary<string, ModProfile>();
+                        string kosherProfileName = kosherServerName + " Synced Mods";
+                        ModManager.ProfileList[kosherProfileName] = creatingProfile;
+                        this.ShowBasicButton("Added a new profile named \"" + kosherProfileName + "\". " + failedDownloadCount + " mods failed to sync.", "OK", null, null);
                     }
-
-                    // Update available versions list to make the syncing seamless
-                    ModManager.UpdateAvailableVersionsFromIndexFiles();
-
-                    // Add the new profile to the list
-                    string kosherProfileName = kosherServerName + " Synced Mods";
-                    ModManager.ProfileList[kosherProfileName] = creatingProfile;
-                    this.ShowBasicButton("Added a new profile named \"" + kosherProfileName + "\". " + failedDownloadCount + " mods failed to sync.", "OK", null, null);
-                });
+                    catch (Exception ex)
+                    {
+                        if (ex is PlayFabException || ex is WebException)
+                        {
+                            this.ShowBasicButton("Failed to access PlayFab!", "OK", null, null);
+                            return;
+                        }
+                        throw;
+                    }
+                }).ContinueWith(res =>
+                {
+                    ModManager.SyncConfigToDisk();
+                    TableManager.Refresh();
+                }, TaskScheduler.FromCurrentSynchronizationContext());
             }
         }
     }
