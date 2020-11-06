@@ -177,7 +177,6 @@ namespace AstroModLoader
                     try
                     {
                         File.Copy(newInstallingMod, Path.Combine(ModManager.DownloadPath, Path.GetFileName(newInstallingMod)));
-                        //File.Copy(newInstallingMod, Path.Combine(ModManager.InstallPath, Path.GetFileName(newInstallingMod)));
                     }
                     catch (IOException) { }
                 }
@@ -318,6 +317,9 @@ namespace AstroModLoader
         {
             if (ModManager != null)
             {
+                Directory.CreateDirectory(ModManager.DownloadPath);
+                Directory.CreateDirectory(ModManager.InstallPath);
+
                 ModManager.SyncModsFromDisk();
                 ModManager.SyncConfigFromDisk();
                 ModManager.UpdateReadOnlyStatus();
@@ -470,21 +472,28 @@ namespace AstroModLoader
 
                         // Add our current mods into the brand new profile, and specify that they are disabled
                         ModProfile currentProf = ModManager.GenerateProfile();
+                        List<Mod> plannedOrdering = new List<Mod>();
                         foreach (KeyValuePair<string, Mod> entry in currentProf.ProfileData)
                         {
                             entry.Value.Enabled = false;
                             creatingProfile.ProfileData[entry.Key] = entry.Value;
+                            plannedOrdering.Add(entry.Value);
                         }
+
+                        plannedOrdering = new List<Mod>(plannedOrdering.OrderBy(o => o.Priority).ToList());
 
                         // Incorporate newly synced index files into the global index
                         List<string> DuplicateURLs = new List<string>();
                         foreach (Mod mod in allMods)
                         {
-                            IndexFile thisIndexFile = mod.GetIndexFile(DuplicateURLs);
-                            if (thisIndexFile != null)
+                            if (mod.CurrentModData.Sync == SyncMode.ServerAndClient || mod.CurrentModData.Sync == SyncMode.ClientOnly)
                             {
-                                thisIndexFile.Mods.ToList().ForEach(x => ModManager.GlobalIndexFile[x.Key] = x.Value);
-                                DuplicateURLs.Add(thisIndexFile.OriginalURL);
+                                IndexFile thisIndexFile = mod.GetIndexFile(DuplicateURLs);
+                                if (thisIndexFile != null)
+                                {
+                                    thisIndexFile.Mods.ToList().ForEach(x => ModManager.GlobalIndexFile[x.Key] = x.Value);
+                                    DuplicateURLs.Add(thisIndexFile.OriginalURL);
+                                }
                             }
                         }
 
@@ -493,28 +502,56 @@ namespace AstroModLoader
                         {
                             if (mod.CurrentModData.Sync == SyncMode.ServerAndClient || mod.CurrentModData.Sync == SyncMode.ClientOnly)
                             {
-                                bool didDownloadMod = DownloadVersionSync(mod, mod.InstalledVersion);
-                                if (didDownloadMod)
+                                Mod appliedMod = null;
+
+                                // If we already have this mod downloaded, no sense in downloading it again
+                                if (ModManager.ModLookup.ContainsKey(mod.CurrentModData.ModID) && ModManager.ModLookup[mod.CurrentModData.ModID].AvailableVersions != null && ModManager.ModLookup[mod.CurrentModData.ModID].AvailableVersions.Where(m => m.ToString() == mod.InstalledVersion.ToString()).Count() > 0)
                                 {
-                                    creatingProfile.ProfileData[mod.CurrentModData.ModID] = mod;
+                                    appliedMod = (Mod)ModManager.ModLookup[mod.CurrentModData.ModID].Clone();
+                                    appliedMod.InstalledVersion = (Version)mod.InstalledVersion.Clone();
+                                    creatingProfile.ProfileData[mod.CurrentModData.ModID] = appliedMod;
                                 }
                                 else
                                 {
-                                    failedDownloadCount++;
+                                    // Otherwise, go ahead and download it
+                                    bool didDownloadMod = DownloadVersionSync(mod, mod.InstalledVersion);
+                                    if (didDownloadMod)
+                                    {
+                                        appliedMod = mod;
+                                        creatingProfile.ProfileData[mod.CurrentModData.ModID] = appliedMod;
+                                    }
+                                    else
+                                    {
+                                        failedDownloadCount++;
+                                    }
                                 }
-                                mod.Enabled = true;
-                                mod.ForceLatest = false;
+
+                                if (appliedMod != null)
+                                {
+                                    appliedMod.Enabled = true;
+                                    appliedMod.ForceLatest = false;
+                                    plannedOrdering.Remove(appliedMod);
+                                    plannedOrdering.Insert(0, appliedMod);
+                                }
                             }
                         }
 
                         // Update available versions list to make the syncing seamless
                         ModManager.UpdateAvailableVersionsFromIndexFiles();
 
+                        // Enforce the planned ordering in our new profile
+                        for (int i = 0; i < plannedOrdering.Count; i++)
+                        {
+                            string thisModID = plannedOrdering[i].CurrentModData.ModID;
+                            Debug.WriteLine(i + ": " + thisModID);
+                            if (creatingProfile.ProfileData.ContainsKey(thisModID)) creatingProfile.ProfileData[thisModID].Priority = i + 1;
+                        }
+
                         // Add the new profile to the list
                         if (ModManager.ProfileList == null) ModManager.ProfileList = new Dictionary<string, ModProfile>();
                         string kosherProfileName = kosherServerName + " Synced Mods";
                         ModManager.ProfileList[kosherProfileName] = creatingProfile;
-                        this.ShowBasicButton("Added a new profile named \"" + kosherProfileName + "\". " + failedDownloadCount + " mods failed to sync.", "OK", null, null);
+                        this.ShowBasicButton("Added a new profile named \"" + kosherProfileName + "\". " + (failedDownloadCount == 0 ? "No" : failedDownloadCount.ToString()) + " mod" + (failedDownloadCount == 1 ? "" : "s") + " failed to sync.", "OK", null, null);
                     }
                     catch (Exception ex)
                     {

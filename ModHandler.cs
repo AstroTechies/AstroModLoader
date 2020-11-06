@@ -540,6 +540,9 @@ namespace AstroModLoader
             UpdateReadOnlyStatus();
             try
             {
+                Directory.CreateDirectory(DownloadPath);
+                Directory.CreateDirectory(InstallPath);
+
                 SyncConfigToDisk();
                 SyncModsToDisk();
                 IntegrateMods();
