@@ -73,7 +73,7 @@ namespace AstroModLoader
 
         private void accentComboBox_UpdateColor(object sender, EventArgs e)
         {
-            Color backupColor = Color.FromArgb(AMLPalette.AccentColor.A, AMLPalette.AccentColor.R, AMLPalette.AccentColor.G, AMLPalette.AccentColor.B);
+            Color backupColor = Color.FromArgb(AMLPalette.AccentColor.ToArgb());
             try
             {
                 if (AMLPalette.PresetMap.ContainsKey(accentComboBox.Text))

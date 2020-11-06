@@ -297,7 +297,7 @@ namespace AstroModLoader
             }
 
             bool hasHomepage = !string.IsNullOrEmpty(selectedMod.CurrentModData.Homepage) && AMLUtils.IsValidUri(selectedMod.CurrentModData.Homepage);
-            AdjustModInfoText("Name: " + selectedMod.CurrentModData.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync + "\n", (hasHomepage ? "Homepage" : ""));
+            AdjustModInfoText("Name: " + selectedMod.CurrentModData.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync + "\n", (hasHomepage ? "Click here for more info" : ""));
         }
 
         private void modInfo_LinkClicked(object sender, EventArgs e)
