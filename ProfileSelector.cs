@@ -85,6 +85,7 @@ namespace AstroModLoader
             }
             this.RefreshTheme();
             AMLPalette.RefreshTheme(this);
+            this.AdjustFormPosition();
         }
 
         private void ForceRefreshSelectedProfile()

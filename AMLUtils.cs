@@ -56,12 +56,20 @@ namespace AstroModLoader
             return "#" + color.R.ToString("X2") + color.G.ToString("X2") + color.B.ToString("X2");
         }
 
-        public static int ShowBasicButton(this Form frm, string labelText, string button1text, string button2text, string button3text)
+        public static void AdjustFormPosition(this Form frm1)
+        {
+            if (frm1.Owner != null) frm1.Location = new Point((frm1.Owner.Location.X + frm1.Owner.Width / 2) - (frm1.Width / 2), (frm1.Owner.Location.Y + frm1.Owner.Height / 2) - (frm1.Height / 2));
+        }
+
+        public static BasicButtonPopup GetBasicButton(this Form frm, string labelText, string button1text, string button2text, string button3text)
         {
             BasicButtonPopup basicButtonPrompt = new BasicButtonPopup();
+            basicButtonPrompt.Owner = frm;
+            basicButtonPrompt.Text = frm.Text;
+
+            // We later adjust this in the button itself to correct error, but good to have this here as a backup
             basicButtonPrompt.StartPosition = FormStartPosition.Manual;
             basicButtonPrompt.Location = new Point((frm.Location.X + frm.Width / 2) - (basicButtonPrompt.Width / 2), (frm.Location.Y + frm.Height / 2) - (basicButtonPrompt.Height / 2));
-            basicButtonPrompt.Text = frm.Text;
 
             basicButtonPrompt.DisplayText = labelText;
             basicButtonPrompt.button1.Text = button1text;
@@ -71,6 +79,12 @@ namespace AstroModLoader
             basicButtonPrompt.button3.Text = button3text;
             if (string.IsNullOrEmpty(button3text)) basicButtonPrompt.button3.Hide();
 
+            return basicButtonPrompt;
+        }
+
+        public static int ShowBasicButton(this Form frm, string labelText, string button1text, string button2text, string button3text)
+        {
+            BasicButtonPopup basicButtonPrompt = GetBasicButton(frm, labelText, button1text, button2text, button3text);
             basicButtonPrompt.ShowDialog();
             return basicButtonPrompt.ResultButton;
         }

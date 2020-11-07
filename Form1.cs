@@ -340,9 +340,26 @@ namespace AstroModLoader
             FullRefresh();
         }
 
+        public static readonly string GitHubRepo = "AstroTechies/AstroModLoader"; // AstroTechies/AstroModLoader
+        private Version latestOnlineVersion = null;
         private void Form1_Load(object sender, EventArgs e)
         {
             dataGridView1.ClearSelection();
+
+            // Fetch the latest version from github
+            Task.Run(() =>
+            {
+                latestOnlineVersion = GitHubAPI.GetLatestVersionFromGitHub(GitHubRepo);
+            }).ContinueWith(res =>
+            {
+                //Debug.WriteLine("Latest: " + latestOnlineVersion);
+                if (latestOnlineVersion != null && latestOnlineVersion.CompareTo(Assembly.GetExecutingAssembly().GetName().Version) > 0)
+                {
+                    BasicButtonPopup resultButton = this.GetBasicButton("A new version of AstroModLoader (v" + latestOnlineVersion + ") is available!", "OK", "Open in browser", null);
+                    resultButton.PageToVisit = GitHubAPI.GetLatestVersionURL(GitHubRepo);
+                    resultButton.ShowDialog();
+                }
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private void playButton_Click(object sender, EventArgs e)

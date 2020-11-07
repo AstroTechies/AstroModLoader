@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,7 @@ namespace AstroModLoader
     {
         public string DisplayText;
         public int ResultButton;
+        public string PageToVisit = "";
 
         public BasicButtonPopup()
         {
@@ -23,12 +25,6 @@ namespace AstroModLoader
         private void BasicButtonPopup_Load(object sender, EventArgs e)
         {
             mainLabel.Text = DisplayText;
-            if (this.Owner is Form1 parentForm)
-            {
-                this.Text = parentForm.Text;
-                AMLPalette.RefreshTheme(parentForm);
-            }
-            AMLPalette.RefreshTheme(this);
 
             using (Graphics g = CreateGraphics())
             {
@@ -36,6 +32,16 @@ namespace AstroModLoader
                 this.Width = (int)Math.Ceiling(sz.Width) + 100;
             }
 
+            if (this.Owner is Form1 parentForm)
+            {
+                this.Text = parentForm.Text;
+                AMLPalette.RefreshTheme(parentForm);
+            }
+
+            this.AdjustFormPosition();
+            AMLPalette.RefreshTheme(this);
+
+            
             mainLabel.Select();
         }
 
@@ -47,8 +53,15 @@ namespace AstroModLoader
 
         private void button2_Click(object sender, EventArgs e)
         {
-            ResultButton = 1;
-            this.Close();
+            if (string.IsNullOrEmpty(PageToVisit))
+            {
+                ResultButton = 1;
+                this.Close();
+            }
+            else
+            {
+                Process.Start(PageToVisit);
+            }
         }
 
         private void button3_Click(object sender, EventArgs e)

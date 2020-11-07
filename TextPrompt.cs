@@ -33,6 +33,7 @@ namespace AstroModLoader
                 AMLPalette.RefreshTheme(parentForm);
             }
             AMLPalette.RefreshTheme(this);
+            this.AdjustFormPosition();
             if (!AllowBrowse)
             {
                 browseButton.Hide();
