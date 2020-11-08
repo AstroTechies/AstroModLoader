@@ -184,18 +184,23 @@ namespace AstroModLoader
             string[] installingModPaths = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (installingModPaths.Length > 0)
             {
+                List<Mod> newMods = new List<Mod>();
                 foreach (string newInstallingMod in installingModPaths)
                 {
                     try
                     {
-                        File.Copy(newInstallingMod, Path.Combine(ModManager.DownloadPath, Path.GetFileName(newInstallingMod)));
+                        string newPath = Path.Combine(ModManager.DownloadPath, Path.GetFileName(newInstallingMod));
+                        File.Copy(newInstallingMod, newPath);
+                        newMods.Add(ModManager.SyncSingleModFromDisk(newPath, false));
                     }
                     catch (IOException) { }
                 }
 
-                FullRefresh();
+                ModManager.SyncModsFromDisk(true);
+                ModManager.SortMods();
+                if (!autoUpdater.IsBusy) autoUpdater.RunWorkerAsync();
 
-                foreach (Mod mod in ModManager.Mods)
+                foreach (Mod mod in newMods)
                 {
                     mod.Dirty = true;
                     mod.Enabled = true;
@@ -437,7 +442,7 @@ namespace AstroModLoader
             SettingsForm settingsForm = new SettingsForm();
             settingsForm.StartPosition = FormStartPosition.Manual;
             settingsForm.Location = new Point((this.Location.X + this.Width / 2) - (settingsForm.Width / 2), (this.Location.Y + this.Height / 2) - (settingsForm.Height / 2));
-            settingsForm.Show(this);
+            settingsForm.ShowDialog(this);
         }
 
         private void exitButton_Click(object sender, EventArgs e)

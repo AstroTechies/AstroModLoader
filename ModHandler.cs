@@ -381,10 +381,10 @@ namespace AstroModLoader
             }
         }
 
-        public void SyncSingleModFromDisk(string modPath, bool updateSort = true)
+        public Mod SyncSingleModFromDisk(string modPath, bool updateSort = true)
         {
             Mod newMod = new Mod(ExtractMetadataFromPath(modPath), Path.GetFileName(modPath));
-            if (Program.CommandLineOptions.ServerMode && newMod.CurrentModData.Sync == SyncMode.ClientOnly) return;
+            if (Program.CommandLineOptions.ServerMode && newMod.CurrentModData.Sync == SyncMode.ClientOnly) return null;
             if (ModLookup.ContainsKey(newMod.CurrentModData.ModID))
             {
                 if (!ModLookup[newMod.CurrentModData.ModID].AvailableVersions.Contains(newMod.InstalledVersion)) ModLookup[newMod.CurrentModData.ModID].AvailableVersions.Add(newMod.InstalledVersion);
@@ -401,18 +401,21 @@ namespace AstroModLoader
                 SortVersions();
                 SortMods();
             }
-            return;
+            return newMod;
         }
 
-        public void SyncModsFromDisk()
+        public void SyncModsFromDisk(bool skipIndexing = false)
         {
-            Mods = new List<Mod>();
-
-            string[] allMods = Directory.GetFiles(DownloadPath, "*.pak", SearchOption.TopDirectoryOnly);
-            ModLookup = new Dictionary<string, Mod>();
-            foreach (string modPath in allMods)
+            if (!skipIndexing)
             {
-                SyncSingleModFromDisk(modPath, false);
+                Mods = new List<Mod>();
+
+                string[] allMods = Directory.GetFiles(DownloadPath, "*.pak", SearchOption.TopDirectoryOnly);
+                ModLookup = new Dictionary<string, Mod>();
+                foreach (string modPath in allMods)
+                {
+                    SyncSingleModFromDisk(modPath, false);
+                }
             }
 
             SortVersions();

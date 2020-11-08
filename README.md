@@ -20,5 +20,7 @@ AstroModLoader includes the following features:
 ## Getting Started
 To run a local copy of AstroModLoader, visit the [Releases tab](https://github.com/AstroTechies/AstroModLoader/releases) to download the executable, or clone the repository and build AstroModLoader yourself within Visual Studio.
 
+We have a Discord server dedicated to Astroneer modding, which you are free to join to learn more about modding Astroneer: https://discord.gg/bBqdVYxu4k
+
 ## Licensing
 AstroModLoader is licensed under the MIT license, which can be found in [LICENSE.md.](https://github.com/AstroTechies/AstroModLoader/blob/master/LICENSE.md) In addition, necessary licenses for the third-party material used in this software can be found in [NOTICE.md.](https://github.com/AstroTechies/AstroModLoader/blob/master/NOTICE.md)
