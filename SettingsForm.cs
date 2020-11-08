@@ -47,19 +47,25 @@ namespace AstroModLoader
             }
         }
 
+        private Form1 BaseForm;
         private bool _readyToUpdateTheme = false;
         private void SettingsForm_Load(object sender, EventArgs e)
         {
-            if (this.Owner is Form1 parentForm)
+            if (this.Owner is Form1)
             {
-                gamePathBox.Text = parentForm.ModManager.GamePath;
-                AMLPalette.RefreshTheme(parentForm);
+                BaseForm = (Form1)this.Owner;
+                gamePathBox.Text = BaseForm.ModManager.GamePath;
+                platformComboBox.DataSource = BaseForm.ModManager.AllPlatforms;
+                platformComboBox.SelectedIndex = platformComboBox.FindStringExact(BaseForm.ModManager.Platform.ToString());
+                AMLPalette.RefreshTheme(BaseForm);
                 UpdateColorBoxText();
             }
             themeComboBox.DataSource = Enum.GetValues(typeof(ModLoaderTheme));
             themeComboBox.SelectedIndex = (int)AMLPalette.CurrentTheme;
             accentComboBox.Items.AddRange(AMLPalette.PresetMap.Keys.ToArray());
             AMLPalette.RefreshTheme(this);
+
+            this.AdjustFormPosition();
 
             gamePathBox.SelectionStart = 0;
             accentComboBox.SelectionLength = 0;
@@ -112,6 +118,16 @@ namespace AstroModLoader
                 parentForm.ModManager.SyncConfigToDisk();
             }
             AMLPalette.RefreshTheme(this);
+        }
+
+        private void platformComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!_readyToUpdateTheme) return;
+            if (BaseForm == null) return;
+
+            Enum.TryParse(platformComboBox.SelectedValue.ToString(), out PlatformType nextPlatform);
+            BaseForm.SwitchPlatform(nextPlatform);
+            gamePathBox.Text = BaseForm.ModManager.GamePath;
         }
     }
 }

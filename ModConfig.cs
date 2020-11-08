@@ -19,19 +19,6 @@ namespace AstroModLoader
             return !string.IsNullOrEmpty(LaunchCommand);
         }
 
-        [JsonProperty("theme")]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ModLoaderTheme Theme;
-
-        [JsonProperty("accent")]
-        public string AccentColor;
-
-        [JsonProperty("playfab_id")]
-        public string PlayFabCustomID;
-
-        [JsonProperty("playfab_token")]
-        public string PlayFabToken;
-
         [JsonProperty("current")]
         public ModProfile ModsOnDisk;
 

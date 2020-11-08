@@ -58,7 +58,6 @@ namespace AstroModLoader
             }
 
             this.RefreshTheme();
-            AMLPalette.RefreshTheme(OurParentForm);
             this.listBox1.Refresh();
 
             for (int i = 0; i < this.listBox1.Items.Count; i++)

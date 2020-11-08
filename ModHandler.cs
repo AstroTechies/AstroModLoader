@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
 
 namespace AstroModLoader
 {
@@ -24,6 +25,9 @@ namespace AstroModLoader
         internal string BinaryFilePath;
         internal Form1 BaseForm;
 
+        public PlatformType Platform = PlatformType.Unknown;
+        public Dictionary<PlatformType, string> ValidPlatformTypesToPaths;
+        public List<PlatformType> AllPlatforms;
         public List<Mod> Mods;
         public Dictionary<string, ModProfile> ProfileList;
         public Dictionary<string, IndexMod> GlobalIndexFile;
@@ -34,40 +38,50 @@ namespace AstroModLoader
         {
             BaseForm = baseForm;
 
-            DeterminePaths();
-            SyncModsFromDisk();
-            SyncConfigFromDisk();
-
-            if (GamePath == null)
+            string automaticSteamPath = null;
+            string automaticWin10Path = null;
+            try
             {
-                string automaticSteamPath = null;
-                try
+                if (Program.CommandLineOptions.ServerMode)
                 {
-                    if (Program.CommandLineOptions.ServerMode)
+                    if (Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Astro")))
                     {
-                        if (Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Astro")))
-                        {
-                            automaticSteamPath = Directory.GetCurrentDirectory();
-                        }
-                        else
-                        {
-                            automaticSteamPath = CheckRegistryForSteamPath(728470); // Astroneer Dedicated Server: 728470
-                        }
+                        automaticSteamPath = Directory.GetCurrentDirectory();
                     }
                     else
                     {
-                        automaticSteamPath = CheckRegistryForSteamPath(361420); // Astroneer: 361420
+                        automaticSteamPath = CheckRegistryForSteamPath(728470); // Astroneer Dedicated Server: 728470
                     }
                 }
-                catch //(UnauthorizedAccessException)
+                else
                 {
-                    automaticSteamPath = null;
+                    automaticSteamPath = CheckRegistryForSteamPath(361420); // Astroneer: 361420
+                    automaticWin10Path = CheckRegistryForMicrosoftStorePath();
                 }
+            }
+            catch { }
 
-                // automaticSteamPath = null;
-                if (automaticSteamPath != null)
+            //automaticSteamPath = null;
+            //automaticWin10Path = null;
+
+            ValidPlatformTypesToPaths = new Dictionary<PlatformType, string>();
+            if (automaticSteamPath != null) ValidPlatformTypesToPaths[PlatformType.Steam] = automaticSteamPath;
+            if (automaticWin10Path != null) ValidPlatformTypesToPaths[PlatformType.Win10] = automaticWin10Path;
+
+            SyncIndependentConfigFromDisk();
+
+            RefreshAllPlatformsList();
+            if ((Platform != PlatformType.Custom && !ValidPlatformTypesToPaths.ContainsKey(Platform)) && AllPlatforms.Count > 0) Platform = AllPlatforms[0];
+
+            DeterminePaths();
+            SyncModsFromDisk();
+            SyncDependentConfigFromDisk();
+
+            if (GamePath == null)
+            {
+                if (ValidPlatformTypesToPaths.ContainsKey(Platform))
                 {
-                    GamePath = automaticSteamPath;
+                    GamePath = ValidPlatformTypesToPaths[Platform];
                 }
                 else
                 {
@@ -83,10 +97,16 @@ namespace AstroModLoader
                     }
                     else
                     {
-                        //MessageBox.Show("Mod integration will be disabled until you select your game installation directory!", "Uh oh!");
                         Environment.Exit(0);
                     }
                 }
+            }
+            else if (!ValidPlatformTypesToPaths.ContainsValue(GamePath))
+            {
+                Debug.WriteLine(GamePath);
+                Platform = PlatformType.Custom;
+                ValidPlatformTypesToPaths[PlatformType.Custom] = GamePath;
+                RefreshAllPlatformsList();
             }
 
             ApplyGamePathDerivatives();
@@ -99,6 +119,33 @@ namespace AstroModLoader
             SortMods();
             RefreshAllPriorites();
             SyncConfigToDisk();
+        }
+
+        private void RefreshAllPlatformsList()
+        {
+            AllPlatforms = ValidPlatformTypesToPaths.Keys.OrderBy(x => (int)x).ToList();
+        }
+
+        private string CheckRegistryForMicrosoftStorePath()
+        {
+            RegistryKey key1 = Registry.CurrentUser.OpenSubKey(@"Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\Repository\Packages"); // SystemEraSoftworks.29415440E1269_1.16.70.0_x64__ftk5pbg2rayv2
+            if (key1 == null) return null;
+
+            RegistryKey goalKey = null;
+            foreach (string k in key1.GetSubKeyNames())
+            {
+                if (k.StartsWith("SystemEraSoftworks"))
+                {
+                    goalKey = key1.OpenSubKey(k);
+                    break;
+                }
+            }
+            key1.Close();
+            if (goalKey == null) return null;
+
+            string res = goalKey.GetValue("PackageRootFolder") as string;
+            goalKey.Close();
+            return res;
         }
 
         private static Regex acfEntryReader = new Regex(@"\s+""(\w+)""\s+""([\w ]+)""", RegexOptions.Compiled);
@@ -117,6 +164,9 @@ namespace AstroModLoader
                 object o = key2.GetValue("InstallPath");
                 if (o != null) decidedSteamPath = o as string;
             }
+
+            if (key1 != null) key1.Close();
+            if (key2 != null) key2.Close();
 
             if (decidedSteamPath == null) return null;
 
@@ -171,7 +221,14 @@ namespace AstroModLoader
             }
 
             // Get astroneer version
+            SetInstalledAstroBuild();
+        }
+
+        private void SetInstalledAstroBuild()
+        {
             InstalledAstroBuild = null;
+
+            // Steam
             try
             {
                 using (StreamReader f = new StreamReader(Path.Combine(GamePath, "build.version")))
@@ -181,13 +238,36 @@ namespace AstroModLoader
                     if (m.Groups.Count == 2) InstalledAstroBuild = new Version(m.Groups[1].Value);
                 }
             }
+            catch
+            {
+                InstalledAstroBuild = null;
+            }
+
+            if (InstalledAstroBuild != null) return;
+
+            // Win10
+            try
+            {
+                XmlDocument doc = new XmlDocument();
+                doc.Load(Path.Combine(GamePath, "AppxManifest.xml"));
+
+                if (doc != null)
+                {
+                    XmlNodeList identityList = doc.GetElementsByTagName("Identity");
+                    if (identityList != null && identityList.Count > 0)
+                    {
+                        var verAttr = identityList[0].Attributes["Version"];
+                        if (verAttr != null) Version.TryParse(verAttr.Value, out InstalledAstroBuild);
+                    }
+                } 
+            }
             catch (IOException)
             {
                 InstalledAstroBuild = null;
             }
         }
 
-        private void DeterminePaths()
+        public void DeterminePaths()
         {
             BasePath = null;
             if (!string.IsNullOrEmpty(Program.CommandLineOptions.LocalDataPath))
@@ -200,10 +280,19 @@ namespace AstroModLoader
                 {
                     BasePath = Path.Combine(GamePath != null ? GamePath : Directory.GetCurrentDirectory(), "Astro");
                 }
-                else
+                else if (Environment.GetEnvironmentVariable("LocalAppData") != null)
                 {
-                    string lappdata = Environment.GetEnvironmentVariable("LocalAppData");
-                    if (lappdata != null) BasePath = Path.Combine(lappdata, "Astro");
+                    switch(Platform)
+                    {
+                        case PlatformType.Steam:
+                        case PlatformType.Custom:
+                        case PlatformType.Unknown:
+                            BasePath = Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Astro");
+                            break;
+                        case PlatformType.Win10:
+                            BasePath = Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Packages", "SystemEraSoftworks.29415440E1269_ftk5pbg2rayv2", "LocalState", "Astro");
+                            break;
+                    }
                 }
             }
 
@@ -395,37 +484,65 @@ namespace AstroModLoader
             }
         }
 
-        public void SyncConfigFromDisk()
+        public void SyncIndependentConfigFromDisk()
         {
-            ModConfig diskConfig;
+            IndependentConfig independentConfig = null;
+            try
+            {
+                independentConfig = JsonConvert.DeserializeObject<IndependentConfig>(File.ReadAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AstroModLoader", "config.json")));
+            }
+            catch
+            {
+                independentConfig = null;
+            }
+
+            if (independentConfig != null)
+            {
+                if (!string.IsNullOrEmpty(independentConfig.AccentColor))
+                {
+                    try
+                    {
+                        AMLPalette.AccentColor = AMLUtils.ColorFromHTML(independentConfig.AccentColor);
+                    }
+                    catch { }
+                }
+                AMLPalette.CurrentTheme = independentConfig.Theme;
+                AMLPalette.RefreshTheme(BaseForm);
+
+                Platform = independentConfig.Platform;
+                if (!string.IsNullOrEmpty(independentConfig.PlayFabCustomID)) PlayFabAPI.CustomID = independentConfig.PlayFabCustomID;
+                if (!string.IsNullOrEmpty(independentConfig.PlayFabToken)) PlayFabAPI.Token = independentConfig.PlayFabToken;
+            }
+        }
+
+        public void SyncDependentConfigFromDisk()
+        {
+            ModConfig diskConfig = null;
             try
             {
                 diskConfig = JsonConvert.DeserializeObject<ModConfig>(File.ReadAllText(Path.Combine(DownloadPath, "modconfig.json")));
             }
             catch
             {
-                return;
+                diskConfig = null;
             }
-            if (diskConfig == null) return;
-            ApplyProfile(diskConfig.ModsOnDisk);
-            ProfileList = diskConfig.Profiles;
-            if (ProfileList == null) ProfileList = new Dictionary<string, ModProfile>();
-
-            if (!string.IsNullOrEmpty(diskConfig.AccentColor))
+            if (diskConfig != null)
             {
-                try
-                {
-                    AMLPalette.AccentColor = AMLUtils.ColorFromHTML(diskConfig.AccentColor);
-                }
-                catch { }
-            }
-            AMLPalette.CurrentTheme = diskConfig.Theme;
-            AMLPalette.RefreshTheme(BaseForm);
+                ApplyProfile(diskConfig.ModsOnDisk);
+                ProfileList = diskConfig.Profiles;
+                if (ProfileList == null) ProfileList = new Dictionary<string, ModProfile>();
+                if (!string.IsNullOrEmpty(diskConfig.LaunchCommand)) LaunchCommand = diskConfig.LaunchCommand;
+                if (!string.IsNullOrEmpty(diskConfig.GamePath)) GamePath = diskConfig.GamePath;
 
-            if (!string.IsNullOrEmpty(diskConfig.LaunchCommand)) LaunchCommand = diskConfig.LaunchCommand;
-            if (!string.IsNullOrEmpty(diskConfig.PlayFabCustomID)) PlayFabAPI.CustomID = diskConfig.PlayFabCustomID;
-            if (!string.IsNullOrEmpty(diskConfig.PlayFabToken)) PlayFabAPI.Token = diskConfig.PlayFabToken;
-            if (!string.IsNullOrEmpty(diskConfig.GamePath)) GamePath = diskConfig.GamePath;
+                KeyValuePair<PlatformType, string> prospectivePlatform = ValidPlatformTypesToPaths.FirstOrDefault(x => x.Value == GamePath);
+                if (Platform == PlatformType.Unknown && !prospectivePlatform.Equals(default(KeyValuePair<PlatformType, string>))) Platform = prospectivePlatform.Key;
+            }
+        }
+
+        public void SyncConfigFromDisk()
+        {
+            SyncIndependentConfigFromDisk();
+            SyncDependentConfigFromDisk();
         }
 
         public void ApplyProfile(ModProfile prof)
@@ -462,19 +579,30 @@ namespace AstroModLoader
             return res;
         }
 
+        public void SyncIndependentConfigToDisk()
+        {
+            var newIndConfig = new IndependentConfig();
+            newIndConfig.Platform = Platform;
+            newIndConfig.Theme = AMLPalette.CurrentTheme;
+            newIndConfig.AccentColor = AMLUtils.ColorToHTML(AMLPalette.AccentColor);
+            newIndConfig.PlayFabCustomID = PlayFabAPI.CustomID;
+            newIndConfig.PlayFabToken = PlayFabAPI.Token;
+
+            Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AstroModLoader"));
+            File.WriteAllBytes(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AstroModLoader", "config.json"), Encoding.UTF8.GetBytes(AMLUtils.SerializeObject(newIndConfig)));
+        }
+
         public void SyncConfigToDisk()
         {
             var newConfig = new ModConfig();
             newConfig.GamePath = GamePath;
             newConfig.LaunchCommand = LaunchCommand;
-            newConfig.Theme = AMLPalette.CurrentTheme;
-            newConfig.AccentColor = AMLUtils.ColorToHTML(AMLPalette.AccentColor);
-            newConfig.PlayFabCustomID = PlayFabAPI.CustomID;
-            newConfig.PlayFabToken = PlayFabAPI.Token;
             newConfig.Profiles = ProfileList;
             newConfig.ModsOnDisk = GenerateProfile();
 
             File.WriteAllBytes(Path.Combine(DownloadPath, "modconfig.json"), Encoding.UTF8.GetBytes(AMLUtils.SerializeObject(newConfig)));
+
+            SyncIndependentConfigToDisk();
         }
 
         public void IntegrateMods()

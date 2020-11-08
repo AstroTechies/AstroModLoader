@@ -76,6 +76,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="GitHubAPI.cs" />
+    <Compile Include="IndependentConfig.cs" />
     <Compile Include="IndexFile.cs" />
     <Compile Include="PlayFabAPI.cs" />
     <Compile Include="Server.cs" />

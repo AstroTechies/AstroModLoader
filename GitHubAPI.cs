@@ -39,10 +39,11 @@ namespace AstroModLoader
 
                 if (string.IsNullOrEmpty(newURL)) return null;
                 string[] splitURL = newURL.Split('/');
-                string kosherVersion = splitURL[splitURL.Length - 1];
-                if (kosherVersion[0] == 'v') kosherVersion = kosherVersion.Substring(1);
 
-                Version.TryParse(kosherVersion, out Version foundVersion);
+                string finalVersionBit = splitURL[splitURL.Length - 1];
+                if (finalVersionBit[0] == 'v') finalVersionBit = finalVersionBit.Substring(1);
+
+                Version.TryParse(finalVersionBit, out Version foundVersion);
                 return foundVersion;
             }
             catch (Exception ex)

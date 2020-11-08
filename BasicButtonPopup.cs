@@ -35,13 +35,11 @@ namespace AstroModLoader
             if (this.Owner is Form1 parentForm)
             {
                 this.Text = parentForm.Text;
-                AMLPalette.RefreshTheme(parentForm);
             }
 
             this.AdjustFormPosition();
             AMLPalette.RefreshTheme(this);
 
-            
             mainLabel.Select();
         }
 

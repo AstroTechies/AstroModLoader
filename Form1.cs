@@ -162,6 +162,18 @@ namespace AstroModLoader
             this.modInfo.LinkArea = new LinkArea(txt.Length, linkText.Length);
         }
 
+        public void SwitchPlatform(PlatformType newPlatform)
+        {
+            if (!ModManager.ValidPlatformTypesToPaths.ContainsKey(newPlatform)) return;
+            ModManager.GamePath = null;
+            ModManager.Platform = newPlatform;
+            ModManager.DeterminePaths();
+            ModManager.GamePath = ModManager.ValidPlatformTypesToPaths[newPlatform];
+            ModManager.ApplyGamePathDerivatives();
+            ModManager.SyncIndependentConfigToDisk();
+            FullRefresh();
+        }
+
         private void Form1_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
@@ -274,6 +286,12 @@ namespace AstroModLoader
 
             previouslySelectedMod = selectedMod;
 
+            RefreshModInfoLabel();
+        }
+
+        private void RefreshModInfoLabel()
+        {
+            Mod selectedMod = TableManager.GetCurrentlySelectedMod();
             if (selectedMod == null)
             {
                 AdjustModInfoText("");
@@ -311,6 +329,7 @@ namespace AstroModLoader
         public void ForceResize()
         {
             footerPanel.Width = this.Width;
+            RefreshModInfoLabel();
         }
 
         public void FullRefresh()
@@ -365,6 +384,12 @@ namespace AstroModLoader
         private void playButton_Click(object sender, EventArgs e)
         {
             ModManager.FullUpdate();
+            
+            if (ModManager.Platform == PlatformType.Win10) // You can't launch the executable directly on the Windows Store version so this is our only real option
+            {
+                Process.Start("ms-windows-store://pdp/?ProductId=9nblggh43kzb");
+                return;
+            }
 
             if ((Program.CommandLineOptions.ServerMode || ModManager.BinaryFilePath == null) && string.IsNullOrEmpty(ModManager.LaunchCommand))
             {
@@ -404,7 +429,6 @@ namespace AstroModLoader
                     ModManager.LaunchCommand = null;
                     ModManager.SyncConfigToDisk();
                 }
-                
             }
         }
 
@@ -445,11 +469,22 @@ namespace AstroModLoader
             TableManager.Refresh();
         }
 
+        private bool currentlySyncing = false;
+        private bool syncErrored = false;
+        private string syncErrorMessage;
+        private int syncFailedDownloadCount;
+        private string syncKosherProfileName;
         private void syncButton_Click(object sender, EventArgs e)
         {
             if (ModManager.IsReadOnly)
             {
                 this.ShowBasicButton("You cannot sync mods while the game is open!", "OK", null, null);
+                return;
+            }
+
+            if (currentlySyncing)
+            {
+                this.ShowBasicButton("The mod loader is already busy syncing!", "OK", null, null);
                 return;
             }
 
@@ -462,14 +497,21 @@ namespace AstroModLoader
 
             if (getIPPrompt.ShowDialog(this) == DialogResult.OK)
             {
+                syncErrored = false;
+                syncErrorMessage = "";
+                syncFailedDownloadCount = 0;
+                syncKosherProfileName = "";
+
                 Task.Run(() =>
                 {
+                    currentlySyncing = true;
                     try
                     {
                         AstroLauncherServerInfo serverInfo = PlayFabAPI.GetAstroLauncherData(getIPPrompt.OutputText);
                         if (serverInfo == null)
                         {
-                            this.ShowBasicButton("Failed to find an online AstroLauncher server with the requested address!", "OK", null, null);
+                            syncErrored = true;
+                            syncErrorMessage = "Failed to find an online AstroLauncher server with the requested address!";
                             return;
                         }
 
@@ -568,21 +610,32 @@ namespace AstroModLoader
                         if (ModManager.ProfileList == null) ModManager.ProfileList = new Dictionary<string, ModProfile>();
                         string kosherProfileName = kosherServerName + " Synced Mods";
                         ModManager.ProfileList[kosherProfileName] = creatingProfile;
-                        this.ShowBasicButton("Added a new profile named \"" + kosherProfileName + "\". " + (failedDownloadCount == 0 ? "No" : failedDownloadCount.ToString()) + " mod" + (failedDownloadCount == 1 ? "" : "s") + " failed to sync.", "OK", null, null);
+                        syncKosherProfileName = kosherProfileName;
+                        syncFailedDownloadCount = failedDownloadCount;
                     }
-                    catch (Exception ex)
+                    catch (WebException ex)
                     {
                         if (ex is PlayFabException || ex is WebException)
                         {
-                            this.ShowBasicButton("Failed to access PlayFab!", "OK", null, null);
+                            syncErrored = true;
+                            syncErrorMessage = "Failed to access PlayFab!";
                             return;
                         }
                         throw;
                     }
                 }).ContinueWith(res =>
                 {
+                    if (syncErrored)
+                    {
+                        this.ShowBasicButton(syncErrorMessage, "OK", null, null);
+                    }
+                    else
+                    {
+                        this.ShowBasicButton("Added a new profile named \"" + syncKosherProfileName + "\". " + (syncFailedDownloadCount == 0 ? "No" : syncFailedDownloadCount.ToString()) + " mod" + (syncFailedDownloadCount == 1 ? "" : "s") + " failed to sync.", "OK", null, null);
+                    }
                     ModManager.SyncConfigToDisk();
                     TableManager.Refresh();
+                    currentlySyncing = false;
                 }, TaskScheduler.FromCurrentSynchronizationContext());
             }
         }
