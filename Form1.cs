@@ -74,7 +74,7 @@ namespace AstroModLoader
 
         private void Simple_Refresh_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            TableManager.Refresh();
+            if (System.Threading.SynchronizationContext.Current != null) TableManager.Refresh();
         }
 
         public bool DownloadVersionSync(Mod thisMod, Version newVersion)
@@ -602,7 +602,6 @@ namespace AstroModLoader
                         for (int i = 0; i < plannedOrdering.Count; i++)
                         {
                             string thisModID = plannedOrdering[i].CurrentModData.ModID;
-                            Debug.WriteLine(i + ": " + thisModID);
                             if (creatingProfile.ProfileData.ContainsKey(thisModID)) creatingProfile.ProfileData[thisModID].Priority = i + 1;
                         }
 

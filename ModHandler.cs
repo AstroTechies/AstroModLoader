@@ -77,8 +77,24 @@ namespace AstroModLoader
             SyncModsFromDisk();
             SyncDependentConfigFromDisk();
 
-            if (GamePath == null)
+            if (GamePath != null && !ValidPlatformTypesToPaths.ContainsValue(GamePath))
             {
+                // Here, a game path is being provided that we can't recognize. If the set platform is Win10, that probably means there is a new update and we should just discard the one already stored; otherwise, it is custom
+                if (Platform == PlatformType.Win10 && ValidPlatformTypesToPaths.ContainsKey(PlatformType.Win10))
+                {
+                    GamePath = ValidPlatformTypesToPaths[PlatformType.Win10];
+                }
+                else if (Directory.Exists(GamePath))
+                {
+                    Platform = PlatformType.Custom;
+                    ValidPlatformTypesToPaths[PlatformType.Custom] = GamePath;
+                    RefreshAllPlatformsList();
+                }
+            }
+
+            if (GamePath == null || !Directory.Exists(GamePath))
+            {
+                GamePath = null;
                 if (ValidPlatformTypesToPaths.ContainsKey(Platform))
                 {
                     GamePath = ValidPlatformTypesToPaths[Platform];
@@ -94,19 +110,15 @@ namespace AstroModLoader
                     if (initialPathPrompt.ShowDialog(BaseForm) == DialogResult.OK)
                     {
                         GamePath = initialPathPrompt.OutputText;
+                        Platform = PlatformType.Custom;
+                        ValidPlatformTypesToPaths[PlatformType.Custom] = GamePath;
+                        RefreshAllPlatformsList();
                     }
                     else
                     {
                         Environment.Exit(0);
                     }
                 }
-            }
-            else if (!ValidPlatformTypesToPaths.ContainsValue(GamePath))
-            {
-                Debug.WriteLine(GamePath);
-                Platform = PlatformType.Custom;
-                ValidPlatformTypesToPaths[PlatformType.Custom] = GamePath;
-                RefreshAllPlatformsList();
             }
 
             ApplyGamePathDerivatives();
