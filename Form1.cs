@@ -395,9 +395,9 @@ namespace AstroModLoader
         {
             ModManager.FullUpdate();
             
-            if (ModManager.Platform == PlatformType.Win10) // You can't launch the executable directly on the Windows Store version so this is our only real option
+            if (ModManager.Platform == PlatformType.Win10)
             {
-                Process.Start("ms-windows-store://pdp/?ProductId=9nblggh43kzb");
+                if (!string.IsNullOrEmpty(ModManager.MicrosoftRuntimeID)) Process.Start(@"shell:appsFolder\" + ModManager.MicrosoftRuntimeID + "!ASTRONEER");
                 return;
             }
 

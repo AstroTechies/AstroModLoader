@@ -139,6 +139,7 @@ namespace AstroModLoader
             AllPlatforms = ValidPlatformTypesToPaths.Keys.OrderBy(x => (int)x).ToList();
         }
 
+        public string MicrosoftRuntimeID = "";
         private string CheckRegistryForMicrosoftStorePath()
         {
             RegistryKey key1 = Registry.CurrentUser.OpenSubKey(@"Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\Repository\Packages"); // SystemEraSoftworks.29415440E1269_1.16.70.0_x64__ftk5pbg2rayv2
@@ -149,6 +150,9 @@ namespace AstroModLoader
             {
                 if (k.StartsWith("SystemEraSoftworks"))
                 {
+                    string[] idBits = k.Split('_');
+                    if (idBits.Length >= 2) MicrosoftRuntimeID = idBits[0] + "_" + idBits[idBits.Length - 1];
+
                     goalKey = key1.OpenSubKey(k);
                     break;
                 }
