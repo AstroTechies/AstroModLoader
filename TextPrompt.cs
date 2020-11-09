@@ -1,6 +1,7 @@
 ﻿using Ookii.Dialogs.WinForms;
 using System;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 
 namespace AstroModLoader
@@ -76,9 +77,16 @@ namespace AstroModLoader
 
         private void okButton_Click(object sender, EventArgs e)
         {
+            if (AllowBrowse && !AMLUtils.IsValidPath(gamePathBox.Text))
+            {
+                this.ShowBasicButton("This is not a valid path!", "OK", null, null);
+                return;
+            }
+
             if (gamePathBox.Text != null && gamePathBox.Text.Length > 0)
             {
                 OutputText = gamePathBox.Text;
+                if (AllowBrowse && OutputText[OutputText.Length - 1] == Path.DirectorySeparatorChar) OutputText = OutputText.Substring(0, OutputText.Length - 1);
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }

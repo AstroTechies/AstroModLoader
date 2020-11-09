@@ -121,6 +121,23 @@ namespace AstroModLoader
             return Regex.Replace(name, invalidCharactersRegex, "_");
         }
 
+        public static bool IsValidPath(string path)
+        {
+            bool isValidPath = true;
+            if (path != null)
+            {
+                try
+                {
+                    if (!Directory.Exists(path)) isValidPath = false;
+                }
+                catch
+                {
+                    isValidPath = false;
+                }
+            }
+            return isValidPath;
+        }
+
         public static bool IsValidUri(string uri)
         {
             if (!Uri.IsWellFormedUriString(uri, UriKind.Absolute)) return false;

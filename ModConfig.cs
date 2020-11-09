@@ -11,7 +11,7 @@ namespace AstroModLoader
         [DefaultValue("")]
         public string GamePath;
 
-        [JsonProperty("launch_command")]
+        [JsonProperty("launch_path")]
         public string LaunchCommand;
 
         public bool ShouldSerializeLaunchCommand()

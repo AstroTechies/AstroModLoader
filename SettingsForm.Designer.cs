@@ -32,13 +32,16 @@
             this.label2 = new System.Windows.Forms.Label();
             this.gamePathBox = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.setPathButton = new AstroModLoader.CoolButton();
-            this.exitButton = new AstroModLoader.CoolButton();
             this.accentComboBox = new System.Windows.Forms.ComboBox();
             this.themeComboBox = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.platformComboBox = new System.Windows.Forms.ComboBox();
+            this.exitButton = new AstroModLoader.CoolButton();
+            this.setPathButton = new AstroModLoader.CoolButton();
+            this.localPathBox = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.setPathButton2 = new AstroModLoader.CoolButton();
             this.SuspendLayout();
             // 
             // label1
@@ -72,49 +75,16 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.label3.Location = new System.Drawing.Point(69, 123);
+            this.label3.Location = new System.Drawing.Point(69, 149);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(78, 15);
             this.label3.TabIndex = 6;
             this.label3.Text = "Accent Color:";
             // 
-            // setPathButton
-            // 
-            this.setPathButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
-            this.setPathButton.FlatAppearance.BorderColor = System.Drawing.Color.Black;
-            this.setPathButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.setPathButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.setPathButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.setPathButton.Location = new System.Drawing.Point(361, 66);
-            this.setPathButton.MinimumSize = new System.Drawing.Size(0, 26);
-            this.setPathButton.Name = "setPathButton";
-            this.setPathButton.Size = new System.Drawing.Size(40, 26);
-            this.setPathButton.TabIndex = 3;
-            this.setPathButton.Text = "Set";
-            this.setPathButton.UseVisualStyleBackColor = false;
-            this.setPathButton.Click += new System.EventHandler(this.setPathButton_Click);
-            // 
-            // exitButton
-            // 
-            this.exitButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.exitButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
-            this.exitButton.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(231)))), ((int)(((byte)(149)))));
-            this.exitButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.exitButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.exitButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.exitButton.Location = new System.Drawing.Point(16, 155);
-            this.exitButton.MinimumSize = new System.Drawing.Size(0, 26);
-            this.exitButton.Name = "exitButton";
-            this.exitButton.Size = new System.Drawing.Size(75, 26);
-            this.exitButton.TabIndex = 8;
-            this.exitButton.Text = "Close";
-            this.exitButton.UseVisualStyleBackColor = false;
-            this.exitButton.Click += new System.EventHandler(this.exitButton_Click);
-            // 
             // accentComboBox
             // 
             this.accentComboBox.FormattingEnabled = true;
-            this.accentComboBox.Location = new System.Drawing.Point(153, 122);
+            this.accentComboBox.Location = new System.Drawing.Point(153, 148);
             this.accentComboBox.Name = "accentComboBox";
             this.accentComboBox.Size = new System.Drawing.Size(151, 21);
             this.accentComboBox.TabIndex = 7;
@@ -125,7 +95,7 @@
             // 
             this.themeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.themeComboBox.FormattingEnabled = true;
-            this.themeComboBox.Location = new System.Drawing.Point(153, 95);
+            this.themeComboBox.Location = new System.Drawing.Point(153, 121);
             this.themeComboBox.Name = "themeComboBox";
             this.themeComboBox.Size = new System.Drawing.Size(151, 21);
             this.themeComboBox.TabIndex = 5;
@@ -135,7 +105,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.label4.Location = new System.Drawing.Point(98, 96);
+            this.label4.Location = new System.Drawing.Point(98, 122);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(49, 15);
             this.label4.TabIndex = 4;
@@ -161,12 +131,81 @@
             this.platformComboBox.TabIndex = 10;
             this.platformComboBox.SelectedIndexChanged += new System.EventHandler(this.platformComboBox_SelectedIndexChanged);
             // 
+            // exitButton
+            // 
+            this.exitButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.exitButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
+            this.exitButton.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(231)))), ((int)(((byte)(149)))));
+            this.exitButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.exitButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.exitButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
+            this.exitButton.Location = new System.Drawing.Point(16, 187);
+            this.exitButton.MinimumSize = new System.Drawing.Size(0, 26);
+            this.exitButton.Name = "exitButton";
+            this.exitButton.Size = new System.Drawing.Size(75, 26);
+            this.exitButton.TabIndex = 8;
+            this.exitButton.Text = "Close";
+            this.exitButton.UseVisualStyleBackColor = false;
+            this.exitButton.Click += new System.EventHandler(this.exitButton_Click);
+            // 
+            // setPathButton
+            // 
+            this.setPathButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
+            this.setPathButton.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.setPathButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.setPathButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.setPathButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
+            this.setPathButton.Location = new System.Drawing.Point(361, 63);
+            this.setPathButton.MinimumSize = new System.Drawing.Size(0, 26);
+            this.setPathButton.Name = "setPathButton";
+            this.setPathButton.Size = new System.Drawing.Size(40, 26);
+            this.setPathButton.TabIndex = 3;
+            this.setPathButton.Text = "Set";
+            this.setPathButton.UseVisualStyleBackColor = false;
+            this.setPathButton.Click += new System.EventHandler(this.setPathButton_Click);
+            // 
+            // localPathBox
+            // 
+            this.localPathBox.Location = new System.Drawing.Point(153, 95);
+            this.localPathBox.Name = "localPathBox";
+            this.localPathBox.Size = new System.Drawing.Size(202, 20);
+            this.localPathBox.TabIndex = 11;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.label6.Location = new System.Drawing.Point(50, 96);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(97, 15);
+            this.label6.TabIndex = 12;
+            this.label6.Text = "Local Data Path:";
+            // 
+            // setPathButton2
+            // 
+            this.setPathButton2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
+            this.setPathButton2.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(231)))), ((int)(((byte)(149)))));
+            this.setPathButton2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.setPathButton2.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.setPathButton2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
+            this.setPathButton2.Location = new System.Drawing.Point(361, 92);
+            this.setPathButton2.MinimumSize = new System.Drawing.Size(0, 26);
+            this.setPathButton2.Name = "setPathButton2";
+            this.setPathButton2.Size = new System.Drawing.Size(40, 26);
+            this.setPathButton2.TabIndex = 13;
+            this.setPathButton2.Text = "Set";
+            this.setPathButton2.UseVisualStyleBackColor = false;
+            this.setPathButton2.Click += new System.EventHandler(this.setPathButton2_Click);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(42)))), ((int)(((byte)(45)))));
-            this.ClientSize = new System.Drawing.Size(413, 193);
+            this.ClientSize = new System.Drawing.Size(413, 225);
+            this.Controls.Add(this.setPathButton2);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.localPathBox);
             this.Controls.Add(this.platformComboBox);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
@@ -202,5 +241,8 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ComboBox platformComboBox;
+        private System.Windows.Forms.TextBox localPathBox;
+        private System.Windows.Forms.Label label6;
+        private CoolButton setPathButton2;
     }
 }

@@ -16,6 +16,7 @@ namespace AstroModLoader
 {
     public class ModHandler
     {
+        internal string CustomBasePath = "";
         internal string BasePath;
         internal string DownloadPath;
         internal string InstallPath;
@@ -133,7 +134,7 @@ namespace AstroModLoader
             SyncConfigToDisk();
         }
 
-        private void RefreshAllPlatformsList()
+        public void RefreshAllPlatformsList()
         {
             AllPlatforms = ValidPlatformTypesToPaths.Keys.OrderBy(x => (int)x).ToList();
         }
@@ -297,8 +298,6 @@ namespace AstroModLoader
                     switch(Platform)
                     {
                         case PlatformType.Steam:
-                        case PlatformType.Custom:
-                        case PlatformType.Unknown:
                             BasePath = Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Astro");
                             break;
                         case PlatformType.Win10:
@@ -310,10 +309,53 @@ namespace AstroModLoader
 
             if (BasePath == null || !Directory.Exists(BasePath))
             {
-                MessageBox.Show("Unable to find the local data directory. Please specify one with the --data parameter.", "Uh oh!");
-                Environment.Exit(0);
+                if (Platform == PlatformType.Custom || Platform == PlatformType.Unknown)
+                {
+                    if (!string.IsNullOrEmpty(CustomBasePath))
+                    {
+                        BasePath = CustomBasePath;
+                    }
+                    else
+                    {
+                        bool isValidPath = false;
+                        while (!isValidPath)
+                        {
+                            TextPrompt initialPathPrompt = new TextPrompt
+                            {
+                                StartPosition = FormStartPosition.CenterScreen,
+                                DisplayText = "Select your local application data directory"
+                            };
+
+                            if (initialPathPrompt.ShowDialog(BaseForm) == DialogResult.OK)
+                            {
+                                CustomBasePath = initialPathPrompt.OutputText;
+                                if (Path.GetFileName(initialPathPrompt.OutputText) != "Astro") CustomBasePath = Path.Combine(initialPathPrompt.OutputText, "Astro");
+
+                                if (Directory.Exists(CustomBasePath))
+                                {
+                                    isValidPath = true;
+                                    BasePath = CustomBasePath;
+                                }
+                            }
+                            else
+                            {
+                                Environment.Exit(0);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Unable to find the local application data directory. Please specify one with the --data parameter.", "Uh oh!");
+                    Environment.Exit(0);
+                }
             }
 
+            DetermineBasePathDerivatives();
+        }
+
+        public void DetermineBasePathDerivatives()
+        {
             DownloadPath = Path.Combine(BasePath, "Saved", "Mods");
             Directory.CreateDirectory(DownloadPath);
             InstallPath = Path.Combine(BasePath, "Saved", "Paks");
@@ -525,6 +567,7 @@ namespace AstroModLoader
                 AMLPalette.RefreshTheme(BaseForm);
 
                 Platform = independentConfig.Platform;
+                if (!string.IsNullOrEmpty(independentConfig.CustomBasePath)) CustomBasePath = independentConfig.CustomBasePath;
                 if (!string.IsNullOrEmpty(independentConfig.PlayFabCustomID)) PlayFabAPI.CustomID = independentConfig.PlayFabCustomID;
                 if (!string.IsNullOrEmpty(independentConfig.PlayFabToken)) PlayFabAPI.Token = independentConfig.PlayFabToken;
             }
@@ -600,6 +643,7 @@ namespace AstroModLoader
             newIndConfig.Platform = Platform;
             newIndConfig.Theme = AMLPalette.CurrentTheme;
             newIndConfig.AccentColor = AMLUtils.ColorToHTML(AMLPalette.AccentColor);
+            newIndConfig.CustomBasePath = CustomBasePath;
             newIndConfig.PlayFabCustomID = PlayFabAPI.CustomID;
             newIndConfig.PlayFabToken = PlayFabAPI.Token;
 
@@ -686,9 +730,9 @@ namespace AstroModLoader
                 Directory.CreateDirectory(DownloadPath);
                 Directory.CreateDirectory(InstallPath);
 
+                IntegrateMods();
                 SyncConfigToDisk();
                 SyncModsToDisk();
-                IntegrateMods();
             }
             catch (IOException)
             {

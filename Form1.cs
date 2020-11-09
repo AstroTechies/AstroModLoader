@@ -396,7 +396,7 @@ namespace AstroModLoader
                 return;
             }
 
-            if ((Program.CommandLineOptions.ServerMode || ModManager.BinaryFilePath == null) && string.IsNullOrEmpty(ModManager.LaunchCommand))
+            if ((Program.CommandLineOptions.ServerMode || string.IsNullOrEmpty(ModManager.BinaryFilePath)) && string.IsNullOrEmpty(ModManager.LaunchCommand))
             {
                 TextPrompt initialPathPrompt = new TextPrompt
                 {
@@ -413,7 +413,7 @@ namespace AstroModLoader
                 }
             }
 
-            if (string.IsNullOrEmpty(ModManager.LaunchCommand) && ModManager.BinaryFilePath != null)
+            if (string.IsNullOrEmpty(ModManager.LaunchCommand) && !string.IsNullOrEmpty(ModManager.BinaryFilePath))
             {
                 Process.Start(ModManager.BinaryFilePath, Program.CommandLineOptions.ServerMode ? "-log" : "");
             }

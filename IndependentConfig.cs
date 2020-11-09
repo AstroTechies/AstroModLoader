@@ -7,9 +7,9 @@ namespace AstroModLoader
     public enum PlatformType
     {
         [EnumMember(Value = "unknown")]
-        Unknown,
+        Unknown, // We have no idea about anything
         [EnumMember(Value = "custom")]
-        Custom,
+        Custom, // The game is installed somewhere, but it isn't auto detected as Steam or Win10
         [EnumMember(Value = "steam")]
         Steam,
         [EnumMember(Value = "win10")]
@@ -21,6 +21,9 @@ namespace AstroModLoader
         [JsonProperty("platform")]
         [JsonConverter(typeof(StringEnumConverter))]
         public PlatformType Platform;
+
+        [JsonProperty("custom_base_path")]
+        public string CustomBasePath;
 
         [JsonProperty("theme")]
         [JsonConverter(typeof(StringEnumConverter))]

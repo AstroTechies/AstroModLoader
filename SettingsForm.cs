@@ -18,16 +18,6 @@ namespace AstroModLoader
             InitializeComponent();
         }
 
-        private void setPathButton_Click(object sender, EventArgs e)
-        {
-            if (this.Owner is Form1 parentForm)
-            {
-                parentForm.ModManager.GamePath = gamePathBox.Text;
-                parentForm.ModManager.ApplyGamePathDerivatives();
-                parentForm.ModManager.SyncConfigToDisk();
-            }
-        }
-
         private void UpdateColorBoxText()
         {
             bool foundMatch = false;
@@ -55,6 +45,7 @@ namespace AstroModLoader
             {
                 BaseForm = (Form1)this.Owner;
                 gamePathBox.Text = BaseForm.ModManager.GamePath;
+                localPathBox.Text = BaseForm.ModManager.BasePath;
                 platformComboBox.DataSource = BaseForm.ModManager.AllPlatforms;
                 platformComboBox.SelectedIndex = platformComboBox.FindStringExact(BaseForm.ModManager.Platform.ToString());
                 AMLPalette.RefreshTheme(BaseForm);
@@ -128,6 +119,51 @@ namespace AstroModLoader
             Enum.TryParse(platformComboBox.SelectedValue.ToString(), out PlatformType nextPlatform);
             BaseForm.SwitchPlatform(nextPlatform);
             gamePathBox.Text = BaseForm.ModManager.GamePath;
+            localPathBox.Text = BaseForm.ModManager.BasePath;
+        }
+
+        private void setPathButton_Click(object sender, EventArgs e)
+        {
+            if (!AMLUtils.IsValidPath(gamePathBox.Text))
+            {
+                gamePathBox.Text = BaseForm.ModManager.GamePath;
+                this.ShowBasicButton("This is not a valid path!", "OK", null, null);
+                return;
+            }
+
+            if (this.Owner is Form1 parentForm)
+            {
+                parentForm.ModManager.GamePath = gamePathBox.Text;
+                parentForm.ModManager.ApplyGamePathDerivatives();
+                parentForm.ModManager.SyncConfigToDisk();
+                parentForm.FullRefresh();
+            }
+        }
+
+        private void setPathButton2_Click(object sender, EventArgs e)
+        {
+            if (!AMLUtils.IsValidPath(localPathBox.Text))
+            {
+                localPathBox.Text = BaseForm.ModManager.BasePath;
+                this.ShowBasicButton("This is not a valid path!", "OK", null, null);
+                return;
+            }
+
+            if (this.Owner is Form1 parentForm)
+            {
+                parentForm.ModManager.CustomBasePath = localPathBox.Text;
+                parentForm.ModManager.BasePath = localPathBox.Text;
+                parentForm.ModManager.DetermineBasePathDerivatives();
+
+                parentForm.ModManager.ValidPlatformTypesToPaths[PlatformType.Custom] = parentForm.ModManager.GamePath;
+                parentForm.ModManager.Platform = PlatformType.Custom;
+                parentForm.ModManager.RefreshAllPlatformsList();
+                platformComboBox.DataSource = BaseForm.ModManager.AllPlatforms;
+                platformComboBox.SelectedIndex = platformComboBox.FindStringExact(BaseForm.ModManager.Platform.ToString());
+
+                parentForm.ModManager.SyncConfigToDisk();
+                parentForm.FullRefresh();
+            }
         }
     }
 }
