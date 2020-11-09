@@ -370,6 +370,11 @@ namespace AstroModLoader
         {
             dataGridView1.ClearSelection();
 
+            /*if (AMLUtils.IsLinux)
+            {
+                MessageBox.Show("You are running on Linux!", "Test");
+            }*/
+
             // Fetch the latest version from github
             Task.Run(() =>
             {
@@ -396,7 +401,7 @@ namespace AstroModLoader
                 return;
             }
 
-            if ((Program.CommandLineOptions.ServerMode || string.IsNullOrEmpty(ModManager.BinaryFilePath)) && string.IsNullOrEmpty(ModManager.LaunchCommand))
+            if ((Program.CommandLineOptions.ServerMode || AMLUtils.IsLinux || string.IsNullOrEmpty(ModManager.BinaryFilePath)) && string.IsNullOrEmpty(ModManager.LaunchCommand))
             {
                 TextPrompt initialPathPrompt = new TextPrompt
                 {

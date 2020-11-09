@@ -1,8 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Win32;
+using Newtonsoft.Json;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -11,12 +14,28 @@ namespace AstroModLoader
 {
     public static class AMLUtils
     {
+        private static bool _checkForLinux = true;
+        private static bool _isLinux = false;
+
         public static bool IsLinux
         {
             get
             {
-                int p = (int)Environment.OSVersion.Platform;
-                return (p == 4) || (p == 6) || (p == 128);
+                if (_checkForLinux)
+                {
+                    _checkForLinux = false;
+                    int p = (int)Environment.OSVersion.Platform;
+                    if ((p == 4) || (p == 6) || (p == 128)) return true;
+                    try
+                    {
+                        _isLinux = Registry.CurrentUser.OpenSubKey(@"Software").GetSubKeyNames().Contains("Wine");
+                    }
+                    catch
+                    {
+                        _isLinux = false;
+                    }
+                }
+                return _isLinux;
             }
         }
 
@@ -128,7 +147,7 @@ namespace AstroModLoader
             {
                 try
                 {
-                    if (!Directory.Exists(path)) isValidPath = false;
+                    if (!Directory.Exists(path) && !File.Exists(path)) isValidPath = false;
                 }
                 catch
                 {
