@@ -13,7 +13,9 @@ namespace AstroModLoader
         [EnumMember(Value = "steam")]
         Steam,
         [EnumMember(Value = "win10")]
-        Win10
+        Win10,
+        [EnumMember(Value = "server")]
+        Server
     }
 
     public class IndependentConfig

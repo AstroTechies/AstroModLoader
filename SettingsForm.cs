@@ -37,6 +37,22 @@ namespace AstroModLoader
             }
         }
 
+        public void RefreshPlatformComboBox()
+        {
+            if (Program.CommandLineOptions.ServerMode)
+            {
+                platformComboBox.Enabled = false;
+                platformComboBox.DataSource = new string[] { "Server" };
+                platformComboBox.SelectedIndex = 0;
+            }
+            else
+            {
+                platformComboBox.Enabled = true;
+                platformComboBox.DataSource = BaseForm.ModManager.AllPlatforms;
+                platformComboBox.SelectedIndex = platformComboBox.FindStringExact(BaseForm.ModManager.Platform.ToString());
+            }
+        }
+
         private Form1 BaseForm;
         private bool _readyToUpdateTheme = false;
         private void SettingsForm_Load(object sender, EventArgs e)
@@ -46,9 +62,8 @@ namespace AstroModLoader
                 BaseForm = (Form1)this.Owner;
                 gamePathBox.Text = BaseForm.ModManager.GamePath;
                 localPathBox.Text = BaseForm.ModManager.BasePath;
-                platformComboBox.DataSource = BaseForm.ModManager.AllPlatforms;
-                platformComboBox.SelectedIndex = platformComboBox.FindStringExact(BaseForm.ModManager.Platform.ToString());
                 AMLPalette.RefreshTheme(BaseForm);
+                RefreshPlatformComboBox();
                 UpdateColorBoxText();
             }
             themeComboBox.DataSource = Enum.GetValues(typeof(ModLoaderTheme));
@@ -158,8 +173,7 @@ namespace AstroModLoader
                 parentForm.ModManager.ValidPlatformTypesToPaths[PlatformType.Custom] = parentForm.ModManager.GamePath;
                 parentForm.ModManager.Platform = PlatformType.Custom;
                 parentForm.ModManager.RefreshAllPlatformsList();
-                platformComboBox.DataSource = BaseForm.ModManager.AllPlatforms;
-                platformComboBox.SelectedIndex = platformComboBox.FindStringExact(BaseForm.ModManager.Platform.ToString());
+                RefreshPlatformComboBox();
 
                 parentForm.ModManager.SyncConfigToDisk();
                 parentForm.FullRefresh();

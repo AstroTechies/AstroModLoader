@@ -73,6 +73,7 @@ namespace AstroModLoader
 
             RefreshAllPlatformsList();
             if ((Platform != PlatformType.Custom && !ValidPlatformTypesToPaths.ContainsKey(Platform)) && AllPlatforms.Count > 0) Platform = AllPlatforms[0];
+            if (Program.CommandLineOptions.ServerMode) Platform = PlatformType.Server;
 
             DeterminePaths();
             SyncModsFromDisk();
@@ -150,9 +151,6 @@ namespace AstroModLoader
             {
                 if (k.StartsWith("SystemEraSoftworks"))
                 {
-                    string[] idBits = k.Split('_');
-                    if (idBits.Length >= 2) MicrosoftRuntimeID = idBits[0] + "_" + idBits[idBits.Length - 1];
-
                     goalKey = key1.OpenSubKey(k);
                     break;
                 }
@@ -160,9 +158,16 @@ namespace AstroModLoader
             key1.Close();
             if (goalKey == null) return null;
 
-            string res = goalKey.GetValue("PackageRootFolder") as string;
+            string packageID = goalKey.GetValue("PackageID") as string;
+            string rootFolder = goalKey.GetValue("PackageRootFolder") as string;
             goalKey.Close();
-            return res;
+
+            if (!string.IsNullOrEmpty(packageID))
+            {
+                string[] idBits = packageID.Split('_');
+                if (idBits.Length >= 2) MicrosoftRuntimeID = idBits[0] + "_" + idBits[idBits.Length - 1];
+            }
+            return rootFolder;
         }
 
         private static Regex acfEntryReader = new Regex(@"\s+""(\w+)""\s+""([\w ]+)""", RegexOptions.Compiled);
@@ -738,9 +743,14 @@ namespace AstroModLoader
                 SyncConfigToDisk();
                 SyncModsToDisk();
             }
-            catch (IOException)
+            catch (Exception ex)
             {
-                IsReadOnly = true;
+                if (ex is IOException || ex is FileNotFoundException)
+                {
+                    IsReadOnly = true;
+                    return;
+                }
+                throw;
             }
         }
     }

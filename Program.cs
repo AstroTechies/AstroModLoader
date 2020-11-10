@@ -17,6 +17,9 @@ namespace AstroModLoader
 
         [Option("data", Required = false, HelpText = "Specifies the %localappdata% folder or the local equivalent of it.")]
         public string LocalDataPath { get; set; }
+
+        [Option("next_launch_path", Required = false, HelpText = "Specifies a path to a file to store as the launch script.")]
+        public string NextLaunchPath { get; set; }
     }
 
     public static class Program

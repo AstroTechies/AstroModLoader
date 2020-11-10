@@ -375,6 +375,13 @@ namespace AstroModLoader
                 MessageBox.Show("You are running on Linux!", "Test");
             }*/
 
+            if (!string.IsNullOrEmpty(Program.CommandLineOptions.NextLaunchPath))
+            {
+                ModManager.LaunchCommand = Program.CommandLineOptions.NextLaunchPath;
+                Program.CommandLineOptions.NextLaunchPath = null;
+                ModManager.SyncConfigToDisk();
+            }
+
             // Fetch the latest version from github
             Task.Run(() =>
             {
@@ -395,7 +402,12 @@ namespace AstroModLoader
         {
             ModManager.FullUpdate();
             
-            if (ModManager.Platform == PlatformType.Win10)
+            if (ModManager.Platform == PlatformType.Steam)
+            {
+                Process.Start(@"steam://run/361420");
+                return;
+            }
+            else if (ModManager.Platform == PlatformType.Win10)
             {
                 if (!string.IsNullOrEmpty(ModManager.MicrosoftRuntimeID)) Process.Start(@"shell:appsFolder\" + ModManager.MicrosoftRuntimeID + "!ASTRONEER");
                 return;

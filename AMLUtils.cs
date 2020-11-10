@@ -25,14 +25,13 @@ namespace AstroModLoader
                 {
                     _checkForLinux = false;
                     int p = (int)Environment.OSVersion.Platform;
-                    if ((p == 4) || (p == 6) || (p == 128)) return true;
-                    try
+                    if ((p == 4) || (p == 6) || (p == 128))
                     {
-                        _isLinux = Registry.CurrentUser.OpenSubKey(@"Software").GetSubKeyNames().Contains("Wine");
+                        _isLinux = true;
                     }
-                    catch
+                    else
                     {
-                        _isLinux = false;
+                        _isLinux = Registry.CurrentUser.OpenSubKey(@"Software\Wine") != null;
                     }
                 }
                 return _isLinux;
