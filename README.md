@@ -13,6 +13,7 @@ AstroModLoader includes the following features:
 * Automatic updating of supporting mods
 * A profile system, to allow switching between sets of mods for different playthroughs
 * Customizable appearance, with both light and dark themes as well as nine accent color presets
+* Customizable mod load order by holding SHIFT and using the arrow keys in the mod list
 * Easy drag-and-drop functionality to install mods
 * Syncing of mods with modded [AstroLauncher](https://github.com/ricky-davis/AstroLauncher) servers
 * [Built-in mod integration](https://github.com/AstroTechies/AstroModIntegrator) to help prevent mod conflict
