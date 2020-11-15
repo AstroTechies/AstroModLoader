@@ -92,7 +92,7 @@ namespace AstroModLoader
                     string kosherFileName = AMLUtils.SanitizeFilename(allVerData[newVersion].Filename);
                     if (kosherFileName.Substring(kosherFileName.Length - 6, 6) != "_P.pak") kosherFileName += "_P.pak";
                     wb.DownloadFile(allVerData[newVersion].URL, Path.Combine(ModManager.DownloadPath, kosherFileName));
-                    ModManager.SyncSingleModFromDisk(Path.Combine(ModManager.DownloadPath, kosherFileName));
+                    ModManager.SyncSingleModFromDisk(Path.Combine(ModManager.DownloadPath, kosherFileName), out _);
                 }
             }
             catch (Exception ex)
@@ -185,13 +185,25 @@ namespace AstroModLoader
             if (installingModPaths.Length > 0)
             {
                 List<Mod> newMods = new List<Mod>();
+                int clientOnlyCount = 0;
                 foreach (string newInstallingMod in installingModPaths)
                 {
+                    string newPath = null;
                     try
                     {
-                        string newPath = Path.Combine(ModManager.DownloadPath, Path.GetFileName(newInstallingMod));
+                        newPath = Path.Combine(ModManager.DownloadPath, Path.GetFileName(newInstallingMod));
                         File.Copy(newInstallingMod, newPath);
-                        newMods.Add(ModManager.SyncSingleModFromDisk(newPath, false));
+                    }
+                    catch (IOException) { }
+
+                    try
+                    {
+                        if (!string.IsNullOrEmpty(newPath))
+                        {
+                            bool wasClientOnly = false;
+                            newMods.Add(ModManager.SyncSingleModFromDisk(newPath, out wasClientOnly, false));
+                            if (wasClientOnly) clientOnlyCount++;
+                        }
                     }
                     catch (IOException) { }
                 }
@@ -202,6 +214,7 @@ namespace AstroModLoader
 
                 foreach (Mod mod in newMods)
                 {
+                    if (mod == null) continue;
                     mod.Dirty = true;
                     mod.Enabled = true;
                     if ((ModManager.InstalledAstroBuild != null && mod.CurrentModData.AstroBuild != null && !ModManager.InstalledAstroBuild.AcceptablySimilar(mod.CurrentModData.AstroBuild)) || (Program.CommandLineOptions.ServerMode && mod.CurrentModData.Sync == SyncMode.ClientOnly))
@@ -212,6 +225,11 @@ namespace AstroModLoader
 
                 ModManager.FullUpdate();
                 TableManager.Refresh();
+
+                if (clientOnlyCount > 0)
+                {
+                    this.ShowBasicButton(clientOnlyCount + " mod" + (clientOnlyCount == 1 ? "" : "s") + " are designated as \"Client only\" and were ignored.", "OK", null, null);
+                }
             }
         }
 

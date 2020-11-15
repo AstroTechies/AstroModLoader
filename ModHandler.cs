@@ -94,6 +94,11 @@ namespace AstroModLoader
                 }
             }
 
+            if (Program.CommandLineOptions.ServerMode && Directory.Exists(Path.Combine(BasePath, "Saved")))
+            {
+                GamePath = Path.GetFullPath(Path.Combine(BasePath, ".."));
+            }
+
             if (GamePath == null || !Directory.Exists(GamePath))
             {
                 GamePath = null;
@@ -294,7 +299,7 @@ namespace AstroModLoader
             BasePath = null;
             if (!string.IsNullOrEmpty(Program.CommandLineOptions.LocalDataPath))
             {
-                BasePath = Path.Combine(Program.CommandLineOptions.LocalDataPath, "Astro");
+                BasePath = Path.GetFullPath(Path.Combine(Program.CommandLineOptions.LocalDataPath, "Astro"));
             }
             else
             {
@@ -432,10 +437,14 @@ namespace AstroModLoader
             }
         }
 
-        public Mod SyncSingleModFromDisk(string modPath, bool updateSort = true)
+        public Mod SyncSingleModFromDisk(string modPath, out bool wasClientOnly, bool updateSort = true)
         {
             Mod newMod = new Mod(ExtractMetadataFromPath(modPath), Path.GetFileName(modPath));
-            if (Program.CommandLineOptions.ServerMode && newMod.CurrentModData.Sync == SyncMode.ClientOnly) return null;
+            if (Program.CommandLineOptions.ServerMode && newMod.CurrentModData.Sync == SyncMode.ClientOnly)
+            {
+                wasClientOnly = true;
+                return null;
+            }
             if (ModLookup.ContainsKey(newMod.CurrentModData.ModID))
             {
                 if (!ModLookup[newMod.CurrentModData.ModID].AvailableVersions.Contains(newMod.InstalledVersion)) ModLookup[newMod.CurrentModData.ModID].AvailableVersions.Add(newMod.InstalledVersion);
@@ -452,6 +461,7 @@ namespace AstroModLoader
                 SortVersions();
                 SortMods();
             }
+            wasClientOnly = false;
             return newMod;
         }
 
@@ -465,7 +475,7 @@ namespace AstroModLoader
                 ModLookup = new Dictionary<string, Mod>();
                 foreach (string modPath in allMods)
                 {
-                    SyncSingleModFromDisk(modPath, false);
+                    SyncSingleModFromDisk(modPath, out _, false);
                 }
             }
 
@@ -550,6 +560,7 @@ namespace AstroModLoader
             }
         }
 
+        private PlatformType FirstRecordedIndependentConfigPlatform = PlatformType.Unknown;
         public void SyncIndependentConfigFromDisk()
         {
             IndependentConfig independentConfig = null;
@@ -576,6 +587,7 @@ namespace AstroModLoader
                 AMLPalette.RefreshTheme(BaseForm);
 
                 Platform = independentConfig.Platform;
+                if (FirstRecordedIndependentConfigPlatform == PlatformType.Unknown) FirstRecordedIndependentConfigPlatform = independentConfig.Platform;
                 if (!string.IsNullOrEmpty(independentConfig.CustomBasePath)) CustomBasePath = independentConfig.CustomBasePath;
                 if (!string.IsNullOrEmpty(independentConfig.PlayFabCustomID)) PlayFabAPI.CustomID = independentConfig.PlayFabCustomID;
                 if (!string.IsNullOrEmpty(independentConfig.PlayFabToken)) PlayFabAPI.Token = independentConfig.PlayFabToken;
@@ -649,7 +661,14 @@ namespace AstroModLoader
         public void SyncIndependentConfigToDisk()
         {
             var newIndConfig = new IndependentConfig();
-            newIndConfig.Platform = Platform;
+            if (Program.CommandLineOptions.ServerMode)
+            {
+                newIndConfig.Platform = FirstRecordedIndependentConfigPlatform;
+            }
+            else
+            {
+                newIndConfig.Platform = Platform;
+            }
             newIndConfig.Theme = AMLPalette.CurrentTheme;
             newIndConfig.AccentColor = AMLUtils.ColorToHTML(AMLPalette.AccentColor);
             newIndConfig.CustomBasePath = CustomBasePath;
