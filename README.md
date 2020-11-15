@@ -1,5 +1,4 @@
 <p align="center">
-  <img src="https://i.imgur.com/zrjykFN.png" width="128px">
   <h3 align="center">AstroModLoader</h3>
 </p>
 <p align="center"><img src="https://i.imgur.com/SALFGLa.png"></p>
