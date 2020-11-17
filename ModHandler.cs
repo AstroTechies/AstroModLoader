@@ -217,7 +217,6 @@ namespace AstroModLoader
                 string tempAstroInstallDir = null;
                 if ((tempAstroInstallDir = CheckSteamPathForGame(appID, installPath)) != null)
                 {
-                    Debug.WriteLine(string.Join("\n", astroInstallDirs));
                     astroInstallDirs.Add(tempAstroInstallDir);
                 }
             }
