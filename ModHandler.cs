@@ -197,10 +197,43 @@ namespace AstroModLoader
 
             if (decidedSteamPath == null) return null;
 
-            string astroInstallDir = null;
+            List<string> potentialInstallDirs = new List<string>();
+            potentialInstallDirs.Add(decidedSteamPath);
+            using (StreamReader f = new StreamReader(Path.Combine(decidedSteamPath, "config", "config.vdf")))
+            {
+                string vdfEntry = null;
+                while ((vdfEntry = f.ReadLine()) != null)
+                {
+                    if (vdfEntry.Contains("BaseInstallFolder_"))
+                    {
+                        potentialInstallDirs.Add(vdfEntry.Trim().Replace("		", " ").Split(' ')[1].Replace(@"\\", @"\").Replace("\"", ""));
+                    }
+                }
+            }
+
+            List<string> astroInstallDirs = new List<string>();
+            foreach (string installPath in potentialInstallDirs)
+            {
+                string tempAstroInstallDir = null;
+                if ((tempAstroInstallDir = CheckSteamPathForGame(appID, installPath)) != null)
+                {
+                    Debug.WriteLine(string.Join("\n", astroInstallDirs));
+                    astroInstallDirs.Add(tempAstroInstallDir);
+                }
+            }
+
+            if (astroInstallDirs.Count > 0)
+            {
+                return astroInstallDirs[0];
+            }
+
+            return null;
+        }
+        private string CheckSteamPathForGame(int appID, string SteamPath)
+        {
             try
             {
-                using (StreamReader f = new StreamReader(Path.Combine(decidedSteamPath, "steamapps", "appmanifest_" + appID + ".acf")))
+                using (StreamReader f = new StreamReader(Path.Combine(SteamPath, "steamapps", "appmanifest_" + appID + ".acf")))
                 {
                     string acfEntry = null;
                     while ((acfEntry = f.ReadLine()) != null)
@@ -208,24 +241,21 @@ namespace AstroModLoader
                         Match m = acfEntryReader.Match(acfEntry);
                         if (m.Groups.Count == 3 && m.Groups[1].Value == "installdir")
                         {
-                            astroInstallDir = m.Groups[2].Value;
-                            break;
+                            string astroInstallDir = m.Groups[2].Value;
+                            if (!string.IsNullOrEmpty(astroInstallDir))
+                            {
+                                string decidedAnswer = Path.Combine(SteamPath, "steamapps", "common", astroInstallDir);
+                                if (!Directory.Exists(decidedAnswer)) return null;
+                                return decidedAnswer;
+                            }
                         }
                     }
                 }
             }
             catch (IOException)
             {
-                astroInstallDir = null;
+                return null;
             }
-            
-            if (!string.IsNullOrEmpty(astroInstallDir))
-            {
-                string decidedAnswer = Path.Combine(decidedSteamPath, "steamapps", "common", astroInstallDir);
-                if (!Directory.Exists(decidedAnswer)) return null;
-                return decidedAnswer;
-            }
-
             return null;
         }
 
