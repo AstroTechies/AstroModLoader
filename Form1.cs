@@ -285,7 +285,7 @@ namespace AstroModLoader
         {
             Mod selectedMod = TableManager.GetCurrentlySelectedMod();
 
-            if (dataGridView1.SelectedRows.Count == 1)
+            if (dataGridView1.SelectedRows.Count == 1 && !ModManager.IsReadOnly)
             {
                 DataGridViewRow selectedRow = dataGridView1.SelectedRows[0];
 
@@ -310,6 +310,21 @@ namespace AstroModLoader
             previouslySelectedMod = selectedMod;
 
             RefreshModInfoLabel();
+        }
+
+        private void dataGridView1_KeyDown(object sender, KeyEventArgs e)
+        {
+            Mod selectedMod = TableManager.GetCurrentlySelectedMod();
+
+            if (selectedMod != null && !ModManager.IsReadOnly && e.KeyCode == Keys.Delete)
+            {
+                int dialogRes = this.ShowBasicButton("Are you sure you want to delete this mod?", "Yes", "No", null);
+                if (dialogRes == 0)
+                {
+                    ModManager.EviscerateMod(selectedMod);
+                    FullRefresh();
+                }
+            }
         }
 
         private void RefreshModInfoLabel()
@@ -574,7 +589,8 @@ namespace AstroModLoader
                         List<Mod> plannedOrdering = new List<Mod>();
                         foreach (KeyValuePair<string, Mod> entry in currentProf.ProfileData)
                         {
-                            entry.Value.Enabled = false;
+                            //entry.Value.Enabled = false;
+                            entry.Value.Enabled = entry.Value.CurrentModData.Sync == SyncMode.ClientOnly;
                             creatingProfile.ProfileData[entry.Key] = entry.Value;
                             plannedOrdering.Add(entry.Value);
                         }

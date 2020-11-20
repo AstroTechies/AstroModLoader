@@ -228,6 +228,7 @@ namespace AstroModLoader
 
             return null;
         }
+
         private string CheckSteamPathForGame(int appID, string SteamPath)
         {
             try
@@ -466,6 +467,44 @@ namespace AstroModLoader
             }
         }
 
+        private void SafeDelete(string targetPath)
+        {
+            try
+            {
+                File.Delete(targetPath);
+            }
+            catch { }
+        }
+
+        public void EviscerateMod(Mod targetMod)
+        {
+            string[] allNormalMods = Directory.GetFiles(DownloadPath, "*.pak", SearchOption.TopDirectoryOnly);
+            string[] installedMods = Directory.GetFiles(InstallPath, "*.pak", SearchOption.TopDirectoryOnly);
+            string[] allMods = new string[allNormalMods.Length + installedMods.Length];
+            Array.Copy(allNormalMods, allMods, allNormalMods.Length);
+            Array.Copy(installedMods, 0, allMods, allNormalMods.Length, installedMods.Length);
+
+            foreach (string modPath in allMods)
+            {
+                string modNameOnDisk = Path.GetFileName(modPath);
+                Mod newMod = new Mod(ExtractMetadataFromPath(modPath), modNameOnDisk);
+                if (newMod.CurrentModData.ModID == targetMod.CurrentModData.ModID)
+                {
+                    SafeDelete(modPath);
+                }
+            }
+
+            for (int i = 0; i < Mods.Count; i++)
+            {
+                if (Mods[i].CurrentModData.ModID == targetMod.CurrentModData.ModID)
+                {
+                    ModLookup.Remove(Mods[i].CurrentModData.ModID);
+                    Mods.RemoveAt(i);
+                    i--;
+                }
+            }
+        }
+
         public Mod SyncSingleModFromDisk(string modPath, out bool wasClientOnly, bool updateSort = true)
         {
             Mod newMod = new Mod(ExtractMetadataFromPath(modPath), Path.GetFileName(modPath));
@@ -518,31 +557,30 @@ namespace AstroModLoader
             foreach (string modPath in installedMods)
             {
                 var modNameOnDisk = Path.GetFileName(modPath);
-                var m = new Mod(null, modNameOnDisk);
+                var m = new Mod(ExtractMetadataFromPath(modPath), modNameOnDisk);
 
                 if (ModLookup.ContainsKey(m.CurrentModData.ModID))
                 {
-                    // TODO: copy if new version is in Paks folder but not Mods
                     ModLookup[m.CurrentModData.ModID].Enabled = true;
                     ModLookup[m.CurrentModData.ModID].NameOnDisk = modNameOnDisk;
                     ModLookup[m.CurrentModData.ModID].InstalledVersion = m.InstalledVersion;
                     ModLookup[m.CurrentModData.ModID].Priority = m.Priority;
                     if (!ModLookup[m.CurrentModData.ModID].AvailableVersions.Contains(m.InstalledVersion))
                     {
+                        File.Copy(modPath, Path.Combine(DownloadPath, modNameOnDisk));
                         ModLookup[m.CurrentModData.ModID].AvailableVersions.Add(m.InstalledVersion);
                         ModLookup[m.CurrentModData.ModID].AllModData.Add(m.InstalledVersion, m.CurrentModData);
                     }
                 }
                 else
                 {
-                    Mod newMod = new Mod(ExtractMetadataFromPath(modPath), modNameOnDisk);
-                    if (Program.CommandLineOptions.ServerMode && newMod.CurrentModData.Sync == SyncMode.ClientOnly) continue;
-                    if (newMod.Priority < 999)
+                    if (Program.CommandLineOptions.ServerMode && m.CurrentModData.Sync == SyncMode.ClientOnly) continue;
+                    if (m.Priority < 999)
                     {
                         File.Copy(modPath, Path.Combine(DownloadPath, modNameOnDisk));
-                        newMod.Enabled = true;
-                        Mods.Add(newMod);
-                        ModLookup.Add(newMod.CurrentModData.ModID, newMod);
+                        m.Enabled = true;
+                        Mods.Add(m);
+                        ModLookup.Add(m.CurrentModData.ModID, m);
                     }
                 }
             }
