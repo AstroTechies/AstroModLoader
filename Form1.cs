@@ -194,14 +194,14 @@ namespace AstroModLoader
 
         private string[] AllowedModExtensions = new string[]
         {
-            "pak",
-            "zip"
+            ".pak",
+            ".zip"
         };
 
         private List<Mod> InstallModFromPath(string newInstallingMod, out int numClientOnly)
         {
             numClientOnly = 0;
-            string ext = Path.GetExtension(newInstallingMod).TrimStart('.');
+            string ext = Path.GetExtension(newInstallingMod);
             if (!AllowedModExtensions.Contains(ext)) return null;
 
             List<string> newPaths = new List<string>();
@@ -264,9 +264,21 @@ namespace AstroModLoader
             {
                 List<Mod> newMods = new List<Mod>();
                 int clientOnlyCount = 0;
+                int invalidExtensionCount = 0;
+                int wasFolderCount = 0;
                 foreach (string newInstallingMod in installingModPaths)
                 {
-                    if (!File.Exists(newInstallingMod)) continue;
+                    if (!File.Exists(newInstallingMod))
+                    {
+                        wasFolderCount++;
+                        continue;
+                    }
+                    if (!AllowedModExtensions.Contains(Path.GetExtension(newInstallingMod)))
+                    {
+                        invalidExtensionCount++;
+                        continue;
+                    }
+
                     List<Mod> resMods = InstallModFromPath(newInstallingMod, out int thisClientOnlyCount);
                     if (resMods == null) continue;
                     foreach (Mod resMod in resMods)
@@ -294,9 +306,19 @@ namespace AstroModLoader
                 ModManager.FullUpdate();
                 TableManager.Refresh();
 
+                if (wasFolderCount > 0)
+                {
+                    this.ShowBasicButton("You cannot drag in a folder!", "OK", null, null);
+                }
+
+                if (invalidExtensionCount > 0)
+                {
+                    this.ShowBasicButton(invalidExtensionCount + " file" + (invalidExtensionCount == 1 ? " had an invalid extension" : "s had invalid extensions") + " and " + (invalidExtensionCount == 1 ? "was" : "were") + " ignored.\nAcceptable mod extensions are: " + string.Join(", ", AllowedModExtensions), "OK", null, null);
+                }
+
                 if (clientOnlyCount > 0)
                 {
-                    this.ShowBasicButton(clientOnlyCount + " mod" + (clientOnlyCount == 1 ? "" : "s") + " are designated as \"Client only\" and were ignored.", "OK", null, null);
+                    this.ShowBasicButton(clientOnlyCount + " mod" + (clientOnlyCount == 1 ? " is" : "s are") + " designated as \"Client only\" and " + (clientOnlyCount == 1 ? "was" : "were") + " ignored.", "OK", null, null);
                 }
             }
         }
