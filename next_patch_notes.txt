@@ -1,7 +1,2 @@
-﻿* Added auto-extraction of .zip files upon auto-update or drag-and-drop installation.
-* Fixed a bug where the mod loader would crash when an index file disagrees with a mod on its version.
-* Fixed a bug where sometimes the mod integrator would fail to account for new mods automatically copied from the Paks folder.
-* Fixed a bug where mods present in the Paks folder but not the Mods folder and mods dragged-and-dropped into the window would be erroneously disabled by the loader.
-* Fixed a bug where auto-updating mods would download new versions but not immediately apply them when the mod loader boots up.
-* (Hopefully) fixed a bug where the loader would erroneously detect the game as being open when it is not.
-* Fixed several bugs where multiple threads would attempt to change UI elements at the same time.
+﻿* Added the ability to double-click in the profile selector menu to quickload that profile.
+* Fixed a bug where on some machines the profile selector ListBox would display lines that are too short for the text within.

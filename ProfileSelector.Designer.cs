@@ -65,6 +65,7 @@
             this.listBox1.Size = new System.Drawing.Size(317, 252);
             this.listBox1.TabIndex = 1;
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
+            this.listBox1.DoubleClick += new System.EventHandler(this.listBox1_DoubleClick);
             // 
             // listBoxPanel
             // 
@@ -168,8 +169,9 @@
             this.statusLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             this.statusLabel.Location = new System.Drawing.Point(22, 301);
             this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(0, 17);
+            this.statusLabel.Size = new System.Drawing.Size(64, 17);
             this.statusLabel.TabIndex = 8;
+            this.statusLabel.Text = "Test 123";
             // 
             // ProfileSelector
             // 

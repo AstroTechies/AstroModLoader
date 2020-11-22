@@ -19,19 +19,33 @@ namespace AstroModLoader
         public ProfileSelector()
         {
             InitializeComponent();
+            this.statusLabel.Text = "";
             this.listBox1.DrawItem += ListBox1_DrawItem;
+        }
+
+        private int GetMaxListBoxEntryHeight(Font font)
+        {
+            int maxHeight = -1;
+            foreach (KeyValuePair<string, ModProfile> entry in listBox1.Items)
+            {
+                int testingHeight = TextRenderer.MeasureText(entry.Key, font).Height;
+                if (testingHeight > maxHeight) maxHeight = testingHeight;
+            }
+            return maxHeight;
         }
 
         private void ListBox1_DrawItem(object sender, DrawItemEventArgs e)
         {
             if (e.Index < 0) return;
+
+            string decidedText = ((KeyValuePair<string, ModProfile>)listBox1.Items[e.Index]).Key;
             if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
             {
                 e = new DrawItemEventArgs(e.Graphics, e.Font, e.Bounds, e.Index, e.State ^ DrawItemState.Selected, AMLPalette.ForeColor, AMLPalette.HighlightColor);
             }
 
             e.DrawBackground();
-            e.Graphics.DrawString(((KeyValuePair<string, ModProfile>)listBox1.Items[e.Index]).Key, e.Font, new SolidBrush(AMLPalette.ForeColor), e.Bounds, StringFormat.GenericDefault);
+            e.Graphics.DrawString(decidedText, e.Font, new SolidBrush(AMLPalette.ForeColor), e.Bounds, StringFormat.GenericDefault);
             e.DrawFocusRectangle();
         }
 
@@ -55,6 +69,16 @@ namespace AstroModLoader
             else
             {
                 listBox1.DataSource = null;
+            }
+
+            double desiredItemHeight = GetMaxListBoxEntryHeight(listBox1.Font);
+            if (desiredItemHeight > 5)
+            {
+                listBox1.Height = (int)(Math.Ceiling(listBox1.Height / desiredItemHeight) * desiredItemHeight);
+                listBox1.ItemHeight = (int)desiredItemHeight;
+                listBoxPanel.Height = listBox1.Height + 2;
+                statusLabel.Location = new Point(statusLabel.Location.X, listBoxPanel.Location.Y + listBoxPanel.Height + 12);
+                this.Height = statusLabel.Location.Y + 100;
             }
 
             this.RefreshTheme();
@@ -104,7 +128,7 @@ namespace AstroModLoader
             ForceRefreshSelectedProfile();
         }
 
-        private void okButton_Click(object sender, EventArgs e)
+        private void ForceLoadSelectedProfile()
         {
             if (SelectedProfile == null)
             {
@@ -116,6 +140,16 @@ namespace AstroModLoader
             OurParentForm.FullRefresh();
             statusLabel.Text = "Successfully loaded from profile.";
             ForceRefreshSelectedProfile();
+        }
+
+        private void listBox1_DoubleClick(object sender, EventArgs e)
+        {
+            ForceLoadSelectedProfile();
+        }
+
+        private void okButton_Click(object sender, EventArgs e)
+        {
+            ForceLoadSelectedProfile();
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
