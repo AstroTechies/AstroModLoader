@@ -29,15 +29,13 @@
         private void InitializeComponent()
         {
             this.label1 = new System.Windows.Forms.Label();
-            this.listBox1 = new System.Windows.Forms.ListBox();
-            this.listBoxPanel = new System.Windows.Forms.Panel();
+            this.statusLabel = new System.Windows.Forms.Label();
             this.saveButton = new AstroModLoader.CoolButton();
             this.deleteProfileButton = new AstroModLoader.CoolButton();
             this.newProfileButton = new AstroModLoader.CoolButton();
             this.cancelButton = new AstroModLoader.CoolButton();
             this.okButton = new AstroModLoader.CoolButton();
-            this.statusLabel = new System.Windows.Forms.Label();
-            this.listBoxPanel.SuspendLayout();
+            this.listBox1 = new AstroModLoader.CoolListBox();
             this.SuspendLayout();
             // 
             // label1
@@ -51,32 +49,15 @@
             this.label1.Text = "Profiles:";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // listBox1
+            // statusLabel
             // 
-            this.listBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.listBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.listBox1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.listBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.ItemHeight = 18;
-            this.listBox1.Location = new System.Drawing.Point(1, 1);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(317, 252);
-            this.listBox1.TabIndex = 1;
-            this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
-            this.listBox1.DoubleClick += new System.EventHandler(this.listBox1_DoubleClick);
-            // 
-            // listBoxPanel
-            // 
-            this.listBoxPanel.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.listBoxPanel.Controls.Add(this.listBox1);
-            this.listBoxPanel.Location = new System.Drawing.Point(24, 35);
-            this.listBoxPanel.Margin = new System.Windows.Forms.Padding(0);
-            this.listBoxPanel.Name = "listBoxPanel";
-            this.listBoxPanel.Padding = new System.Windows.Forms.Padding(1);
-            this.listBoxPanel.Size = new System.Drawing.Size(319, 254);
-            this.listBoxPanel.TabIndex = 4;
+            this.statusLabel.AutoSize = true;
+            this.statusLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.statusLabel.Location = new System.Drawing.Point(22, 301);
+            this.statusLabel.Name = "statusLabel";
+            this.statusLabel.Size = new System.Drawing.Size(64, 17);
+            this.statusLabel.TabIndex = 8;
+            this.statusLabel.Text = "Test 123";
             // 
             // saveButton
             // 
@@ -163,15 +144,23 @@
             this.okButton.UseVisualStyleBackColor = false;
             this.okButton.Click += new System.EventHandler(this.okButton_Click);
             // 
-            // statusLabel
+            // listBox1
             // 
-            this.statusLabel.AutoSize = true;
-            this.statusLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.statusLabel.Location = new System.Drawing.Point(22, 301);
-            this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(64, 17);
-            this.statusLabel.TabIndex = 8;
-            this.statusLabel.Text = "Test 123";
+            this.listBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.listBox1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.listBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.listBox1.FormattingEnabled = true;
+            this.listBox1.ItemHeight = 18;
+            this.listBox1.Location = new System.Drawing.Point(25, 35);
+            this.listBox1.Name = "listBox1";
+            this.listBox1.Size = new System.Drawing.Size(317, 252);
+            this.listBox1.TabIndex = 1;
+            this.listBox1.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.ListBox1_DrawItem);
+            this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
+            this.listBox1.DoubleClick += new System.EventHandler(this.listBox1_DoubleClick);
+            this.listBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.listBox1_KeyDown);
             // 
             // ProfileSelector
             // 
@@ -183,17 +172,15 @@
             this.Controls.Add(this.saveButton);
             this.Controls.Add(this.deleteProfileButton);
             this.Controls.Add(this.newProfileButton);
-            this.Controls.Add(this.listBoxPanel);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.okButton);
             this.Controls.Add(this.label1);
+            this.Controls.Add(this.listBox1);
             this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "ProfileSelector";
             this.Text = "ProfileSelector";
             this.Load += new System.EventHandler(this.ProfileSelector_Load);
-            this.listBoxPanel.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -202,13 +189,12 @@
         #endregion
 
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ListBox listBox1;
         private CoolButton okButton;
         private CoolButton cancelButton;
-        public System.Windows.Forms.Panel listBoxPanel;
         private CoolButton newProfileButton;
         private CoolButton deleteProfileButton;
         private CoolButton saveButton;
         private System.Windows.Forms.Label statusLabel;
+        private AstroModLoader.CoolListBox listBox1;
     }
 }

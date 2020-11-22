@@ -44,14 +44,18 @@ namespace AstroModLoader
                 e = new DrawItemEventArgs(e.Graphics, e.Font, e.Bounds, e.Index, e.State ^ DrawItemState.Selected, AMLPalette.ForeColor, AMLPalette.HighlightColor);
             }
 
-            e.DrawBackground();
-            e.Graphics.DrawString(decidedText, e.Font, new SolidBrush(AMLPalette.ForeColor), e.Bounds, StringFormat.GenericDefault);
-            e.DrawFocusRectangle();
+            Rectangle decidedNewBounds = new Rectangle(e.Bounds.Location.X + (AMLPalette.BorderPenWidth / 2), e.Bounds.Location.Y + (AMLPalette.BorderPenWidth / 2), e.Bounds.Width - AMLPalette.BorderPenWidth, e.Bounds.Height);
+
+            e.Graphics.FillRectangle(new SolidBrush(e.BackColor), decidedNewBounds);
+            e.Graphics.DrawString(decidedText, e.Font, new SolidBrush(AMLPalette.ForeColor), decidedNewBounds, StringFormat.GenericDefault);
+            if ((e.State & DrawItemState.Focus) == DrawItemState.Focus && (e.State & DrawItemState.NoFocusRect) != DrawItemState.NoFocusRect)
+            {
+                ControlPaint.DrawFocusRectangle(e.Graphics, decidedNewBounds, e.ForeColor, e.BackColor);
+            }
         }
 
         private void RefreshTheme()
         {
-            this.listBoxPanel.BackColor = AMLPalette.AccentColor;
             this.listBox1.Select();
         }
 
@@ -76,9 +80,8 @@ namespace AstroModLoader
             {
                 listBox1.Height = (int)(Math.Ceiling(listBox1.Height / desiredItemHeight) * desiredItemHeight);
                 listBox1.ItemHeight = (int)desiredItemHeight;
-                listBoxPanel.Height = listBox1.Height + 2;
-                statusLabel.Location = new Point(statusLabel.Location.X, listBoxPanel.Location.Y + listBoxPanel.Height + 12);
-                this.Height = statusLabel.Location.Y + 100;
+                statusLabel.Location = new Point(statusLabel.Location.X, listBox1.Location.Y + listBox1.Height + (int)desiredItemHeight);
+                this.Height = statusLabel.Location.Y + ((int)desiredItemHeight * 7);
             }
 
             this.RefreshTheme();
@@ -196,9 +199,13 @@ namespace AstroModLoader
             }
         }
 
-        private void deleteProfileButton_Click(object sender, EventArgs e)
+        private void ForceDeleteProfilePrompt()
         {
-            if (listBox1.SelectedValue == null) return;
+            if (listBox1.SelectedValue == null)
+            {
+                this.ShowBasicButton("Please select a profile to delete it.", "OK", null, null);
+                return;
+            }
             int dialogResult = this.ShowBasicButton("Are you sure you want to delete this profile?", "Yes", "No", null);
             if (dialogResult == 0)
             {
@@ -208,6 +215,16 @@ namespace AstroModLoader
                 statusLabel.Text = "Successfully deleted profile.";
             }
             ForceRefreshSelectedProfile();
+        }
+
+        private void listBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete) ForceDeleteProfilePrompt();
+        }
+
+        private void deleteProfileButton_Click(object sender, EventArgs e)
+        {
+            ForceDeleteProfilePrompt();
         }
 
         private void saveButton_Click(object sender, EventArgs e)

@@ -30,10 +30,9 @@
         {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.dataGridView1 = new AstroModLoader.CoolDataGridView();
             this.label1 = new System.Windows.Forms.Label();
             this.modInfo = new System.Windows.Forms.LinkLabel();
-            this.tablePanel = new System.Windows.Forms.Panel();
             this.footerPanel = new System.Windows.Forms.Panel();
             this.exitButton = new AstroModLoader.CoolButton();
             this.settingsButton = new AstroModLoader.CoolButton();
@@ -44,7 +43,6 @@
             this.syncButton = new AstroModLoader.CoolButton();
             this.PeriodicCheckTimer = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
-            this.tablePanel.SuspendLayout();
             this.footerPanel.SuspendLayout();
             this.modPanel.SuspendLayout();
             this.SuspendLayout();
@@ -74,12 +72,12 @@
             this.dataGridView1.DefaultCellStyle = this.dataGridView1.ColumnHeadersDefaultCellStyle;
             this.dataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
             this.dataGridView1.EnableHeadersVisualStyles = false;
-            this.dataGridView1.Location = new System.Drawing.Point(1, 1);
+            this.dataGridView1.Location = new System.Drawing.Point(12, 0);
             this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(432, 225);
+            this.dataGridView1.Size = new System.Drawing.Size(434, 225);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dataGridView1_KeyDown);
             // 
@@ -107,18 +105,6 @@
             this.modInfo.Size = new System.Drawing.Size(0, 17);
             this.modInfo.TabIndex = 3;
             this.modInfo.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.modInfo_LinkClicked);
-            // 
-            // tablePanel
-            // 
-            this.tablePanel.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.tablePanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.tablePanel.BackColor = System.Drawing.Color.Black;
-            this.tablePanel.Controls.Add(this.dataGridView1);
-            this.tablePanel.Location = new System.Drawing.Point(12, 4);
-            this.tablePanel.Name = "tablePanel";
-            this.tablePanel.Padding = new System.Windows.Forms.Padding(1);
-            this.tablePanel.Size = new System.Drawing.Size(434, 227);
-            this.tablePanel.TabIndex = 4;
             // 
             // footerPanel
             // 
@@ -187,7 +173,7 @@
             this.modPanel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.modPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.modPanel.BackColor = System.Drawing.Color.Transparent;
-            this.modPanel.Controls.Add(this.tablePanel);
+            this.modPanel.Controls.Add(this.dataGridView1);
             this.modPanel.Controls.Add(this.refresh);
             this.modPanel.Controls.Add(this.loadButton);
             this.modPanel.Controls.Add(this.syncButton);
@@ -265,7 +251,6 @@
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
-            this.tablePanel.ResumeLayout(false);
             this.footerPanel.ResumeLayout(false);
             this.modPanel.ResumeLayout(false);
             this.ResumeLayout(false);

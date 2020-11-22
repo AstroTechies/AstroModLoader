@@ -20,6 +20,7 @@ namespace AstroModLoader
 
     public static class AMLPalette
     {
+        public static int BorderPenWidth = 2;
         public static Color BackColor = Color.FromArgb(40, 42, 45);
         public static Color ButtonBackColor = Color.FromArgb(51, 51, 51);
         public static Color ForeColor = Color.FromArgb(225, 225, 225);
@@ -94,7 +95,6 @@ namespace AstroModLoader
                 frm1.modInfo.ActiveLinkColor = AMLPalette.LinkColor;
                 frm1.footerPanel.BackColor = AMLPalette.FooterColor;
                 frm1.dataGridView1.GridColor = AMLPalette.AccentColor;
-                frm1.tablePanel.BackColor = AMLPalette.AccentColor;
             }
             frm.RefreshAllButtonsInControl();
         }

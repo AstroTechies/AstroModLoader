@@ -19,7 +19,7 @@ namespace AstroModLoader
         public ModHandler ModManager;
         public TableHandler TableManager;
 
-        public DataGridView dataGridView1;
+        public CoolDataGridView dataGridView1;
         public Panel footerPanel;
         public Panel tablePanel;
 
@@ -328,7 +328,7 @@ namespace AstroModLoader
             if (e.RowIndex == -1) return;
             if (AMLUtils.IsLinux) return;
 
-            Type t = dataGridView1.GetType();
+            Type t = dataGridView1.GetType().BaseType;
             FieldInfo viewSetter = t.GetField("latestEditingControl", BindingFlags.Default | BindingFlags.NonPublic | BindingFlags.Instance);
             viewSetter.SetValue(dataGridView1, null);
         }

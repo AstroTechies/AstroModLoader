@@ -1,2 +1,3 @@
 ﻿* Added the ability to double-click in the profile selector menu to quickload that profile.
-* Fixed a bug where on some machines the profile selector ListBox would display lines that are too short for the text within.
+* Fixed a bug where on certain machines the profile selector ListBox would display lines that are too short for the text within to fit.
+* Fixed a bug where bordered controls would not render properly on certain machines.

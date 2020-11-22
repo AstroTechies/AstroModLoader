@@ -70,6 +70,9 @@
     <Compile Include="CoolButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CoolBorderedControls.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
