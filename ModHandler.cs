@@ -773,12 +773,9 @@ namespace AstroModLoader
 
         public void IntegrateMods()
         {
-            Task.Run(() =>
-            {
-                if (IsReadOnly) return;
-                if (GamePath == null || InstallPath == null) return;
-                ModIntegrator.IntegrateMods(InstallPath, Path.Combine(GamePath, "Astro", "Content", "Paks"));
-            });
+            if (IsReadOnly) return;
+            if (GamePath == null || InstallPath == null) return;
+            ModIntegrator.IntegrateMods(InstallPath, Path.Combine(GamePath, "Astro", "Content", "Paks"));
         }
 
         public void RefreshAllPriorites()
