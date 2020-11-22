@@ -153,7 +153,7 @@ namespace AstroModLoader
 
                 if (mod.CurrentModData.AstroBuild == null)
                 {
-                    row.Cells[4].Value = string.Empty;
+                    row.Cells[4].Value = "Any";
                 }
                 else
                 {

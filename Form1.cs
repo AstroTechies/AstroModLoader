@@ -63,6 +63,8 @@ namespace AstroModLoader
             autoUpdater.DoWork += new DoWorkEventHandler(AutoUpdater_DoWork);
             autoUpdater.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Simple_Refresh_RunWorkerCompleted);
             autoUpdater.RunWorkerAsync();
+
+            AMLUtils.InitializeInvoke(this);
         }
 
         // Async operations
@@ -394,33 +396,36 @@ namespace AstroModLoader
 
         private void RefreshModInfoLabel()
         {
-            Mod selectedMod = TableManager.GetCurrentlySelectedMod();
-            if (selectedMod == null)
+            AMLUtils.InvokeUI(() =>
             {
-                AdjustModInfoText("");
-                return;
-            }
-            string kosherDescription = string.IsNullOrEmpty(selectedMod.CurrentModData.Description) ? "N/A" : selectedMod.CurrentModData.Description;
-            if (kosherDescription.Length > 80) kosherDescription = kosherDescription.Substring(0, 80) + "...";
-            string kosherSync = "N/A";
-            switch (selectedMod.CurrentModData.Sync)
-            {
-                case SyncMode.None:
-                    kosherSync = "None";
-                    break;
-                case SyncMode.ClientOnly:
-                    kosherSync = "Client only";
-                    break;
-                case SyncMode.ServerOnly:
-                    kosherSync = "Server only";
-                    break;
-                case SyncMode.ServerAndClient:
-                    kosherSync = "Server and client";
-                    break;
-            }
+                Mod selectedMod = TableManager.GetCurrentlySelectedMod();
+                if (selectedMod == null)
+                {
+                    AdjustModInfoText("");
+                    return;
+                }
+                string kosherDescription = string.IsNullOrEmpty(selectedMod.CurrentModData.Description) ? "N/A" : selectedMod.CurrentModData.Description;
+                if (kosherDescription.Length > 80) kosherDescription = kosherDescription.Substring(0, 80) + "...";
+                string kosherSync = "N/A";
+                switch (selectedMod.CurrentModData.Sync)
+                {
+                    case SyncMode.None:
+                        kosherSync = "None";
+                        break;
+                    case SyncMode.ClientOnly:
+                        kosherSync = "Client only";
+                        break;
+                    case SyncMode.ServerOnly:
+                        kosherSync = "Server only";
+                        break;
+                    case SyncMode.ServerAndClient:
+                        kosherSync = "Server and client";
+                        break;
+                }
 
-            bool hasHomepage = !string.IsNullOrEmpty(selectedMod.CurrentModData.Homepage) && AMLUtils.IsValidUri(selectedMod.CurrentModData.Homepage);
-            AdjustModInfoText("Name: " + selectedMod.CurrentModData.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync + (hasHomepage ? "\nWebsite: " : ""), hasHomepage ? selectedMod.CurrentModData.Homepage : "");
+                bool hasHomepage = !string.IsNullOrEmpty(selectedMod.CurrentModData.Homepage) && AMLUtils.IsValidUri(selectedMod.CurrentModData.Homepage);
+                AdjustModInfoText("Name: " + selectedMod.CurrentModData.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync + (hasHomepage ? "\nWebsite: " : ""), hasHomepage ? selectedMod.CurrentModData.Homepage : "");
+            });
         }
 
         private void modInfo_LinkClicked(object sender, EventArgs e)

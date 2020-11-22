@@ -627,7 +627,7 @@ namespace AstroModLoader
 
                         if (!string.IsNullOrEmpty(copyingPath))
                         {
-                            File.Copy(copyingPath, Path.Combine(InstallPath, destinedName));
+                            File.Copy(copyingPath, Path.Combine(InstallPath, destinedName), true);
                             mod.NameOnDisk = destinedName;
                         }
                     }

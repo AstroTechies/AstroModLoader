@@ -167,5 +167,23 @@ namespace AstroModLoader
         {
             return v1.Major == v2.Major && v1.Minor == v2.Minor; // no sense in warning if the current version is 1.16.70.0 and the mod is for 1.16.60.0, who cares
         }
+
+        private static Control internalForm;
+        public static void InitializeInvoke(Control control)
+        {
+            internalForm = control;
+        }
+
+        public static void InvokeUI(Action act)
+        {
+            if (internalForm.InvokeRequired)
+            {
+                internalForm.Invoke(act);
+            }
+            else
+            {
+                act();
+            }
+        }
     }
 }
