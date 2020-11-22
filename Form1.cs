@@ -206,7 +206,7 @@ namespace AstroModLoader
 
             List<string> newPaths = new List<string>();
 
-            if (ext == "zip") // If the mod we are trying to install is a zip, we go through and copy each pak file inside that zip
+            if (ext == ".zip") // If the mod we are trying to install is a zip, we go through and copy each pak file inside that zip
             {
                 string targetFolderPath = Path.Combine(Path.GetTempPath(), "AstroModLoader", Path.GetFileNameWithoutExtension(newInstallingMod)); // Extract the zip file to the temporary data folder
                 ZipFile.ExtractToDirectory(newInstallingMod, targetFolderPath);
