@@ -80,13 +80,13 @@ namespace AstroModLoader
 
             PerformNameAnalysis();
 
+            Priority = newPriority;
+            InstalledVersion = newModVersion;
+
             if (modData != null)
             {
                 if (modData.ModVersion != null) InstalledVersion = modData.ModVersion;
             }
-
-            Priority = newPriority;
-            InstalledVersion = newModVersion;
 
             AllModData[InstalledVersion] = modData;
             if (modData == null)

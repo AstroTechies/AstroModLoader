@@ -408,6 +408,8 @@ namespace AstroModLoader
 
         private Metadata ExtractMetadataFromPath(string modPath)
         {
+            if (new Mod(null, Path.GetFileName(modPath)).Priority >= 999) return null;
+
             try
             {
                 using (FileStream f = new FileStream(modPath, FileMode.Open, FileAccess.Read))
@@ -439,6 +441,7 @@ namespace AstroModLoader
 
                 if (mod.ForceLatest && latestVersion != null) BaseForm.SwitchVersionSync(mod, latestVersion);
             }
+            FullUpdate();
         }
 
         public void AggregateIndexFiles()
@@ -505,14 +508,8 @@ namespace AstroModLoader
             }
         }
 
-        public Mod SyncSingleModFromDisk(string modPath, out bool wasClientOnly, bool updateSort = true)
+        public void SyncSingleMod(Mod newMod)
         {
-            Mod newMod = new Mod(ExtractMetadataFromPath(modPath), Path.GetFileName(modPath));
-            if (Program.CommandLineOptions.ServerMode && newMod.CurrentModData.Sync == SyncMode.ClientOnly)
-            {
-                wasClientOnly = true;
-                return null;
-            }
             if (ModLookup.ContainsKey(newMod.CurrentModData.ModID))
             {
                 if (!ModLookup[newMod.CurrentModData.ModID].AvailableVersions.Contains(newMod.InstalledVersion)) ModLookup[newMod.CurrentModData.ModID].AvailableVersions.Add(newMod.InstalledVersion);
@@ -523,12 +520,24 @@ namespace AstroModLoader
                 Mods.Add(newMod);
                 ModLookup.Add(newMod.CurrentModData.ModID, newMod);
             }
+        }
 
+        public Mod SyncSingleModFromDisk(string modPath, out bool wasClientOnly, bool updateSort = true)
+        {
+            Mod newMod = new Mod(ExtractMetadataFromPath(modPath), Path.GetFileName(modPath));
+            if (Program.CommandLineOptions.ServerMode && newMod.CurrentModData.Sync == SyncMode.ClientOnly)
+            {
+                wasClientOnly = true;
+                return null;
+            }
+
+            SyncSingleMod(newMod);
             if (updateSort)
             {
                 SortVersions();
                 SortMods();
             }
+
             wasClientOnly = false;
             return newMod;
         }
@@ -608,7 +617,7 @@ namespace AstroModLoader
                         string copyingPath = null;
                         foreach (string modPath in allMods)
                         {
-                            Mod testMod = new Mod(null, Path.GetFileName(modPath));
+                            Mod testMod = new Mod(ExtractMetadataFromPath(modPath), Path.GetFileName(modPath));
                             if ((testMod.CurrentModData.ModID == mod.CurrentModData.ModID || testMod.NameOnDisk == mod.NameOnDisk) && testMod.InstalledVersion == mod.InstalledVersion)
                             {
                                 copyingPath = modPath;
@@ -674,7 +683,7 @@ namespace AstroModLoader
             }
             if (diskConfig != null)
             {
-                ApplyProfile(diskConfig.ModsOnDisk);
+                ApplyProfile(diskConfig.ModsOnDisk, false);
                 ProfileList = diskConfig.Profiles;
                 if (ProfileList == null) ProfileList = new Dictionary<string, ModProfile>();
                 if (!string.IsNullOrEmpty(diskConfig.LaunchCommand)) LaunchCommand = diskConfig.LaunchCommand;
@@ -691,14 +700,17 @@ namespace AstroModLoader
             SyncDependentConfigFromDisk();
         }
 
-        public void ApplyProfile(ModProfile prof)
+        public void ApplyProfile(ModProfile prof, bool disableAllMods = true)
         {
             if (prof == null) return;
-            foreach (KeyValuePair<string, Mod> rawEntry in ModLookup)
+            if (disableAllMods)
             {
-                ModLookup[rawEntry.Key].Enabled = false;
+                foreach (KeyValuePair<string, Mod> rawEntry in ModLookup)
+                {
+                    ModLookup[rawEntry.Key].Enabled = false;
+                }
             }
-
+            
             foreach (KeyValuePair<string, Mod> entry in prof.ProfileData)
             {
                 if (ModLookup.ContainsKey(entry.Key))

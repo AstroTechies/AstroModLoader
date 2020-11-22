@@ -17,10 +17,13 @@ AstroModLoader includes the following features:
 * Syncing of mods with modded [AstroLauncher](https://github.com/ricky-davis/AstroLauncher) servers
 * [Built-in mod integration](https://github.com/AstroTechies/AstroModIntegrator) to help prevent mod conflict
 
-## Getting Started
+## Usage
 To run a local copy of AstroModLoader, visit the [Releases tab](https://github.com/AstroTechies/AstroModLoader/releases) to download the executable, or clone the repository and build AstroModLoader yourself within Visual Studio.
 
-We have a Discord server dedicated to Astroneer modding, which you are free to join to learn more about modding Astroneer: https://discord.gg/bBqdVYxu4k
+### Mod Installation
+To install mods, drag and drop the .zip or the .pak file onto the AstroModLoader window while it is running. Alternatively, on Steam, you can also manually install mods by placing them into %localappdata%\Astro\Saved\Mods directory. On the Windows Store, you can place them into the %localappdata%\Packages\SystemEraSoftworks.29415440E1269_ftk5pbg2rayv2\LocalState\Astro\Saved\Mods directory.
+
+We have a Discord server dedicated to Astroneer modding, which you are free to join to learn more about using or making Astroneer mods: https://discord.gg/bBqdVYxu4k
 
 ## Licensing
 AstroModLoader is licensed under the MIT license, which can be found in [LICENSE.md.](https://github.com/AstroTechies/AstroModLoader/blob/master/LICENSE.md) In addition, necessary licenses for the third-party material used in this software can be found in [NOTICE.md.](https://github.com/AstroTechies/AstroModLoader/blob/master/NOTICE.md)

@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -90,14 +91,19 @@ namespace AstroModLoader
                     wb.Headers[HttpRequestHeader.UserAgent] = AMLUtils.UserAgent;
 
                     string kosherFileName = AMLUtils.SanitizeFilename(allVerData[newVersion].Filename);
-                    if (kosherFileName.Substring(kosherFileName.Length - 6, 6) != "_P.pak") kosherFileName += "_P.pak";
-                    wb.DownloadFile(allVerData[newVersion].URL, Path.Combine(ModManager.DownloadPath, kosherFileName));
-                    ModManager.SyncSingleModFromDisk(Path.Combine(ModManager.DownloadPath, kosherFileName), out _);
+
+                    string tempDownloadFolder = Path.Combine(Path.GetTempPath(), "AstroModLoader", "Downloads");
+                    Directory.CreateDirectory(tempDownloadFolder);
+                    wb.DownloadFile(allVerData[newVersion].URL, Path.Combine(tempDownloadFolder, kosherFileName));
+                    InstallModFromPath(Path.Combine(tempDownloadFolder, kosherFileName), out _);
+                    ModManager.SortVersions();
+                    ModManager.SortMods();
+                    Directory.Delete(tempDownloadFolder, true);
                 }
             }
             catch (Exception ex)
             {
-                if (ex is WebException || ex is IndexFileException)
+                if (ex is WebException || ex is IndexFileException || ex is IOException)
                 {
                     Debug.WriteLine(ex.ToString());
                     return false;
@@ -119,6 +125,11 @@ namespace AstroModLoader
             }
 
             thisMod.InstalledVersion = newVersion;
+            if (!thisMod.AllModData.ContainsKey(newVersion))
+            {
+                if (!thisMod.ForceLatest) return;
+                thisMod.InstalledVersion = thisMod.AvailableVersions[0];
+            }
             thisMod.Dirty = true;
         }
 
@@ -179,6 +190,71 @@ namespace AstroModLoader
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
         }
 
+        private string[] AllowedModExtensions = new string[]
+        {
+            "pak",
+            "zip"
+        };
+
+        private List<Mod> InstallModFromPath(string newInstallingMod, out int numClientOnly)
+        {
+            numClientOnly = 0;
+            string ext = Path.GetExtension(newInstallingMod).TrimStart('.');
+            if (!AllowedModExtensions.Contains(ext)) return null;
+
+            List<string> newPaths = new List<string>();
+
+            if (ext == "zip") // If the mod we are trying to install is a zip, we go through and copy each pak file inside that zip
+            {
+                string targetFolderPath = Path.Combine(Path.GetTempPath(), "AstroModLoader", Path.GetFileNameWithoutExtension(newInstallingMod)); // Extract the zip file to the temporary data folder
+                ZipFile.ExtractToDirectory(newInstallingMod, targetFolderPath);
+
+                string[] allAccessiblePaks = Directory.GetFiles(targetFolderPath, "*.pak", SearchOption.AllDirectories); // Get all pak files that exist in the zip file
+                foreach (string zippedPakPath in allAccessiblePaks)
+                {
+                    string newPath = null;
+                    try
+                    {
+                        newPath = Path.Combine(ModManager.DownloadPath, Path.GetFileName(zippedPakPath));
+                        File.Copy(zippedPakPath, newPath);
+                        newPaths.Add(newPath);
+                    }
+                    catch (IOException) { }
+                }
+
+                Directory.Delete(targetFolderPath, true); // Clean up the temporary data folder
+            }
+            else // Otherwise just copy the file itself
+            {
+                string newPath = null;
+                try
+                {
+                    newPath = Path.Combine(ModManager.DownloadPath, Path.GetFileName(newInstallingMod));
+                    File.Copy(newInstallingMod, newPath);
+                    newPaths.Add(newPath);
+                }
+                catch (IOException) { }
+            }
+
+            List<Mod> outputs = new List<Mod>();
+
+            foreach (string newPath in newPaths)
+            {
+                try
+                {
+                    if (!string.IsNullOrEmpty(newPath))
+                    {
+                        Mod nextMod = ModManager.SyncSingleModFromDisk(newPath, out bool wasClientOnly, false);
+                        if (nextMod != null) outputs.Add(nextMod);
+                        if (wasClientOnly) numClientOnly++;
+                    }
+                }
+                catch (IOException) { }
+            }
+            
+            return outputs;
+        }
+
         private void Form1_DragDrop(object sender, DragEventArgs e)
         {
             string[] installingModPaths = (string[])e.Data.GetData(DataFormats.FileDrop);
@@ -188,24 +264,13 @@ namespace AstroModLoader
                 int clientOnlyCount = 0;
                 foreach (string newInstallingMod in installingModPaths)
                 {
-                    string newPath = null;
-                    try
+                    List<Mod> resMods = InstallModFromPath(newInstallingMod, out int thisClientOnlyCount);
+                    if (resMods == null) continue;
+                    foreach (Mod resMod in resMods)
                     {
-                        newPath = Path.Combine(ModManager.DownloadPath, Path.GetFileName(newInstallingMod));
-                        File.Copy(newInstallingMod, newPath);
+                        if (resMod != null) newMods.Add(resMod);
                     }
-                    catch (IOException) { }
-
-                    try
-                    {
-                        if (!string.IsNullOrEmpty(newPath))
-                        {
-                            bool wasClientOnly = false;
-                            newMods.Add(ModManager.SyncSingleModFromDisk(newPath, out wasClientOnly, false));
-                            if (wasClientOnly) clientOnlyCount++;
-                        }
-                    }
-                    catch (IOException) { }
+                    clientOnlyCount += thisClientOnlyCount;
                 }
 
                 ModManager.SyncModsFromDisk(true);
@@ -429,6 +494,9 @@ namespace AstroModLoader
                     resultButton.ShowDialog();
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());
+
+            // Force an update for good measure
+            ModManager.FullUpdate();
         }
 
         private void playButton_Click(object sender, EventArgs e)

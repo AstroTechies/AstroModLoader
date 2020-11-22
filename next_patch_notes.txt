@@ -1,0 +1,5 @@
+﻿* Added auto-extraction of .zip files upon auto-update or drag-and-drop installation.
+* Fixed a bug where the mod loader would crash when an index file disagrees with a mod on its version.
+* Fixed a bug where sometimes the mod integrator would fail to account for new mods automatically copied from the Mods folder.
+* Fixed a bug where mods present in the Paks folder but not the Mods folder would be erroneously disabled by the loader.
+* Fixed a bug where auto-updating mods would download new versions but not immediately apply them when the mod loader boots up.
