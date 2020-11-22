@@ -835,7 +835,7 @@ namespace AstroModLoader
         public void FullUpdate()
         {
             UpdateReadOnlyStatus();
-            //try
+            try
             {
                 Directory.CreateDirectory(DownloadPath);
                 Directory.CreateDirectory(InstallPath);
@@ -844,7 +844,7 @@ namespace AstroModLoader
                 SyncConfigToDisk();
                 SyncModsToDisk();
             }
-            /*catch (Exception ex)
+            catch (Exception ex)
             {
                 if (ex is IOException || ex is FileNotFoundException)
                 {
@@ -852,7 +852,7 @@ namespace AstroModLoader
                     return;
                 }
                 throw;
-            }*/
+            }
         }
     }
 }
