@@ -79,6 +79,11 @@ namespace AstroModLoader
 
         public void Refresh()
         {
+            AMLUtils.InvokeUI(RefreshInternal);
+        }
+
+        private void RefreshInternal()
+        {
             Mod selectedMod = GetCurrentlySelectedMod();
 
             GridView.DataSource = null;

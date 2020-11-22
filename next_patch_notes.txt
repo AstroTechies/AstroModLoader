@@ -4,3 +4,4 @@
 * Fixed a bug where mods present in the Paks folder but not the Mods folder would be erroneously disabled by the loader.
 * Fixed a bug where auto-updating mods would download new versions but not immediately apply them when the mod loader boots up.
 * Fixed a bug where the loader would erroneously detect the game as being open when it is not.
+* Fixed several bugs where multiple threads would attempt to change UI elements at the same time.

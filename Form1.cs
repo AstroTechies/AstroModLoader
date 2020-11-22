@@ -26,6 +26,8 @@ namespace AstroModLoader
         public Form1()
         {
             InitializeComponent();
+            AMLUtils.InitializeInvoke(this);
+
             this.Text = "AstroModLoader v" + Application.ProductVersion;
 
             // Enable double buffering to look nicer
@@ -63,8 +65,6 @@ namespace AstroModLoader
             autoUpdater.DoWork += new DoWorkEventHandler(AutoUpdater_DoWork);
             autoUpdater.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Simple_Refresh_RunWorkerCompleted);
             autoUpdater.RunWorkerAsync();
-
-            AMLUtils.InitializeInvoke(this);
         }
 
         // Async operations
@@ -266,6 +266,7 @@ namespace AstroModLoader
                 int clientOnlyCount = 0;
                 foreach (string newInstallingMod in installingModPaths)
                 {
+                    if (!File.Exists(newInstallingMod)) continue;
                     List<Mod> resMods = InstallModFromPath(newInstallingMod, out int thisClientOnlyCount);
                     if (resMods == null) continue;
                     foreach (Mod resMod in resMods)
@@ -312,7 +313,7 @@ namespace AstroModLoader
 
         private void DataGridView1_DataError(object sender, DataGridViewDataErrorEventArgs anError)
         {
-            MessageBox.Show("Error happened " + anError.Context.ToString());
+            MessageBox.Show("DataError happened! Please report this! " + anError.Context.ToString());
         }
 
         private void Footer_Paint(object sender, PaintEventArgs e)
@@ -354,24 +355,27 @@ namespace AstroModLoader
 
             if (dataGridView1.SelectedRows.Count == 1 && !ModManager.IsReadOnly)
             {
-                DataGridViewRow selectedRow = dataGridView1.SelectedRows[0];
-
-                // If shift is held, that means we are changing the order
-                if (canAdjustOrder && ModifierKeys == Keys.Shift && selectedMod != null && previouslySelectedMod != null && previouslySelectedMod != selectedMod)
+                AMLUtils.InvokeUI(() =>
                 {
-                    int newModIndex = selectedRow.Index;
-                    ModManager.SwapMod(previouslySelectedMod, newModIndex);
+                    DataGridViewRow selectedRow = dataGridView1.SelectedRows[0];
 
-                    previouslySelectedMod = null;
-                    canAdjustOrder = false;
-                    TableManager.Refresh();
-                    canAdjustOrder = true;
+                    // If shift is held, that means we are changing the order
+                    if (canAdjustOrder && ModifierKeys == Keys.Shift && selectedMod != null && previouslySelectedMod != null && previouslySelectedMod != selectedMod)
+                    {
+                        int newModIndex = selectedRow.Index;
+                        ModManager.SwapMod(previouslySelectedMod, newModIndex);
 
-                    dataGridView1.ClearSelection();
-                    dataGridView1.Rows[newModIndex].Selected = true;
-                    dataGridView1.CurrentCell = dataGridView1.Rows[newModIndex].Cells[0];
-                    selectedMod = ModManager.Mods[newModIndex];
-                }
+                        previouslySelectedMod = null;
+                        canAdjustOrder = false;
+                        TableManager.Refresh();
+                        canAdjustOrder = true;
+
+                        dataGridView1.ClearSelection();
+                        dataGridView1.Rows[newModIndex].Selected = true;
+                        dataGridView1.CurrentCell = dataGridView1.Rows[newModIndex].Cells[0];
+                        selectedMod = ModManager.Mods[newModIndex];
+                    }
+                });
             }
 
             previouslySelectedMod = selectedMod;
@@ -467,16 +471,11 @@ namespace AstroModLoader
             FullRefresh();
         }
 
-        public static readonly string GitHubRepo = "AstroTechies/AstroModLoader"; // AstroTechies/AstroModLoader
+        public static readonly string GitHubRepo = "AstroTechies/AstroModLoader";
         private Version latestOnlineVersion = null;
         private void Form1_Load(object sender, EventArgs e)
         {
             dataGridView1.ClearSelection();
-
-            /*if (AMLUtils.IsLinux)
-            {
-                MessageBox.Show("You are running on Linux!", "Test");
-            }*/
 
             if (!string.IsNullOrEmpty(Program.CommandLineOptions.NextLaunchPath))
             {

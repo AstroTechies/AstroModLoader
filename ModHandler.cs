@@ -760,22 +760,28 @@ namespace AstroModLoader
 
         public void SyncConfigToDisk()
         {
-            var newConfig = new ModConfig();
-            newConfig.GamePath = GamePath;
-            newConfig.LaunchCommand = LaunchCommand;
-            newConfig.Profiles = ProfileList;
-            newConfig.ModsOnDisk = GenerateProfile();
+            AMLUtils.InvokeUI(() =>
+            {
+                var newConfig = new ModConfig();
+                newConfig.GamePath = GamePath;
+                newConfig.LaunchCommand = LaunchCommand;
+                newConfig.Profiles = ProfileList;
+                newConfig.ModsOnDisk = GenerateProfile();
 
-            File.WriteAllBytes(Path.Combine(DownloadPath, "modconfig.json"), Encoding.UTF8.GetBytes(AMLUtils.SerializeObject(newConfig)));
+                File.WriteAllBytes(Path.Combine(DownloadPath, "modconfig.json"), Encoding.UTF8.GetBytes(AMLUtils.SerializeObject(newConfig)));
 
-            SyncIndependentConfigToDisk();
+                SyncIndependentConfigToDisk();
+            });
         }
 
         public void IntegrateMods()
         {
-            if (IsReadOnly) return;
-            if (GamePath == null || InstallPath == null) return;
-            ModIntegrator.IntegrateMods(InstallPath, Path.Combine(GamePath, "Astro", "Content", "Paks"));
+            AMLUtils.InvokeUI(() =>
+            {
+                if (IsReadOnly) return;
+                if (GamePath == null || InstallPath == null) return;
+                ModIntegrator.IntegrateMods(InstallPath, Path.Combine(GamePath, "Astro", "Content", "Paks"));
+            });
         }
 
         public void RefreshAllPriorites()
@@ -829,7 +835,7 @@ namespace AstroModLoader
         public void FullUpdate()
         {
             UpdateReadOnlyStatus();
-            try
+            //try
             {
                 Directory.CreateDirectory(DownloadPath);
                 Directory.CreateDirectory(InstallPath);
@@ -838,7 +844,7 @@ namespace AstroModLoader
                 SyncConfigToDisk();
                 SyncModsToDisk();
             }
-            catch (Exception ex)
+            /*catch (Exception ex)
             {
                 if (ex is IOException || ex is FileNotFoundException)
                 {
@@ -846,7 +852,7 @@ namespace AstroModLoader
                     return;
                 }
                 throw;
-            }
+            }*/
         }
     }
 }

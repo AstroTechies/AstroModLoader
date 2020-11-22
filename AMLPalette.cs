@@ -47,6 +47,14 @@ namespace AstroModLoader
 
         public static void RefreshTheme(Form frm)
         {
+            AMLUtils.InvokeUI(() =>
+            {
+                RefreshThemeInternal(frm);
+            });
+        }
+
+        private static void RefreshThemeInternal(Form frm)
+        {
             switch (CurrentTheme)
             {
                 case ModLoaderTheme.Dark:
