@@ -42,6 +42,7 @@
             this.loadButton = new AstroModLoader.CoolButton();
             this.syncButton = new AstroModLoader.CoolButton();
             this.PeriodicCheckTimer = new System.Windows.Forms.Timer(this.components);
+            this.CheckAllDirty = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.footerPanel.SuspendLayout();
             this.modPanel.SuspendLayout();
@@ -235,6 +236,11 @@
             this.PeriodicCheckTimer.Interval = 8000;
             this.PeriodicCheckTimer.Tick += new System.EventHandler(this.PeriodicCheckTimer_Tick);
             // 
+            // CheckAllDirty
+            // 
+            this.CheckAllDirty.Interval = 1500;
+            this.CheckAllDirty.Tick += new System.EventHandler(this.CheckAllDirty_Tick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -270,6 +276,7 @@
         private System.Windows.Forms.Panel modPanel;
         private System.Windows.Forms.Timer PeriodicCheckTimer;
         public System.Windows.Forms.LinkLabel modInfo;
+        private System.Windows.Forms.Timer CheckAllDirty;
     }
 }
 

@@ -21,7 +21,6 @@ namespace AstroModLoader
 
         public CoolDataGridView dataGridView1;
         public Panel footerPanel;
-        public Panel tablePanel;
 
         public Form1()
         {
@@ -60,6 +59,7 @@ namespace AstroModLoader
             dataGridView1.DragDrop += new DragEventHandler(Form1_DragDrop);
 
             PeriodicCheckTimer.Enabled = true;
+            CheckAllDirty.Enabled = true;
 
             autoUpdater = new BackgroundWorker();
             autoUpdater.DoWork += new DoWorkEventHandler(AutoUpdater_DoWork);
@@ -77,7 +77,11 @@ namespace AstroModLoader
 
         private void Simple_Refresh_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (System.Threading.SynchronizationContext.Current != null) TableManager.Refresh();
+            if (System.Threading.SynchronizationContext.Current != null)
+            {
+                TableManager.Refresh();
+                ModManager.FullUpdate();
+            }
         }
 
         public bool DownloadVersionSync(Mod thisMod, Version newVersion)
@@ -136,7 +140,7 @@ namespace AstroModLoader
         }
 
         // The rest
-        private void DataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        private void ForceUpdateCells()
         {
             Task.Run(() =>
             {
@@ -167,6 +171,26 @@ namespace AstroModLoader
                 }
                 ModManager.FullUpdate();
             });
+        }
+
+        private volatile bool IsAllDirty = false;
+        private void DataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            IsAllDirty = true;
+        }
+
+        private void CheckAllDirty_Tick(object sender, EventArgs e)
+        {
+            if (IsAllDirty)
+            {
+                ForceUpdateCells();
+                IsAllDirty = false;
+            }
+        }
+
+        private void PeriodicCheckTimer_Tick(object sender, EventArgs e)
+        {
+            ModManager.UpdateReadOnlyStatus();
         }
 
         public void AdjustModInfoText(string txt, string linkText = "")
@@ -606,16 +630,6 @@ namespace AstroModLoader
             selectorForm.StartPosition = FormStartPosition.Manual;
             selectorForm.Location = new Point((this.Location.X + this.Width / 2) - (selectorForm.Width / 2), (this.Location.Y + this.Height / 2) - (selectorForm.Height / 2));
             selectorForm.ShowDialog(this);
-        }
-
-        private void PeriodicCheckTimer_Tick(object sender, EventArgs e)
-        {
-            ModManager.UpdateReadOnlyStatus();
-        }
-
-        private void ForceRefreshTimer_Tick(object sender, EventArgs e)
-        {
-            TableManager.Refresh();
         }
 
         private bool currentlySyncing = false;

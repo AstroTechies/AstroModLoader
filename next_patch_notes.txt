@@ -1,3 +1,6 @@
-﻿* Added the ability to double-click in the profile selector menu to quickload that profile.
+﻿* Added the ability to double-click in the profile selector menu to quickload a profile and the ability to press delete in the profile selector menu to quickly delete a profile.
 * Fixed a bug where on certain machines the profile selector ListBox would display lines that are too short for the text within to fit.
 * Fixed a bug where bordered controls would not render properly on certain machines.
+* Fixed a bug where the current mod loadout on disk would desync with what is shown by the UI when the checkboxes are fired rapidly.
+* Fixed a bug where the loader would sometimes not properly integrate after a change in mods.
+* Updated the local copy of AstroModIntegrator to 1.1.

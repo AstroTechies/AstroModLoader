@@ -441,7 +441,6 @@ namespace AstroModLoader
 
                 if (mod.ForceLatest && latestVersion != null) BaseForm.SwitchVersionSync(mod, latestVersion);
             }
-            FullUpdate();
         }
 
         public void AggregateIndexFiles()
@@ -840,9 +839,9 @@ namespace AstroModLoader
                 Directory.CreateDirectory(DownloadPath);
                 Directory.CreateDirectory(InstallPath);
 
-                IntegrateMods();
                 SyncConfigToDisk();
                 SyncModsToDisk();
+                IntegrateMods();
             }
             catch (Exception ex)
             {
