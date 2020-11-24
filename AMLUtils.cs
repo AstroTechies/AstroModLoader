@@ -14,6 +14,10 @@ namespace AstroModLoader
 {
     public static class AMLUtils
     {
+        public const int WM_PAINT = 0x000F;
+        public const int WM_HSCROLL = 0x0114;
+        public const int WM_VSCROLL = 0x0115;
+
         private static bool _checkForLinux = true;
         private static bool _isLinux = false;
 

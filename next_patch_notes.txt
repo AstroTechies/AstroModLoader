@@ -1,6 +1,6 @@
-﻿* Added the ability to double-click in the profile selector menu to quickload a profile and the ability to press delete in the profile selector menu to quickly delete a profile.
-* Fixed a bug where on certain machines the profile selector ListBox would display lines that are too short for the text within to fit.
-* Fixed a bug where bordered controls would not render properly on certain machines.
-* Fixed a bug where the current mod loadout on disk would desync with what is shown by the UI when the checkboxes are fired rapidly.
-* Fixed a bug where the loader would sometimes not properly integrate after a change in mods.
-* Updated the local copy of AstroModIntegrator to 1.1.
+﻿* Added additional keyboard shortcuts to menus.
+* Fixed a bug where the user could drag in a pak mod and its priority would not be properly adjusted until a full update.
+* Fixed a bug where the user could drag in pak mods with the reserved priority 999.
+* Fixed a bug where the user could drag in pak mods with invalid names.
+* Fixed a bug where the profile selector menu would behave improperly if the user has more profiles than UI space allows.
+* Updated the local copy of AstroModIntegrator to 1.1.1.

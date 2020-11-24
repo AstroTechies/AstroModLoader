@@ -13,6 +13,12 @@ namespace AstroModLoader
         public CoolDataGridView()
         {
             BorderStyle = BorderStyle.None;
+            this.Scroll += CoolDataGridView_Scroll;
+        }
+
+        private void CoolDataGridView_Scroll(object sender, ScrollEventArgs e)
+        {
+            this.Invalidate();
         }
 
         protected override void WndProc(ref Message m)
@@ -20,7 +26,7 @@ namespace AstroModLoader
             base.WndProc(ref m);
             switch (m.Msg)
             {
-                case 0xF:
+                case AMLUtils.WM_PAINT:
                     Graphics g = this.CreateGraphics();
                     g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.Default;
                     Rectangle rect = ClientRectangle;
@@ -45,7 +51,7 @@ namespace AstroModLoader
             base.WndProc(ref m);
             switch (m.Msg)
             {
-                case 0xF:
+                case AMLUtils.WM_PAINT:
                     Graphics g = this.CreateGraphics();
                     g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.Default;
                     Rectangle rect = ClientRectangle;

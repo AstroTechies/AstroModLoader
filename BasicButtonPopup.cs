@@ -43,6 +43,23 @@ namespace AstroModLoader
             mainLabel.Select();
         }
 
+        private void BasicButtonPopup_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(PageToVisit)) return;
+            if (button3.Visible) return;
+
+            if (e.KeyCode == Keys.Return)
+            {
+                ResultButton = 0;
+                this.Close();
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                ResultButton = 1;
+                this.Close();
+            }
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             ResultButton = 0;

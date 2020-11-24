@@ -111,10 +111,12 @@
             this.Controls.Add(this.mainLabel);
             this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.KeyPreview = true;
             this.MaximizeBox = false;
             this.Name = "BasicButtonPopup";
             this.Text = "BasicButtonPopup";
             this.Load += new System.EventHandler(this.BasicButtonPopup_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.BasicButtonPopup_KeyDown);
             this.ResumeLayout(false);
             this.PerformLayout();
 

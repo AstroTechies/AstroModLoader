@@ -43,18 +43,7 @@ namespace AstroModLoader
             string automaticWin10Path = null;
             try
             {
-                if (Program.CommandLineOptions.ServerMode)
-                {
-                    if (Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Astro")))
-                    {
-                        automaticSteamPath = Directory.GetCurrentDirectory();
-                    }
-                    else
-                    {
-                        automaticSteamPath = CheckRegistryForSteamPath(728470); // Astroneer Dedicated Server: 728470
-                    }
-                }
-                else
+                if (!Program.CommandLineOptions.ServerMode)
                 {
                     automaticSteamPath = CheckRegistryForSteamPath(361420); // Astroneer: 361420
                     automaticWin10Path = CheckRegistryForMicrosoftStorePath();
@@ -406,7 +395,7 @@ namespace AstroModLoader
             Directory.CreateDirectory(InstallPath);
         }
 
-        private Metadata ExtractMetadataFromPath(string modPath)
+        internal Metadata ExtractMetadataFromPath(string modPath)
         {
             if (new Mod(null, Path.GetFileName(modPath)).Priority >= 999) return null;
 
@@ -585,7 +574,7 @@ namespace AstroModLoader
                     if (Program.CommandLineOptions.ServerMode && m.CurrentModData.Sync == SyncMode.ClientOnly) continue;
                     if (m.Priority < 999)
                     {
-                        File.Copy(modPath, Path.Combine(DownloadPath, modNameOnDisk));
+                        File.Copy(modPath, Path.Combine(DownloadPath, modNameOnDisk), true);
                         m.Enabled = true;
                         Mods.Add(m);
                         ModLookup.Add(m.CurrentModData.ModID, m);

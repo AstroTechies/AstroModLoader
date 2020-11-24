@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -106,9 +107,10 @@ namespace AstroModLoader
             if (InstalledVersion != null && !AvailableVersions.Contains(InstalledVersion)) AvailableVersions.Add(InstalledVersion);
         }
 
+        Regex ModIDFilterRegex = new Regex(@"[^A-Za-z0-9]", RegexOptions.Compiled);
         public string ConstructName()
         {
-            return AMLUtils.GeneratePriorityFromPositionInList(Priority) + "-" + CurrentModData.ModID + "-" + InstalledVersion + "_P.pak";
+            return AMLUtils.GeneratePriorityFromPositionInList(Priority) + "-" + ModIDFilterRegex.Replace(CurrentModData.ModID, "") + "-" + InstalledVersion + "_P.pak";
         }
 
         private int newPriority;
@@ -144,7 +146,7 @@ namespace AstroModLoader
             }
             else
             {
-                newModID = NameOnDisk;
+                newModID = NameOnDisk.Replace(".pak", "");
             }
 
             newModVersion = new Version(0, 1, 0);

@@ -222,6 +222,32 @@ namespace AstroModLoader
             ".zip"
         };
 
+        private string AdjustNewPathToBeValid(string newPath, Metadata originalModData)
+        {
+            Mod testMod = new Mod(originalModData, Path.GetFileName(newPath));
+            if (testMod.Priority >= 999) return null;
+            return Path.Combine(Path.GetDirectoryName(newPath), testMod.ConstructName());
+        }
+
+        private string AddModFromPakPath(string newInstallingMod)
+        {
+            try
+            {
+                string newPath = AdjustNewPathToBeValid(Path.Combine(ModManager.DownloadPath, Path.GetFileName(newInstallingMod)), ModManager.ExtractMetadataFromPath(newInstallingMod));
+                if (!string.IsNullOrEmpty(newPath))
+                {
+                    File.Copy(newInstallingMod, newPath, true);
+                    return newPath;
+                }
+            }
+            catch (IOException)
+            {
+                return null;
+            }
+
+            return null;
+        }
+
         private List<Mod> InstallModFromPath(string newInstallingMod, out int numClientOnly)
         {
             numClientOnly = 0;
@@ -238,28 +264,16 @@ namespace AstroModLoader
                 string[] allAccessiblePaks = Directory.GetFiles(targetFolderPath, "*.pak", SearchOption.AllDirectories); // Get all pak files that exist in the zip file
                 foreach (string zippedPakPath in allAccessiblePaks)
                 {
-                    string newPath = null;
-                    try
-                    {
-                        newPath = Path.Combine(ModManager.DownloadPath, Path.GetFileName(zippedPakPath));
-                        File.Copy(zippedPakPath, newPath);
-                        newPaths.Add(newPath);
-                    }
-                    catch (IOException) { }
+                    string newPath = AddModFromPakPath(zippedPakPath);
+                    if (newPath != null) newPaths.Add(newPath);
                 }
 
                 Directory.Delete(targetFolderPath, true); // Clean up the temporary data folder
             }
             else // Otherwise just copy the file itself
             {
-                string newPath = null;
-                try
-                {
-                    newPath = Path.Combine(ModManager.DownloadPath, Path.GetFileName(newInstallingMod));
-                    File.Copy(newInstallingMod, newPath);
-                    newPaths.Add(newPath);
-                }
-                catch (IOException) { }
+                string newPath = AddModFromPakPath(newInstallingMod);
+                if (newPath != null) newPaths.Add(newPath);
             }
 
             List<Mod> outputs = new List<Mod>();
@@ -272,7 +286,11 @@ namespace AstroModLoader
                     {
                         Mod nextMod = ModManager.SyncSingleModFromDisk(newPath, out bool wasClientOnly, false);
                         if (nextMod != null) outputs.Add(nextMod);
-                        if (wasClientOnly) numClientOnly++;
+                        if (wasClientOnly)
+                        {
+                            numClientOnly++;
+                            File.Delete(newPath);
+                        }
                     }
                 }
                 catch (IOException) { }
@@ -314,17 +332,22 @@ namespace AstroModLoader
 
                 ModManager.SyncModsFromDisk(true);
                 ModManager.SortMods();
+                ModManager.RefreshAllPriorites();
                 if (!autoUpdater.IsBusy) autoUpdater.RunWorkerAsync();
 
                 foreach (Mod mod in newMods)
                 {
                     if (mod == null) continue;
-                    mod.Dirty = true;
                     mod.Enabled = true;
                     if ((ModManager.InstalledAstroBuild != null && mod.CurrentModData.AstroBuild != null && !ModManager.InstalledAstroBuild.AcceptablySimilar(mod.CurrentModData.AstroBuild)) || (Program.CommandLineOptions.ServerMode && mod.CurrentModData.Sync == SyncMode.ClientOnly))
                     {
                         mod.Enabled = false;
                     }
+                }
+
+                foreach (Mod mod in ModManager.Mods)
+                {
+                    mod.Dirty = true;
                 }
 
                 ModManager.FullUpdate();

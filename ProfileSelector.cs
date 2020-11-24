@@ -78,7 +78,15 @@ namespace AstroModLoader
             double desiredItemHeight = GetMaxListBoxEntryHeight(listBox1.Font);
             if (desiredItemHeight > 5)
             {
-                listBox1.Height = (int)(Math.Ceiling(listBox1.Height / desiredItemHeight) * desiredItemHeight);
+                int desiredFullHeight = (int)(Math.Ceiling(listBox1.Height / desiredItemHeight) * desiredItemHeight);
+
+                int maxEntries = listBox1.Height / (int)desiredItemHeight;
+                if (maxEntries <= OurParentForm.ModManager.ProfileList.Count)
+                {
+                    desiredFullHeight = (int)desiredItemHeight * (OurParentForm.ModManager.ProfileList.Count + 1);
+                }
+
+                listBox1.Height = desiredFullHeight;
                 listBox1.ItemHeight = (int)desiredItemHeight;
                 statusLabel.Location = new Point(statusLabel.Location.X, listBox1.Location.Y + listBox1.Height + (int)desiredItemHeight);
                 this.Height = statusLabel.Location.Y + ((int)desiredItemHeight * 7);
