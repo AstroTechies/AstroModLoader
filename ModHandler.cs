@@ -261,9 +261,21 @@ namespace AstroModLoader
                 string[] allExes = Directory.GetFiles(Path.Combine(GamePath, "Astro", "Binaries"), "*.exe", SearchOption.AllDirectories);
                 if (allExes.Length > 0) BinaryFilePath = allExes[0];                
             }
-            catch (IOException)
+            catch (Exception ex)
             {
-                BinaryFilePath = null;
+                if (ex is IOException)
+                {
+                    BinaryFilePath = null;
+                }
+                else if (ex is UnauthorizedAccessException)
+                {
+                    MessageBox.Show("Unable to access an important directory! Please make sure the current user has read access for the folder \"" + GamePath + "\".", "Uh oh!");
+                    Environment.Exit(0);
+                }
+                else
+                {
+                    throw;
+                }
             }
 
             // Get astroneer version
@@ -389,10 +401,18 @@ namespace AstroModLoader
 
         public void DetermineBasePathDerivatives()
         {
-            DownloadPath = Path.Combine(BasePath, "Saved", "Mods");
-            Directory.CreateDirectory(DownloadPath);
-            InstallPath = Path.Combine(BasePath, "Saved", "Paks");
-            Directory.CreateDirectory(InstallPath);
+            try
+            {
+                DownloadPath = Path.Combine(BasePath, "Saved", "Mods");
+                Directory.CreateDirectory(DownloadPath);
+                InstallPath = Path.Combine(BasePath, "Saved", "Paks");
+                Directory.CreateDirectory(InstallPath);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show("Unable to access an important directory! Please make sure the current user has read access for the folder \"" + BasePath + "\".", "Uh oh!");
+                Environment.Exit(0);
+            }
         }
 
         internal Metadata ExtractMetadataFromPath(string modPath)
