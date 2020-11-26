@@ -158,6 +158,23 @@ namespace AstroModLoader
             return isValidPath;
         }
 
+        private static readonly string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+        private static readonly int FileSizeDecimalPlaces = 1;
+        public static string FormatFileSize(long size)
+        {
+            if (size == 0) return string.Format("{0:n" + FileSizeDecimalPlaces + "} bytes", 0);
+
+            int suffixOffset = 0;
+            decimal determinedVal = size;
+            while (Math.Round(determinedVal, FileSizeDecimalPlaces) >= 1000)
+            {
+                determinedVal /= 1000;
+                suffixOffset++;
+            }
+
+            return string.Format("{0:n" + FileSizeDecimalPlaces + "} {1}", determinedVal, SizeSuffixes[suffixOffset]);
+        }
+
         public static bool IsValidUri(string uri)
         {
             if (!Uri.IsWellFormedUriString(uri, UriKind.Absolute)) return false;

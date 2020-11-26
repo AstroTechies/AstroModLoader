@@ -496,8 +496,22 @@ namespace AstroModLoader
                         break;
                 }
 
+                long knownSize = 0;
+                try
+                {
+                    if (File.Exists(Path.Combine(ModManager.DownloadPath, selectedMod.NameOnDisk))) knownSize = new FileInfo(Path.Combine(ModManager.DownloadPath, selectedMod.NameOnDisk)).Length;
+                    if (File.Exists(Path.Combine(ModManager.InstallPath, selectedMod.NameOnDisk))) knownSize = new FileInfo(Path.Combine(ModManager.InstallPath, selectedMod.NameOnDisk)).Length;
+                }
+                catch (Exception ex)
+                {
+                    if (!(ex is IOException) && !(ex is FileNotFoundException)) throw;
+                }
+
+                string additionalData = "";
+                if (knownSize > 0) additionalData += "\nSize: " + AMLUtils.FormatFileSize(knownSize);
+
                 bool hasHomepage = !string.IsNullOrEmpty(selectedMod.CurrentModData.Homepage) && AMLUtils.IsValidUri(selectedMod.CurrentModData.Homepage);
-                AdjustModInfoText("Name: " + selectedMod.CurrentModData.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync + (hasHomepage ? "\nWebsite: " : ""), hasHomepage ? selectedMod.CurrentModData.Homepage : "");
+                AdjustModInfoText("Name: " + selectedMod.CurrentModData.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync + additionalData + (hasHomepage ? "\nWebsite: " : ""), hasHomepage ? selectedMod.CurrentModData.Homepage : "");
             });
         }
 

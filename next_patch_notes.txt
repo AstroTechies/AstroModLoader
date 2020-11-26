@@ -1,1 +1,2 @@
-﻿
+﻿* Added additional failsafes for Microsoft Store players.
+* Added a mod size display to the mod info label.

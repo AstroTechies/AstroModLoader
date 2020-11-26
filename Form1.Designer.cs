@@ -116,7 +116,7 @@
             this.footerPanel.Controls.Add(this.exitButton);
             this.footerPanel.Controls.Add(this.settingsButton);
             this.footerPanel.Controls.Add(this.playButton);
-            this.footerPanel.Location = new System.Drawing.Point(0, 418);
+            this.footerPanel.Location = new System.Drawing.Point(0, 436);
             this.footerPanel.Name = "footerPanel";
             this.footerPanel.Size = new System.Drawing.Size(458, 50);
             this.footerPanel.TabIndex = 5;
@@ -246,13 +246,13 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(42)))), ((int)(((byte)(45)))));
-            this.ClientSize = new System.Drawing.Size(459, 468);
+            this.ClientSize = new System.Drawing.Size(459, 486);
             this.Controls.Add(this.modPanel);
             this.Controls.Add(this.footerPanel);
             this.Controls.Add(this.modInfo);
             this.Controls.Add(this.label1);
             this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.MinimumSize = new System.Drawing.Size(475, 500);
+            this.MinimumSize = new System.Drawing.Size(475, 515);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
