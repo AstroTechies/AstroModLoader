@@ -158,7 +158,7 @@ namespace AstroModLoader
             return isValidPath;
         }
 
-        private static readonly string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+        private static readonly string[] SizeSuffixes = { "bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB" };
         private static readonly int FileSizeDecimalPlaces = 1;
         public static string FormatFileSize(long size)
         {
@@ -166,9 +166,9 @@ namespace AstroModLoader
 
             int suffixOffset = 0;
             decimal determinedVal = size;
-            while (Math.Round(determinedVal, FileSizeDecimalPlaces) >= 1000)
+            while (Math.Round(determinedVal, FileSizeDecimalPlaces) >= 1024)
             {
-                determinedVal /= 1000;
+                determinedVal /= 1024;
                 suffixOffset++;
             }
 

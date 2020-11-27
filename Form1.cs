@@ -330,7 +330,7 @@ namespace AstroModLoader
                     clientOnlyCount += thisClientOnlyCount;
                 }
 
-                ModManager.SyncModsFromDisk(true);
+                //ModManager.SyncModsFromDisk(true);
                 ModManager.SortMods();
                 ModManager.RefreshAllPriorites();
                 if (!autoUpdater.IsBusy) autoUpdater.RunWorkerAsync();

@@ -1,2 +1,3 @@
 ﻿* Added additional failsafes for Microsoft Store players.
 * Added a mod size display to the mod info label.
+* Fixed a major bug where the mod loader could crash when installing a new mod under specific conditions.
