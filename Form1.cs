@@ -524,7 +524,11 @@ namespace AstroModLoader
         public void ForceResize()
         {
             footerPanel.Width = this.Width;
-            RefreshModInfoLabel();
+            modPanel.Width = this.ClientSize.Width - 15;
+            dataGridView1.Width = modPanel.Width - dataGridView1.Location.X;
+            syncButton.Location = new Point(dataGridView1.Location.X + dataGridView1.Width - syncButton.Width, syncButton.Location.Y);
+            exitButton.Location = new Point(this.Width - exitButton.Width - 30, exitButton.Location.Y);
+            dataGridView1.Invalidate();
         }
 
         public void FullRefresh()
@@ -584,6 +588,9 @@ namespace AstroModLoader
 
             // Force an update for good measure
             ModManager.FullUpdate();
+
+            AMLUtils.InvokeUI(ForceResize);
+            AMLUtils.InvokeUI(ForceResize);
         }
 
         private void playButton_Click(object sender, EventArgs e)

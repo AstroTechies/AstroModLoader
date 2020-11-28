@@ -162,10 +162,11 @@ namespace AstroModLoader
         private static readonly int FileSizeDecimalPlaces = 1;
         public static string FormatFileSize(long size)
         {
-            if (size == 0) return string.Format("{0:n" + FileSizeDecimalPlaces + "} bytes", 0);
-
             int suffixOffset = 0;
             decimal determinedVal = size;
+
+            if (Math.Round(determinedVal, FileSizeDecimalPlaces) < 1024) return size + " bytes";
+
             while (Math.Round(determinedVal, FileSizeDecimalPlaces) >= 1024)
             {
                 determinedVal /= 1024;
