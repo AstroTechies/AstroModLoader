@@ -555,8 +555,13 @@ namespace AstroModLoader
                 ModManager.SortMods();
                 if (!autoUpdater.IsBusy) autoUpdater.RunWorkerAsync();
             }
-            if (TableManager != null) TableManager.Refresh();
-            AMLPalette.RefreshTheme(this);
+
+            AMLUtils.InvokeUI(() =>
+            {
+                if (TableManager != null) TableManager.Refresh();
+                AMLPalette.RefreshTheme(this);
+                RefreshModInfoLabel();
+            });
         }
 
         private void Form1_SizeChanged(object sender, EventArgs e)
