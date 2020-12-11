@@ -797,7 +797,7 @@ namespace AstroModLoader
             for (int i = 0; i < Mods.Count; i++) Mods[i].Priority = i + 1; // The mod loader should never save a mod's priority as 0 to disk, so that external applications can use 0 to force a mod to always load first
         }
 
-        public void SwapMod(Mod previouslySelectedMod, int newModIndex)
+        public void SwapMod(Mod previouslySelectedMod, int newModIndex, bool updateAutomatically = true)
         {
             // First we remove the old position of the mod we're changing
             for (int i = 0; i < Mods.Count; i++)
@@ -811,8 +811,11 @@ namespace AstroModLoader
 
             Mods.Insert(newModIndex, previouslySelectedMod); // Insert at the new location
             RefreshAllPriorites(); // Refresh priority list
-            foreach (Mod mod in Mods) mod.Dirty = true; // Update all the priorities on disk to be safe
-            FullUpdate();
+            if (updateAutomatically)
+            {
+                foreach (Mod mod in Mods) mod.Dirty = true; // Update all the priorities on disk to be safe
+                FullUpdate();
+            }
         }
 
         public bool GetReadOnly()
@@ -840,8 +843,12 @@ namespace AstroModLoader
             }
         }
 
+        private bool currentlyUpdating = false;
         public void FullUpdate()
         {
+            if (currentlyUpdating) return;
+            currentlyUpdating = true;
+
             UpdateReadOnlyStatus();
             try
             {
@@ -854,6 +861,7 @@ namespace AstroModLoader
             }
             catch (Exception ex)
             {
+                currentlyUpdating = false;
                 if (ex is IOException || ex is FileNotFoundException)
                 {
                     IsReadOnly = true;
@@ -861,6 +869,7 @@ namespace AstroModLoader
                 }
                 throw;
             }
+            currentlyUpdating = false;
         }
     }
 }

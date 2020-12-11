@@ -38,8 +38,7 @@
     <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AstroModIntegrator, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="AstroModIntegrator">
       <HintPath>.\AstroModIntegrator.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -154,9 +153,7 @@
     <None Include="Resources\icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="AstroModIntegrator.dll" />
     <Content Include="next_patch_notes.txt" />
-    <Content Include="UAssetAPI.dll" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommandLineParser">

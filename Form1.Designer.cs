@@ -277,8 +277,8 @@
         private CoolButton exitButton;
         private System.Windows.Forms.Panel modPanel;
         private System.Windows.Forms.Timer PeriodicCheckTimer;
-        public System.Windows.Forms.LinkLabel modInfo;
         private System.Windows.Forms.Timer CheckAllDirty;
+        public System.Windows.Forms.LinkLabel modInfo;
     }
 }
 

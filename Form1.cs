@@ -170,7 +170,10 @@ namespace AstroModLoader
                     }
                 }
                 ModManager.FullUpdate();
-            });
+            }).ContinueWith(res =>
+            {
+                TableManager.Refresh();
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private volatile bool IsAllDirty = false;
@@ -195,8 +198,12 @@ namespace AstroModLoader
 
         public void AdjustModInfoText(string txt, string linkText = "")
         {
-            this.modInfo.Text = txt + linkText;
-            this.modInfo.LinkArea = new LinkArea(txt.Length, linkText.Length);
+            string newTextFull = txt + linkText;
+            var newLinkArea = new LinkArea(txt.Length, linkText.Length);
+            if (this.modInfo.Text == newTextFull && this.modInfo.LinkArea.Start == newLinkArea.Start && this.modInfo.LinkArea.Length == newLinkArea.Length) return; // Partial fix for winforms rendering issue
+
+            this.modInfo.Text = newTextFull;
+            this.modInfo.LinkArea = newLinkArea;
         }
 
         public void SwitchPlatform(PlatformType newPlatform)
@@ -421,19 +428,17 @@ namespace AstroModLoader
         private void DataGridView1_SelectionChanged(object sender, EventArgs e)
         {
             Mod selectedMod = TableManager.GetCurrentlySelectedMod();
-
             if (dataGridView1.SelectedRows.Count == 1 && !ModManager.IsReadOnly)
             {
-                AMLUtils.InvokeUI(() =>
+                DataGridViewRow selectedRow = dataGridView1.SelectedRows[0];
+                int newModIndex = selectedRow.Index;
+
+                // If shift is held, that means we are changing the order
+                if (canAdjustOrder && ModifierKeys == Keys.Shift && selectedMod != null && previouslySelectedMod != null && previouslySelectedMod != selectedMod)
                 {
-                    DataGridViewRow selectedRow = dataGridView1.SelectedRows[0];
-
-                    // If shift is held, that means we are changing the order
-                    if (canAdjustOrder && ModifierKeys == Keys.Shift && selectedMod != null && previouslySelectedMod != null && previouslySelectedMod != selectedMod)
+                    AMLUtils.InvokeUI(() =>
                     {
-                        int newModIndex = selectedRow.Index;
-                        ModManager.SwapMod(previouslySelectedMod, newModIndex);
-
+                        ModManager.SwapMod(previouslySelectedMod, newModIndex, false);
                         previouslySelectedMod = null;
                         canAdjustOrder = false;
                         TableManager.Refresh();
@@ -443,8 +448,14 @@ namespace AstroModLoader
                         dataGridView1.Rows[newModIndex].Selected = true;
                         dataGridView1.CurrentCell = dataGridView1.Rows[newModIndex].Cells[0];
                         selectedMod = ModManager.Mods[newModIndex];
-                    }
-                });
+
+                        Task.Run(() =>
+                        {
+                            foreach (Mod mod in ModManager.Mods) mod.Dirty = true; // Update all the priorities on disk to be safe
+                            ModManager.FullUpdate();
+                        });
+                    });
+                }
             }
 
             previouslySelectedMod = selectedMod;

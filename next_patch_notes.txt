@@ -1,4 +1,5 @@
 ﻿* Added additional failsafes for Microsoft Store players.
 * Added a mod size display to the mod info label.
 * Removed the ability to maximize the mod loader. You'll have to revert to the previous version if you want to take out your anger on the window.
+* Fixed a bug where the displayed mod info would not properly update on switching the installed version of a mod.
 * Fixed a major bug where the mod loader could crash when installing a new mod under specific conditions.
