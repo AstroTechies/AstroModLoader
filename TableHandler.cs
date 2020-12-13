@@ -162,7 +162,7 @@ namespace AstroModLoader
 
                 if (mod.CurrentModData.AstroBuild == null)
                 {
-                    row.Cells[4].Value = "Any";
+                    row.Cells[4].Value = mod.CurrentModData.Sync == AstroModIntegrator.SyncMode.None ? "" : "Any";
                 }
                 else
                 {
@@ -190,11 +190,12 @@ namespace AstroModLoader
                 }
             }
 
-            if (GridView.Rows.Count > 0 && GridView.Rows.Count == LastNumMods)
+            int? currentRowCount = GridView.Rows?.Count;
+            if (currentRowCount != null && currentRowCount > 0 && currentRowCount == LastNumMods)
             {
                 GridView.FirstDisplayedScrollingRowIndex = LastScrollPos;
             }
-            LastNumMods = GridView.Rows?.Count;
+            LastNumMods = currentRowCount;
         }
     }
 }

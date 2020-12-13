@@ -67,21 +67,7 @@ namespace AstroModLoader
             DeterminePaths();
             SyncModsFromDisk();
             SyncDependentConfigFromDisk();
-
-            if (GamePath != null && !ValidPlatformTypesToPaths.ContainsValue(GamePath))
-            {
-                // Here, a game path is being provided that we can't recognize. If the set platform is Win10, that probably means there is a new update and we should just discard the one already stored; otherwise, it is custom
-                if (Platform == PlatformType.Win10 && ValidPlatformTypesToPaths.ContainsKey(PlatformType.Win10))
-                {
-                    GamePath = ValidPlatformTypesToPaths[PlatformType.Win10];
-                }
-                else if (Directory.Exists(GamePath))
-                {
-                    Platform = PlatformType.Custom;
-                    ValidPlatformTypesToPaths[PlatformType.Custom] = GamePath;
-                    RefreshAllPlatformsList();
-                }
-            }
+            VerifyGamePath();
 
             if (Program.CommandLineOptions.ServerMode && Directory.Exists(Path.Combine(BasePath, "Saved")))
             {
@@ -127,6 +113,24 @@ namespace AstroModLoader
             SortMods();
             RefreshAllPriorites();
             SyncConfigToDisk();
+        }
+
+        public void VerifyGamePath()
+        {
+            if (GamePath != null && (!ValidPlatformTypesToPaths.ContainsValue(GamePath) || !Directory.Exists(GamePath)))
+            {
+                // Here, a game path is being provided that we can't recognize. If the set platform is Win10, that probably means there is a new update and we should just discard the one already stored; otherwise, it is custom
+                if (Platform == PlatformType.Win10 && ValidPlatformTypesToPaths.ContainsKey(PlatformType.Win10))
+                {
+                    GamePath = ValidPlatformTypesToPaths[PlatformType.Win10];
+                }
+                else if (Directory.Exists(GamePath))
+                {
+                    Platform = PlatformType.Custom;
+                    ValidPlatformTypesToPaths[PlatformType.Custom] = GamePath;
+                    RefreshAllPlatformsList();
+                }
+            }
         }
 
         public void RefreshAllPlatformsList()
@@ -610,6 +614,23 @@ namespace AstroModLoader
             Mods = new List<Mod>(Mods.OrderBy(o => o.Priority).ToList());
         }
 
+        public long GetSizeOnDisk(Mod mod)
+        {
+            string[] allMods = Directory.GetFiles(DownloadPath, "*.pak", SearchOption.TopDirectoryOnly);
+            string copyingPath = null;
+            foreach (string modPath in allMods)
+            {
+                Mod testMod = new Mod(ExtractMetadataFromPath(modPath), Path.GetFileName(modPath));
+                if ((testMod.CurrentModData.ModID == mod.CurrentModData.ModID || testMod.NameOnDisk == mod.NameOnDisk) && testMod.InstalledVersion == mod.InstalledVersion)
+                {
+                    copyingPath = modPath;
+                    break;
+                }
+            }
+            if (copyingPath == null) return -1;
+            return new FileInfo(copyingPath).Length;
+        }
+
         public void SyncModsToDisk()
         {
             if (IsReadOnly) return;
@@ -678,7 +699,7 @@ namespace AstroModLoader
             }
         }
 
-        public void SyncDependentConfigFromDisk()
+        public void SyncDependentConfigFromDisk(bool includeGamePath = true)
         {
             ModConfig diskConfig = null;
             try
@@ -695,10 +716,13 @@ namespace AstroModLoader
                 ProfileList = diskConfig.Profiles;
                 if (ProfileList == null) ProfileList = new Dictionary<string, ModProfile>();
                 if (!string.IsNullOrEmpty(diskConfig.LaunchCommand)) LaunchCommand = diskConfig.LaunchCommand;
-                if (!string.IsNullOrEmpty(diskConfig.GamePath)) GamePath = diskConfig.GamePath;
+                if (includeGamePath)
+                {
+                    if (!string.IsNullOrEmpty(diskConfig.GamePath)) GamePath = diskConfig.GamePath;
 
-                KeyValuePair<PlatformType, string> prospectivePlatform = ValidPlatformTypesToPaths.FirstOrDefault(x => x.Value == GamePath);
-                if (Platform == PlatformType.Unknown && !prospectivePlatform.Equals(default(KeyValuePair<PlatformType, string>))) Platform = prospectivePlatform.Key;
+                    KeyValuePair<PlatformType, string> prospectivePlatform = ValidPlatformTypesToPaths.FirstOrDefault(x => x.Value == GamePath);
+                    if (Platform == PlatformType.Unknown && !prospectivePlatform.Equals(default(KeyValuePair<PlatformType, string>))) Platform = prospectivePlatform.Key;
+                }
             }
         }
 
@@ -766,18 +790,22 @@ namespace AstroModLoader
             File.WriteAllBytes(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AstroModLoader", "config.json"), Encoding.UTF8.GetBytes(AMLUtils.SerializeObject(newIndConfig)));
         }
 
+        public void SyncDependentConfigToDisk()
+        {
+            var newConfig = new ModConfig();
+            newConfig.GamePath = GamePath;
+            newConfig.LaunchCommand = LaunchCommand;
+            newConfig.Profiles = ProfileList;
+            newConfig.ModsOnDisk = GenerateProfile();
+
+            File.WriteAllBytes(Path.Combine(DownloadPath, "modconfig.json"), Encoding.UTF8.GetBytes(AMLUtils.SerializeObject(newConfig)));
+        }
+
         public void SyncConfigToDisk()
         {
             AMLUtils.InvokeUI(() =>
             {
-                var newConfig = new ModConfig();
-                newConfig.GamePath = GamePath;
-                newConfig.LaunchCommand = LaunchCommand;
-                newConfig.Profiles = ProfileList;
-                newConfig.ModsOnDisk = GenerateProfile();
-
-                File.WriteAllBytes(Path.Combine(DownloadPath, "modconfig.json"), Encoding.UTF8.GetBytes(AMLUtils.SerializeObject(newConfig)));
-
+                SyncDependentConfigToDisk();
                 SyncIndependentConfigToDisk();
             });
         }

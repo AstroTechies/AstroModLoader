@@ -1,1 +1,6 @@
-﻿* Fixed a handful of minor UI layout issues on high-DPI displays.
+﻿* Added a label to the Settings menu that displays the installed Astroneer version.
+* Fixed a handful of minor UI layout issues on high-DPI displays.
+* Fixed a bug where the grid view would not maintain its scroll position on refresh.
+* Fixed a bug where disabled mods would not display their size.
+* Fixed a bug where mods with no metadata would display as being supported by all Astroneer versions.
+* Fixed a bug where an invalid Windows Store path would not automatically correct itself when switching platforms during runtime.

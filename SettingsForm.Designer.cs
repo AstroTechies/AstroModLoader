@@ -42,6 +42,7 @@
             this.localPathBox = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.setPathButton2 = new AstroModLoader.CoolButton();
+            this.versionLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -49,7 +50,7 @@
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             this.label1.Location = new System.Drawing.Point(13, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(342, 21);
+            this.label1.Size = new System.Drawing.Size(388, 21);
             this.label1.TabIndex = 0;
             this.label1.Text = "Settings:";
             this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -139,7 +140,7 @@
             this.exitButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.exitButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.exitButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.exitButton.Location = new System.Drawing.Point(16, 187);
+            this.exitButton.Location = new System.Drawing.Point(16, 189);
             this.exitButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.exitButton.Name = "exitButton";
             this.exitButton.Size = new System.Drawing.Size(75, 26);
@@ -197,12 +198,23 @@
             this.setPathButton2.UseVisualStyleBackColor = false;
             this.setPathButton2.Click += new System.EventHandler(this.setPathButton2_Click);
             // 
+            // versionLabel
+            // 
+            this.versionLabel.AutoSize = true;
+            this.versionLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.versionLabel.Location = new System.Drawing.Point(280, 45);
+            this.versionLabel.Name = "versionLabel";
+            this.versionLabel.Size = new System.Drawing.Size(58, 15);
+            this.versionLabel.TabIndex = 14;
+            this.versionLabel.Text = "1.17.89.0";
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(42)))), ((int)(((byte)(45)))));
-            this.ClientSize = new System.Drawing.Size(413, 225);
+            this.ClientSize = new System.Drawing.Size(413, 227);
+            this.Controls.Add(this.versionLabel);
             this.Controls.Add(this.setPathButton2);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.localPathBox);
@@ -244,5 +256,6 @@
         private System.Windows.Forms.TextBox localPathBox;
         private System.Windows.Forms.Label label6;
         private CoolButton setPathButton2;
+        private System.Windows.Forms.Label versionLabel;
     }
 }

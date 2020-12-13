@@ -213,8 +213,11 @@ namespace AstroModLoader
             ModManager.Platform = newPlatform;
             ModManager.DeterminePaths();
             ModManager.GamePath = ModManager.ValidPlatformTypesToPaths[newPlatform];
+            ModManager.VerifyGamePath();
             ModManager.ApplyGamePathDerivatives();
             ModManager.SyncIndependentConfigToDisk();
+            ModManager.SyncDependentConfigFromDisk(false);
+            ModManager.SyncDependentConfigToDisk();
             FullRefresh();
         }
 
@@ -507,11 +510,10 @@ namespace AstroModLoader
                         break;
                 }
 
-                long knownSize = 0;
+                long knownSize = -1;
                 try
                 {
-                    if (File.Exists(Path.Combine(ModManager.DownloadPath, selectedMod.NameOnDisk))) knownSize = new FileInfo(Path.Combine(ModManager.DownloadPath, selectedMod.NameOnDisk)).Length;
-                    if (File.Exists(Path.Combine(ModManager.InstallPath, selectedMod.NameOnDisk))) knownSize = new FileInfo(Path.Combine(ModManager.InstallPath, selectedMod.NameOnDisk)).Length;
+                    knownSize = ModManager.GetSizeOnDisk(selectedMod);
                 }
                 catch (Exception ex)
                 {

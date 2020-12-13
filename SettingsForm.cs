@@ -16,6 +16,7 @@ namespace AstroModLoader
         public SettingsForm()
         {
             InitializeComponent();
+            versionLabel.Text = "";
         }
 
         private void UpdateColorBoxText()
@@ -34,6 +35,18 @@ namespace AstroModLoader
             if (!foundMatch)
             {
                 accentComboBox.Text = AMLUtils.ColorToHTML(AMLPalette.AccentColor);
+            }
+        }
+
+        private void UpdateVersionLabel()
+        {
+            if (BaseForm.ModManager.InstalledAstroBuild != null)
+            {
+                versionLabel.Text = BaseForm.ModManager.InstalledAstroBuild.ToString();
+            }
+            else
+            {
+                versionLabel.Text = "Unknown";
             }
         }
 
@@ -72,6 +85,7 @@ namespace AstroModLoader
             AMLPalette.RefreshTheme(this);
 
             this.AdjustFormPosition();
+            this.UpdateVersionLabel();
 
             gamePathBox.SelectionStart = 0;
             accentComboBox.SelectionLength = 0;
@@ -135,6 +149,7 @@ namespace AstroModLoader
             BaseForm.SwitchPlatform(nextPlatform);
             gamePathBox.Text = BaseForm.ModManager.GamePath;
             localPathBox.Text = BaseForm.ModManager.BasePath;
+            this.UpdateVersionLabel();
         }
 
         private void setPathButton_Click(object sender, EventArgs e)
