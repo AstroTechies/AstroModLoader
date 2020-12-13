@@ -40,14 +40,7 @@ namespace AstroModLoader
 
         private void UpdateVersionLabel()
         {
-            if (BaseForm.ModManager.InstalledAstroBuild != null)
-            {
-                versionLabel.Text = BaseForm.ModManager.InstalledAstroBuild.ToString();
-            }
-            else
-            {
-                versionLabel.Text = "Unknown";
-            }
+            versionLabel.Text = BaseForm.ModManager.InstalledAstroBuild?.ToString() ?? "Unknown";
         }
 
         public void RefreshPlatformComboBox()

@@ -627,7 +627,7 @@ namespace AstroModLoader
                     break;
                 }
             }
-            if (copyingPath == null) return -1;
+            if (string.IsNullOrEmpty(copyingPath)) return -1;
             return new FileInfo(copyingPath).Length;
         }
 
