@@ -82,8 +82,12 @@ namespace AstroModLoader
             AMLUtils.InvokeUI(RefreshInternal);
         }
 
+        private int? LastNumMods = 0;
+        private int LastScrollPos = 0;
         private void RefreshInternal()
         {
+            LastNumMods = GridView.Rows?.Count;
+            LastScrollPos = GridView.FirstDisplayedScrollingRowIndex;
             Mod selectedMod = GetCurrentlySelectedMod();
 
             GridView.DataSource = null;
@@ -185,6 +189,12 @@ namespace AstroModLoader
                     break;
                 }
             }
+
+            if (GridView.Rows.Count > 0 && GridView.Rows.Count == LastNumMods)
+            {
+                GridView.FirstDisplayedScrollingRowIndex = LastScrollPos;
+            }
+            LastNumMods = GridView.Rows?.Count;
         }
     }
 }

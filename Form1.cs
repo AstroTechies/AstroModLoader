@@ -482,7 +482,7 @@ namespace AstroModLoader
         {
             AMLUtils.InvokeUI(() =>
             {
-                Mod selectedMod = TableManager.GetCurrentlySelectedMod();
+                Mod selectedMod = TableManager?.GetCurrentlySelectedMod();
                 if (selectedMod == null)
                 {
                     AdjustModInfoText("");

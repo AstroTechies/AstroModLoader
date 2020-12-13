@@ -1,9 +1,6 @@
-﻿using AstroModIntegrator;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -29,6 +26,8 @@ namespace AstroModLoader
         public static string CustomID = "";
         public static string Token = "";
         public static bool Dirty = false;
+        private static readonly string UserAgent = "Astro/++UE4+Release-4.23-CL-0 Windows/10.0.18363.1.768.64bit";
+        private static readonly string PlayFabSDK = "UE4MKPL-1.25.190916";
 
         public static void Auth()
         {
@@ -44,10 +43,10 @@ namespace AstroModLoader
             {
                 wb.Encoding = Encoding.UTF8;
                 wb.Headers[HttpRequestHeader.ContentType] = "application/json; charset=utf-8";
-                wb.Headers[HttpRequestHeader.UserAgent] = "game=Astro, engine=UE4, version=4.18.2-0+++UE4+Release-4.18, platform=Windows, osver=6.2.9200.1.256.64bit";
-                wb.Headers.Add("X-PlayFabSDK", "UE4MKPL-1.25.190916");
+                wb.Headers[HttpRequestHeader.UserAgent] = UserAgent;
+                wb.Headers.Add("X-PlayFabSDK", PlayFabSDK);
 
-                string response = wb.UploadString("https://5EA1.playfabapi.com/Client/LoginWithCustomID?sdk=UE4MKPL-1.25.190916", "POST", "{\"CreateAccount\":true, \"CustomId\":\"" + CustomID + "\", \"TitleId\":\"5EA1\"}");
+                string response = wb.UploadString("https://5EA1.playfabapi.com/Client/LoginWithCustomID?sdk=" + PlayFabSDK, "POST", "{\"CreateAccount\":true, \"CustomId\":\"" + CustomID + "\", \"TitleId\":\"5EA1\"}");
                 JObject jObj = JObject.Parse(response);
 
                 int decidedCode = 0;
@@ -78,13 +77,13 @@ namespace AstroModLoader
             using (var wb = new WebClient())
             {
                 wb.Headers[HttpRequestHeader.ContentType] = "application/json; charset=utf-8";
-                wb.Headers[HttpRequestHeader.UserAgent] = "game=Astro, engine=UE4, version=4.18.2-0+++UE4+Release-4.18, platform=Windows, osver=6.2.9200.1.256.64bit";
-                wb.Headers.Add("X-PlayFabSDK", "UE4MKPL-1.25.190916");
+                wb.Headers[HttpRequestHeader.UserAgent] = UserAgent;
+                wb.Headers.Add("X-PlayFabSDK", PlayFabSDK);
                 wb.Headers.Add("X-Authorization", Token);
 
                 try
                 {
-                    string response = wb.UploadString("https://5EA1.playfabapi.com/Client/" + operation + "?sdk=UE4MKPL-1.25.190916", "POST", data);
+                    string response = wb.UploadString("https://5EA1.playfabapi.com/Client/" + operation + "?sdk=" + PlayFabSDK, "POST", data);
                     return JObject.Parse(response);
                 }
                 catch (WebException ex)
