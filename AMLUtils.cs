@@ -165,15 +165,14 @@ namespace AstroModLoader
             int suffixOffset = 0;
             decimal determinedVal = size;
 
-            if (Math.Round(determinedVal, FileSizeDecimalPlaces) < 1024) return size + " bytes";
-
             while (Math.Round(determinedVal, FileSizeDecimalPlaces) >= 1024)
             {
                 determinedVal /= 1024;
                 suffixOffset++;
             }
 
-            return string.Format("{0:n" + FileSizeDecimalPlaces + "} {1}", determinedVal, SizeSuffixes[suffixOffset]);
+            if (suffixOffset >= SizeSuffixes.Length) return "Very big";
+            return string.Format("{0:n" + (suffixOffset == 0 ? 0 : FileSizeDecimalPlaces) + "} {1}", determinedVal, SizeSuffixes[suffixOffset]);
         }
 
         public static bool IsValidUri(string uri)
@@ -185,6 +184,7 @@ namespace AstroModLoader
 
         public static bool AcceptablySimilar(this Version v1, Version v2)
         {
+            if (v1 == null || v2 == null) return true;
             return v1.Major == v2.Major && v1.Minor == v2.Minor; // no sense in warning if the current version is 1.16.70.0 and the mod is for 1.16.60.0, who cares
         }
 

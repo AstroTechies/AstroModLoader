@@ -314,7 +314,7 @@ namespace AstroModLoader
             string[] installingModPaths = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (installingModPaths.Length > 0)
             {
-                List<Mod> newMods = new List<Mod>();
+                Dictionary<string, List<Version>> newMods = new Dictionary<string, List<Version>>();
                 int clientOnlyCount = 0;
                 int invalidExtensionCount = 0;
                 int wasFolderCount = 0;
@@ -335,48 +335,59 @@ namespace AstroModLoader
                     if (resMods == null) continue;
                     foreach (Mod resMod in resMods)
                     {
-                        if (resMod != null) newMods.Add(resMod);
+                        if (resMod == null) continue;
+                        if (!newMods.ContainsKey(resMod.CurrentModData.ModID)) newMods[resMod.CurrentModData.ModID] = new List<Version>();
+                        newMods[resMod.CurrentModData.ModID].AddRange(resMod.AvailableVersions);
                     }
                     clientOnlyCount += thisClientOnlyCount;
                 }
 
                 //ModManager.SyncModsFromDisk(true);
                 ModManager.SortMods();
+                ModManager.SortVersions();
                 ModManager.RefreshAllPriorites();
                 if (!autoUpdater.IsBusy) autoUpdater.RunWorkerAsync();
 
-                foreach (Mod mod in newMods)
+                foreach (Mod mod in ModManager.Mods)
                 {
                     if (mod == null) continue;
-                    mod.Enabled = true;
-                    if ((ModManager.InstalledAstroBuild != null && mod.CurrentModData.AstroBuild != null && !ModManager.InstalledAstroBuild.AcceptablySimilar(mod.CurrentModData.AstroBuild)) || (Program.CommandLineOptions.ServerMode && mod.CurrentModData.Sync == SyncMode.ClientOnly))
+                    mod.Dirty = true;
+
+                    if (newMods.ContainsKey(mod.CurrentModData.ModID))
                     {
-                        mod.Enabled = false;
+                        // We switch the installed version to the newest version that has just been added
+                        newMods[mod.CurrentModData.ModID].Sort();
+                        newMods[mod.CurrentModData.ModID].Reverse();
+                        mod.InstalledVersion = newMods[mod.CurrentModData.ModID][0];
+
+                        // If this is a new mod, we enable it or disable it automatically, but if it's not new then we respect the user's pre-existing setting 
+                        if (mod.AvailableVersions.Count == 1) mod.Enabled = ModManager.InstalledAstroBuild.AcceptablySimilar(mod.CurrentModData.AstroBuild) && (!Program.CommandLineOptions.ServerMode || mod.CurrentModData.Sync != SyncMode.ClientOnly);
                     }
                 }
 
-                foreach (Mod mod in ModManager.Mods)
+                Task.Run(() =>
                 {
-                    mod.Dirty = true;
-                }
+                    ModManager.FullUpdate();
+                });
 
-                ModManager.FullUpdate();
-                TableManager.Refresh();
-
-                if (wasFolderCount > 0)
+                AMLUtils.InvokeUI(() =>
                 {
-                    this.ShowBasicButton("You cannot drag in a folder!", "OK", null, null);
-                }
+                    TableManager.Refresh();
+                    if (wasFolderCount > 0)
+                    {
+                        this.ShowBasicButton("You cannot drag in a folder!", "OK", null, null);
+                    }
 
-                if (invalidExtensionCount > 0)
-                {
-                    this.ShowBasicButton(invalidExtensionCount + " file" + (invalidExtensionCount == 1 ? " had an invalid extension" : "s had invalid extensions") + " and " + (invalidExtensionCount == 1 ? "was" : "were") + " ignored.\nAcceptable mod extensions are: " + string.Join(", ", AllowedModExtensions), "OK", null, null);
-                }
+                    if (invalidExtensionCount > 0)
+                    {
+                        this.ShowBasicButton(invalidExtensionCount + " file" + (invalidExtensionCount == 1 ? " had an invalid extension" : "s had invalid extensions") + " and " + (invalidExtensionCount == 1 ? "was" : "were") + " ignored.\nAcceptable mod extensions are: " + string.Join(", ", AllowedModExtensions), "OK", null, null);
+                    }
 
-                if (clientOnlyCount > 0)
-                {
-                    this.ShowBasicButton(clientOnlyCount + " mod" + (clientOnlyCount == 1 ? " is" : "s are") + " designated as \"Client only\" and " + (clientOnlyCount == 1 ? "was" : "were") + " ignored.", "OK", null, null);
-                }
+                    if (clientOnlyCount > 0)
+                    {
+                        this.ShowBasicButton(clientOnlyCount + " mod" + (clientOnlyCount == 1 ? " is" : "s are") + " designated as \"Client only\" and " + (clientOnlyCount == 1 ? "was" : "were") + " ignored.", "OK", null, null);
+                    }
+                });
             }
         }
 
@@ -521,7 +532,7 @@ namespace AstroModLoader
                 }
 
                 string additionalData = "";
-                if (knownSize > 0) additionalData += "\nSize: " + AMLUtils.FormatFileSize(knownSize);
+                if (knownSize >= 0) additionalData += "\nSize: " + AMLUtils.FormatFileSize(knownSize);
 
                 bool hasHomepage = !string.IsNullOrEmpty(selectedMod.CurrentModData.Homepage) && AMLUtils.IsValidUri(selectedMod.CurrentModData.Homepage);
                 AdjustModInfoText("Name: " + selectedMod.CurrentModData.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync + additionalData + (hasHomepage ? "\nWebsite: " : ""), hasHomepage ? selectedMod.CurrentModData.Homepage : "");

@@ -293,11 +293,15 @@ namespace AstroModLoader
             // Steam
             try
             {
-                using (StreamReader f = new StreamReader(Path.Combine(GamePath, "build.version")))
+                string buildVersionPath = Path.Combine(GamePath, "build.version");
+                if (File.Exists(buildVersionPath))
                 {
-                    string fullBuildData = f.ReadToEnd();
-                    Match m = AstroBuildRegex.Match(fullBuildData);
-                    if (m.Groups.Count == 2) InstalledAstroBuild = new Version(m.Groups[1].Value);
+                    using (StreamReader f = new StreamReader(buildVersionPath))
+                    {
+                        string fullBuildData = f.ReadToEnd();
+                        Match m = AstroBuildRegex.Match(fullBuildData);
+                        if (m.Groups.Count == 2) InstalledAstroBuild = new Version(m.Groups[1].Value);
+                    }
                 }
             }
             catch
@@ -310,20 +314,24 @@ namespace AstroModLoader
             // Win10
             try
             {
-                XmlDocument doc = new XmlDocument();
-                doc.Load(Path.Combine(GamePath, "AppxManifest.xml"));
-
-                if (doc != null)
+                string buildVersionPath = Path.Combine(GamePath, "AppxManifest.xml");
+                if (File.Exists(buildVersionPath))
                 {
-                    XmlNodeList identityList = doc.GetElementsByTagName("Identity");
-                    if (identityList != null && identityList.Count > 0)
+                    XmlDocument doc = new XmlDocument();
+                    doc.Load(buildVersionPath);
+
+                    if (doc != null)
                     {
-                        var verAttr = identityList[0].Attributes["Version"];
-                        if (verAttr != null) Version.TryParse(verAttr.Value, out InstalledAstroBuild);
+                        XmlNodeList identityList = doc.GetElementsByTagName("Identity");
+                        if (identityList != null && identityList.Count > 0)
+                        {
+                            var verAttr = identityList[0].Attributes["Version"];
+                            if (verAttr != null) Version.TryParse(verAttr.Value, out InstalledAstroBuild);
+                        }
                     }
-                } 
+                }
             }
-            catch (IOException)
+            catch
             {
                 InstalledAstroBuild = null;
             }
