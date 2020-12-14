@@ -483,12 +483,42 @@ namespace AstroModLoader
 
             if (selectedMod != null && !ModManager.IsReadOnly && e.KeyCode == Keys.Delete)
             {
-                int dialogRes = this.ShowBasicButton("Are you sure you want to delete this mod?", "Yes", "No", null);
-                if (dialogRes == 0)
+                if (e.Alt)
                 {
-                    ModManager.EviscerateMod(selectedMod);
-                    FullRefresh();
+                    selectedMod.AvailableVersions.Sort();
+                    selectedMod.AvailableVersions.Reverse();
+
+                    List<Version> badVersions = new List<Version>();
+                    foreach (Version testingVersion in selectedMod.AvailableVersions)
+                    {
+                        if (testingVersion != selectedMod.AvailableVersions[0] && selectedMod.AllModData.ContainsKey(testingVersion)) badVersions.Add(testingVersion);
+                    }
+                    if (badVersions.Count == 0)
+                    {
+                        this.ShowBasicButton("You have no old versions of this mod on disk to clean!", "OK", null, null);
+                    }
+                    else
+                    {
+                        int dialogRes = this.ShowBasicButton("Are you sure you want to clean \"" + selectedMod.CurrentModData.Name + "\"?\nThese versions will be deleted from disk: " + string.Join(", ", badVersions.Select(v => v.ToString()).ToArray()), "Yes", "No", null);
+                        if (dialogRes == 0)
+                        {
+                            ModManager.EviscerateMod(selectedMod, badVersions);
+                            FullRefresh();
+                            selectedMod.InstalledVersion = selectedMod.AvailableVersions[0];
+                            this.ShowBasicButton("Successfully cleaned \"" + selectedMod.CurrentModData.Name + "\".", "OK", null, null);
+                        }
+                    }
                 }
+                else
+                {
+                    int dialogRes = this.ShowBasicButton("Are you sure you want to completely delete \"" + selectedMod.CurrentModData.Name + "\"?", "Yes", "No", null);
+                    if (dialogRes == 0)
+                    {
+                        ModManager.EviscerateMod(selectedMod);
+                        FullRefresh();
+                    }
+                }
+                
             }
         }
 

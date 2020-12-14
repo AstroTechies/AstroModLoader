@@ -6,7 +6,7 @@
 AstroModLoader is a community-made, open-source mod manager for Astroneer .pak mods on Steam and the Windows Store. It includes support for mod profiles, automatic update integration, and the ability to easily swap between multiple mod versions so that you can worry less about setup and more about playing.
 
 ## Features
-AstroModLoader includes the following features:
+AstroModLoader includes the following features and more:
 * A simple GUI to enable, disable, and switch the version of Astroneer .pak mods
 * Mod metadata analysis to provide additional information about compliant mods, such as name, description, and compatible Astroneer version
 * Automatic updating of supporting mods

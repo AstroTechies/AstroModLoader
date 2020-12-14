@@ -105,6 +105,8 @@ namespace AstroModLoader
             NameOnDisk = nameOnDisk;
             AvailableVersions = new List<Version>();
             if (InstalledVersion != null && !AvailableVersions.Contains(InstalledVersion)) AvailableVersions.Add(InstalledVersion);
+
+            if (AllModData[InstalledVersion].Name.Length > 32) AllModData[InstalledVersion].Name = AllModData[InstalledVersion].Name.Substring(0, 32);
         }
 
         Regex ModIDFilterRegex = new Regex(@"[^A-Za-z0-9]", RegexOptions.Compiled);

@@ -499,7 +499,7 @@ namespace AstroModLoader
             catch { }
         }
 
-        public void EviscerateMod(Mod targetMod)
+        public void EviscerateMod(Mod targetMod, List<Version> targetVersions = null)
         {
             string[] allNormalMods = Directory.GetFiles(DownloadPath, "*.pak", SearchOption.TopDirectoryOnly);
             string[] installedMods = Directory.GetFiles(InstallPath, "*.pak", SearchOption.TopDirectoryOnly);
@@ -511,7 +511,7 @@ namespace AstroModLoader
             {
                 string modNameOnDisk = Path.GetFileName(modPath);
                 Mod newMod = new Mod(ExtractMetadataFromPath(modPath), modNameOnDisk);
-                if (newMod.CurrentModData.ModID == targetMod.CurrentModData.ModID)
+                if (newMod.CurrentModData.ModID == targetMod.CurrentModData.ModID && (targetVersions == null || targetVersions.Contains(newMod.InstalledVersion)))
                 {
                     SafeDelete(modPath);
                 }
@@ -521,6 +521,22 @@ namespace AstroModLoader
             {
                 if (Mods[i].CurrentModData.ModID == targetMod.CurrentModData.ModID)
                 {
+                    if (targetVersions != null)
+                    {
+                        foreach (Version targetVersion in targetVersions)
+                        {
+                            Mods[i].AllModData.Remove(targetVersion);
+                            Mods[i].AvailableVersions.Remove(targetVersion);
+                        }
+
+                        if (Mods[i].AvailableVersions.Count > 0)
+                        {
+                            Mods[i].AvailableVersions.Sort();
+                            Mods[i].AvailableVersions.Reverse();
+                            Mods[i].InstalledVersion = Mods[i].AvailableVersions[0];
+                            continue;
+                        }
+                    }
                     ModLookup.Remove(Mods[i].CurrentModData.ModID);
                     Mods.RemoveAt(i);
                     i--;

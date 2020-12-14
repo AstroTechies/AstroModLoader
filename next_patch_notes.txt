@@ -1,4 +1,5 @@
-﻿* Added a label to the Settings menu that displays the installed Astroneer version.
+﻿* Added a feature where you can clean old versions of a mod off disk by pressing ALT+DEL with the mod selected.
+* Added a label to the Settings menu that displays the installed Astroneer version.
 * Fixed a handful of minor UI layout issues on high-DPI displays.
 * Fixed a bug where the version list of a mod would be out of order when dragging in a new version of a mod.
 * Fixed a bug where the grid view would not maintain its scroll position on refresh.
