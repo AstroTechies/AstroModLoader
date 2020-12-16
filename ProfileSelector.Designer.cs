@@ -55,9 +55,9 @@
             this.statusLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             this.statusLabel.Location = new System.Drawing.Point(22, 301);
             this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(64, 17);
+            this.statusLabel.Size = new System.Drawing.Size(83, 17);
             this.statusLabel.TabIndex = 8;
-            this.statusLabel.Text = "Test 123";
+            this.statusLabel.Text = "Testing 123";
             // 
             // saveButton
             // 

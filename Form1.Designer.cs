@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dataGridView1 = new AstroModLoader.CoolDataGridView();
             this.label1 = new System.Windows.Forms.Label();
             this.modInfo = new System.Windows.Forms.LinkLabel();
@@ -60,14 +60,14 @@
             this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridView1.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.dataGridView1.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(42)))), ((int)(((byte)(45)))));
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle7.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(85)))), ((int)(((byte)(85)))), ((int)(((byte)(85)))));
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(42)))), ((int)(((byte)(45)))));
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(85)))), ((int)(((byte)(85)))), ((int)(((byte)(85)))));
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.DefaultCellStyle = this.dataGridView1.ColumnHeadersDefaultCellStyle;
             this.dataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
@@ -90,7 +90,7 @@
             this.label1.Name = "label1";
             this.label1.Padding = new System.Windows.Forms.Padding(10, 10, 3, 3);
             this.label1.Size = new System.Drawing.Size(416, 30);
-            this.label1.TabIndex = 1;
+            this.label1.TabIndex = 0;
             this.label1.Text = "Mods:";
             this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
@@ -99,11 +99,13 @@
             this.modInfo.ActiveLinkColor = System.Drawing.Color.Red;
             this.modInfo.AutoSize = true;
             this.modInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.5F);
+            this.modInfo.LinkArea = new System.Windows.Forms.LinkArea(0, 0);
             this.modInfo.Location = new System.Drawing.Point(12, 320);
             this.modInfo.MaximumSize = new System.Drawing.Size(400, 0);
             this.modInfo.Name = "modInfo";
-            this.modInfo.Size = new System.Drawing.Size(0, 17);
+            this.modInfo.Size = new System.Drawing.Size(83, 17);
             this.modInfo.TabIndex = 3;
+            this.modInfo.Text = "Testing 123";
             this.modInfo.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.modInfo_LinkClicked);
             // 
             // footerPanel
@@ -131,7 +133,7 @@
             this.exitButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.exitButton.Name = "exitButton";
             this.exitButton.Size = new System.Drawing.Size(75, 26);
-            this.exitButton.TabIndex = 7;
+            this.exitButton.TabIndex = 6;
             this.exitButton.Text = "Exit";
             this.exitButton.UseVisualStyleBackColor = false;
             this.exitButton.Click += new System.EventHandler(this.exitButton_Click);
@@ -147,7 +149,7 @@
             this.settingsButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.settingsButton.Name = "settingsButton";
             this.settingsButton.Size = new System.Drawing.Size(82, 26);
-            this.settingsButton.TabIndex = 6;
+            this.settingsButton.TabIndex = 5;
             this.settingsButton.Text = "Settings...";
             this.settingsButton.UseVisualStyleBackColor = false;
             this.settingsButton.Click += new System.EventHandler(this.settingsButton_Click);
@@ -163,7 +165,7 @@
             this.playButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.playButton.Name = "playButton";
             this.playButton.Size = new System.Drawing.Size(75, 26);
-            this.playButton.TabIndex = 3;
+            this.playButton.TabIndex = 4;
             this.playButton.Text = "Play";
             this.playButton.UseVisualStyleBackColor = false;
             this.playButton.Click += new System.EventHandler(this.playButton_Click);
@@ -209,7 +211,7 @@
             this.loadButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.loadButton.Name = "loadButton";
             this.loadButton.Size = new System.Drawing.Size(75, 26);
-            this.loadButton.TabIndex = 5;
+            this.loadButton.TabIndex = 2;
             this.loadButton.Text = "Profiles...";
             this.loadButton.UseVisualStyleBackColor = false;
             this.loadButton.Click += new System.EventHandler(this.loadButton_Click);
@@ -225,7 +227,7 @@
             this.syncButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.syncButton.Name = "syncButton";
             this.syncButton.Size = new System.Drawing.Size(109, 26);
-            this.syncButton.TabIndex = 2;
+            this.syncButton.TabIndex = 3;
             this.syncButton.Text = "Sync from IP";
             this.syncButton.UseVisualStyleBackColor = false;
             this.syncButton.Click += new System.EventHandler(this.syncButton_Click);

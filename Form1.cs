@@ -25,6 +25,7 @@ namespace AstroModLoader
         public Form1()
         {
             InitializeComponent();
+            modInfo.Text = "";
             AMLUtils.InitializeInvoke(this);
 
             this.Text = "AstroModLoader v" + Application.ProductVersion;
