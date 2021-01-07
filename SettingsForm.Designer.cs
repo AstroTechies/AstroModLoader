@@ -163,7 +163,7 @@
             this.setPathButton.TabIndex = 3;
             this.setPathButton.Text = "Set";
             this.setPathButton.UseVisualStyleBackColor = false;
-            this.setPathButton.Click += new System.EventHandler(this.setPathButton_Click);
+            this.setPathButton.Click += new System.EventHandler(this.UpdatePathing);
             // 
             // localPathBox
             // 
@@ -196,7 +196,7 @@
             this.setPathButton2.TabIndex = 13;
             this.setPathButton2.Text = "Set";
             this.setPathButton2.UseVisualStyleBackColor = false;
-            this.setPathButton2.Click += new System.EventHandler(this.setPathButton2_Click);
+            this.setPathButton2.Click += new System.EventHandler(this.UpdatePathing);
             // 
             // versionLabel
             // 

@@ -28,5 +28,8 @@ On the Windows Store, you can place them into the `%localappdata%\Packages\Syste
 
 You are free to join the Astroneer Modding Discord community to learn more about using or creating Astroneer mods: https://discord.gg/bBqdVYxu4k
 
+## Prerequisites
+* .NET Framework 4.6.1
+
 ## Licensing
 AstroModLoader is licensed under the MIT license, which can be found in [the LICENSE.md file.](https://github.com/AstroTechies/AstroModLoader/blob/master/LICENSE.md) In addition, necessary licenses for the third-party material used in this software can be found in [the NOTICE.md file.](https://github.com/AstroTechies/AstroModLoader/blob/master/NOTICE.md)

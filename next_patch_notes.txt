@@ -1,8 +1,4 @@
-﻿* Added a feature where you can clean old versions of a mod off disk by pressing ALT+DEL with the mod selected.
-* Added a label to the Settings menu that displays the installed Astroneer version.
-* Fixed a handful of minor UI layout issues on high-DPI displays.
-* Fixed a bug where the version list of a mod would be out of order when dragging in a new version of a mod.
-* Fixed a bug where the grid view would not maintain its scroll position on refresh.
-* Fixed a bug where disabled mods would not display their size.
-* Fixed a bug where mods with no metadata would display as being supported by all Astroneer versions.
-* Fixed a bug where an invalid Windows Store path would not automatically correct itself when switching platforms during runtime.
+﻿* Added automatic detection for server mode. If an executable file named AstroServer.exe is located in the current working directory, server mode is automatically enabled.
+* Added an indicator that displays if a hash mismatch is detected with the Steam API DLL. This indicator does not affect usage of the mod loader itself.
+* Fixed a bugs where the current path would not switch properly when the platform is changed in specific scenarios.
+* Fixed a bug where the mod loader would crash on switching versions in specific scenarios.

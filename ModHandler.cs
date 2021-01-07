@@ -3,12 +3,11 @@ using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -59,9 +58,14 @@ namespace AstroModLoader
             if (automaticWin10Path != null) ValidPlatformTypesToPaths[PlatformType.Win10] = automaticWin10Path;
 
             SyncIndependentConfigFromDisk();
+            if (!string.IsNullOrEmpty(CustomBasePath))
+            {
+                string customGamePath = GetGamePathFromBasePath(CustomBasePath);
+                if (!string.IsNullOrEmpty(customGamePath)) ValidPlatformTypesToPaths[PlatformType.Custom] = customGamePath;
+            }
 
             RefreshAllPlatformsList();
-            if ((Platform != PlatformType.Custom && !ValidPlatformTypesToPaths.ContainsKey(Platform)) && AllPlatforms.Count > 0) Platform = AllPlatforms[0];
+            if (!ValidPlatformTypesToPaths.ContainsKey(Platform) && AllPlatforms.Count > 0) Platform = AllPlatforms[0];
             if (Program.CommandLineOptions.ServerMode) Platform = PlatformType.Server;
 
             DeterminePaths();
@@ -104,6 +108,7 @@ namespace AstroModLoader
             }
 
             ApplyGamePathDerivatives();
+            VerifyIntegrity();
 
             foreach (Mod mod in Mods)
             {
@@ -499,6 +504,29 @@ namespace AstroModLoader
             catch { }
         }
 
+        // It's counterproductive to try and combat piracy, but it's a good idea to have some visible marker of it to serve as an explanation for the problems people with pirated copies may face
+        public bool MismatchedSteamworksDLL = false;
+        private static readonly byte[] steamsworksDLLHash = new byte[] { 231, 116, 51, 9, 76, 86, 67, 54, 133, 166, 138, 68, 54, 232, 27, 118, 195, 181, 225, 245 };
+        public void VerifyIntegrity()
+        {
+            MismatchedSteamworksDLL = false;
+
+            try
+            {
+                string[] dllPaths = Directory.GetFiles(Path.Combine(GamePath, "Engine", "Binaries", "ThirdParty", "Steamworks"), "steam_api*.dll", SearchOption.AllDirectories);
+                if (dllPaths.Length > 0 && File.Exists(dllPaths[0]))
+                {
+                    var data = File.ReadAllBytes(dllPaths[0]);
+                    var hash = SHA1.Create().ComputeHash(data);
+                    if (!hash.SequenceEqual(steamsworksDLLHash)) MismatchedSteamworksDLL = true;
+                }
+            }
+            catch
+            {
+                MismatchedSteamworksDLL = false;
+            }
+        }
+
         public void EviscerateMod(Mod targetMod, List<Version> targetVersions = null)
         {
             string[] allNormalMods = Directory.GetFiles(DownloadPath, "*.pak", SearchOption.TopDirectoryOnly);
@@ -721,6 +749,21 @@ namespace AstroModLoader
                 if (!string.IsNullOrEmpty(independentConfig.PlayFabCustomID)) PlayFabAPI.CustomID = independentConfig.PlayFabCustomID;
                 if (!string.IsNullOrEmpty(independentConfig.PlayFabToken)) PlayFabAPI.Token = independentConfig.PlayFabToken;
             }
+        }
+
+        public string GetGamePathFromBasePath(string basePath)
+        {
+            ModConfig diskConfig = null;
+            try
+            {
+                diskConfig = JsonConvert.DeserializeObject<ModConfig>(File.ReadAllText(Path.Combine(basePath, "Saved", "Mods", "modconfig.json")));
+            }
+            catch
+            {
+                diskConfig = null;
+            }
+
+            return diskConfig?.GamePath;
         }
 
         public void SyncDependentConfigFromDisk(bool includeGamePath = true)

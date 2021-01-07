@@ -216,8 +216,10 @@ namespace AstroModLoader
             ModManager.GamePath = ModManager.ValidPlatformTypesToPaths[newPlatform];
             ModManager.VerifyGamePath();
             ModManager.ApplyGamePathDerivatives();
+            ModManager.VerifyIntegrity();
             ModManager.SyncIndependentConfigToDisk();
             ModManager.SyncDependentConfigFromDisk(false);
+            ModManager.SyncModsFromDisk();
             ModManager.SyncDependentConfigToDisk();
             FullRefresh();
         }

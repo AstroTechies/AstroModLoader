@@ -1,11 +1,7 @@
 ﻿using CommandLine;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
+using System.IO;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AstroModLoader
@@ -39,6 +35,8 @@ namespace AstroModLoader
             .WithParsed(o =>
             {
                 CommandLineOptions = o;
+                if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "AstroServer.exe"))) CommandLineOptions.ServerMode = true;
+
 
                 if (Environment.OSVersion.Version.Major >= 6) SetProcessDPIAware();
                 Application.EnableVisualStyles();
