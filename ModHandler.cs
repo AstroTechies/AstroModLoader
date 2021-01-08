@@ -87,22 +87,30 @@ namespace AstroModLoader
                 }
                 else
                 {
-                    TextPrompt initialPathPrompt = new TextPrompt
+                    bool isValidPath = false;
+                    while (!isValidPath)
                     {
-                        StartPosition = FormStartPosition.CenterScreen,
-                        DisplayText = "Select your game installation directory"
-                    };
+                        TextPrompt initialPathPrompt = new TextPrompt
+                        {
+                            StartPosition = FormStartPosition.CenterScreen,
+                            DisplayText = "Select your game installation directory"
+                        };
 
-                    if (initialPathPrompt.ShowDialog(BaseForm) == DialogResult.OK)
-                    {
-                        GamePath = initialPathPrompt.OutputText;
-                        Platform = PlatformType.Custom;
-                        ValidPlatformTypesToPaths[PlatformType.Custom] = GamePath;
-                        RefreshAllPlatformsList();
-                    }
-                    else
-                    {
-                        Environment.Exit(0);
+                        if (initialPathPrompt.ShowDialog(BaseForm) == DialogResult.OK)
+                        {
+                            GamePath = AMLUtils.FixGamePath(initialPathPrompt.OutputText);
+                            if (GamePath != null)
+                            {
+                                isValidPath = true;
+                                Platform = PlatformType.Custom;
+                                ValidPlatformTypesToPaths[PlatformType.Custom] = GamePath;
+                                RefreshAllPlatformsList();
+                            }
+                        }
+                        else
+                        {
+                            Environment.Exit(0);
+                        }
                     }
                 }
             }
@@ -390,10 +398,9 @@ namespace AstroModLoader
 
                             if (initialPathPrompt.ShowDialog(BaseForm) == DialogResult.OK)
                             {
-                                CustomBasePath = initialPathPrompt.OutputText;
-                                if (Path.GetFileName(initialPathPrompt.OutputText) != "Astro") CustomBasePath = Path.Combine(initialPathPrompt.OutputText, "Astro");
+                                CustomBasePath = AMLUtils.FixBasePath(initialPathPrompt.OutputText);
 
-                                if (Directory.Exists(CustomBasePath))
+                                if (!string.IsNullOrEmpty(CustomBasePath))
                                 {
                                     isValidPath = true;
                                     BasePath = CustomBasePath;
@@ -513,12 +520,16 @@ namespace AstroModLoader
 
             try
             {
-                string[] dllPaths = Directory.GetFiles(Path.Combine(GamePath, "Engine", "Binaries", "ThirdParty", "Steamworks"), "steam_api*.dll", SearchOption.AllDirectories);
-                if (dllPaths.Length > 0 && File.Exists(dllPaths[0]))
+                string potentialDllDir = Path.Combine(GamePath, "Engine", "Binaries", "ThirdParty", "Steamworks");
+                if (Directory.Exists(potentialDllDir))
                 {
-                    var data = File.ReadAllBytes(dllPaths[0]);
-                    var hash = SHA1.Create().ComputeHash(data);
-                    if (!hash.SequenceEqual(steamsworksDLLHash)) MismatchedSteamworksDLL = true;
+                    string[] dllPaths = Directory.GetFiles(potentialDllDir, "steam_api*.dll", SearchOption.AllDirectories);
+                    if (dllPaths.Length > 0 && File.Exists(dllPaths[0]))
+                    {
+                        var data = File.ReadAllBytes(dllPaths[0]);
+                        var hash = SHA1.Create().ComputeHash(data);
+                        if (!hash.SequenceEqual(steamsworksDLLHash)) MismatchedSteamworksDLL = true;
+                    }
                 }
             }
             catch

@@ -151,6 +151,7 @@
             // 
             // setPathButton
             // 
+            this.setPathButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.setPathButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
             this.setPathButton.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.setPathButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -184,6 +185,7 @@
             // 
             // setPathButton2
             // 
+            this.setPathButton2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.setPathButton2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
             this.setPathButton2.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(231)))), ((int)(((byte)(149)))));
             this.setPathButton2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;

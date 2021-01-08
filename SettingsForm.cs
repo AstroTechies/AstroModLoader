@@ -137,22 +137,25 @@ namespace AstroModLoader
 
         private void UpdatePathing(object sender, EventArgs e)
         {
-            if (!AMLUtils.IsValidPath(gamePathBox.Text))
+            string correctedGamePath = AMLUtils.FixGamePath(gamePathBox.Text);
+            string correctedLocalPath = AMLUtils.FixBasePath(localPathBox.Text);
+
+            if (string.IsNullOrEmpty(correctedGamePath) || !AMLUtils.IsValidPath(correctedGamePath))
             {
                 gamePathBox.Text = BaseForm.ModManager.GamePath;
                 this.ShowBasicButton("The specified game path is invalid!", "OK", null, null);
                 return;
             }
 
-            if (!AMLUtils.IsValidPath(localPathBox.Text))
+            if (string.IsNullOrEmpty(correctedLocalPath) || !AMLUtils.IsValidPath(correctedLocalPath))
             {
                 localPathBox.Text = BaseForm.ModManager.BasePath;
                 this.ShowBasicButton("The specified local path is invalid!", "OK", null, null);
                 return;
             }
 
-            BaseForm.ModManager.ValidPlatformTypesToPaths[PlatformType.Custom] = gamePathBox.Text;
-            BaseForm.ModManager.CustomBasePath = localPathBox.Text;
+            BaseForm.ModManager.ValidPlatformTypesToPaths[PlatformType.Custom] = correctedGamePath;
+            BaseForm.ModManager.CustomBasePath = correctedLocalPath;
             BaseForm.SwitchPlatform(PlatformType.Custom);
 
             this.UpdateLabels();

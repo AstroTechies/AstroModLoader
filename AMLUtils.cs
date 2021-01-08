@@ -1,9 +1,11 @@
 ﻿using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -66,9 +68,8 @@ namespace AstroModLoader
 
         public static Color ColorFromHTML(string htmlColor)
         {
-            string kosherColor = htmlColor;
-            if (!kosherColor[0].Equals('#')) kosherColor = "#" + kosherColor;
-            return ColorTranslator.FromHtml(kosherColor);
+            if (!htmlColor[0].Equals('#')) htmlColor = "#" + htmlColor;
+            return ColorTranslator.FromHtml(htmlColor);
         }
 
         public static string ColorToHTML(Color color)
@@ -140,6 +141,34 @@ namespace AstroModLoader
             string invalidCharactersRegex = string.Format(@"([{0}]*\.+$)|([{0}]+)", Regex.Escape(new string(Path.GetInvalidFileNameChars())));
             return Regex.Replace(name, invalidCharactersRegex, "_");
         }
+        
+        public static string FixBasePath(string basePath)
+        {
+            string[] allDirs = basePath.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });
+            if (Path.GetFileName(basePath) != "Astro") basePath = Path.Combine(basePath, "Astro");
+
+            for (int i = 0; i < allDirs.Length; i++)
+            {
+                if (allDirs[i] == "Astro")
+                {
+                    basePath = string.Join(Path.DirectorySeparatorChar.ToString(), allDirs.Subsequence(0, i + 1));
+                    break;
+                }
+            }
+
+            basePath = Path.GetFullPath(basePath);
+            if (!Directory.Exists(basePath)) return null;
+            return basePath;
+        }
+
+        public static string FixGamePath(string gamePath)
+        {
+            if (Path.GetFileName(gamePath) == "Astro") gamePath = Path.Combine(gamePath, "..");
+
+            gamePath = Path.GetFullPath(gamePath);
+            if (!Directory.Exists(gamePath)) return null;
+            return gamePath;
+        }
 
         public static bool IsValidPath(string path)
         {
@@ -186,6 +215,11 @@ namespace AstroModLoader
         {
             if (v1 == null || v2 == null) return true;
             return v1.Major == v2.Major && v1.Minor == v2.Minor; // no sense in warning if the current version is 1.16.70.0 and the mod is for 1.16.60.0, who cares
+        }
+
+        public static T[] Subsequence<T>(this IEnumerable<T> arr, int startIndex, int length)
+        {
+            return arr.Skip(startIndex).Take(length).ToArray();
         }
 
         private static Control internalForm;
