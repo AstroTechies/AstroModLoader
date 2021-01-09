@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AstroModLoader
@@ -21,21 +16,16 @@ namespace AstroModLoader
 
         private void UpdateColorBoxText()
         {
-            bool foundMatch = false;
             foreach (KeyValuePair<string, Color> entry in AMLPalette.PresetMap)
             {
                 if (entry.Value.Equals(AMLPalette.AccentColor))
                 {
                     accentComboBox.Text = entry.Key;
-                    foundMatch = true;
-                    break;
+                    return;
                 }
             }
 
-            if (!foundMatch)
-            {
-                accentComboBox.Text = AMLUtils.ColorToHTML(AMLPalette.AccentColor);
-            }
+            accentComboBox.Text = AMLUtils.ColorToHTML(AMLPalette.AccentColor);
         }
 
         private void UpdateLabels()
@@ -104,14 +94,13 @@ namespace AstroModLoader
                 AMLPalette.RefreshTheme(BaseForm);
                 BaseForm.ModManager.SyncConfigToDisk();
                 AMLPalette.RefreshTheme(this);
-                UpdateColorBoxText();
             }
             catch
             {
                 this.ShowBasicButton("Invalid color!", "OK", null, null);
                 AMLPalette.AccentColor = backupColor;
-                UpdateColorBoxText();
             }
+            UpdateColorBoxText();
         }
 
         private void themeBox_SelectedIndexChanged(object sender, EventArgs e)

@@ -761,7 +761,7 @@ namespace AstroModLoader
 
             if (currentlySyncing)
             {
-                this.ShowBasicButton("The mod loader is already busy syncing!", "OK", null, null);
+                this.ShowBasicButton("Please wait, the mod loader is currently busy syncing.", "OK", null, null);
                 return;
             }
 
@@ -908,7 +908,7 @@ namespace AstroModLoader
                     }
                     else
                     {
-                        this.ShowBasicButton("Added a new profile named \"" + syncKosherProfileName + "\". " + (syncFailedDownloadCount == 0 ? "No" : syncFailedDownloadCount.ToString()) + " mod" + (syncFailedDownloadCount == 1 ? "" : "s") + " failed to sync.", "OK", null, null);
+                        this.ShowBasicButton("Added a new profile named \"" + syncKosherProfileName + "\".\n" + (syncFailedDownloadCount == 0 ? "No" : syncFailedDownloadCount.ToString()) + " mod" + (syncFailedDownloadCount == 1 ? "" : "s") + " failed to sync.", "OK", null, null);
                     }
                     ModManager.SyncConfigToDisk();
                     TableManager.Refresh();

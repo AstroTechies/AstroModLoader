@@ -109,7 +109,7 @@ namespace AstroModLoader
             if (AllModData[InstalledVersion].Name.Length > 32) AllModData[InstalledVersion].Name = AllModData[InstalledVersion].Name.Substring(0, 32);
         }
 
-        Regex ModIDFilterRegex = new Regex(@"[^A-Za-z0-9]", RegexOptions.Compiled);
+        public static Regex ModIDFilterRegex = new Regex(@"[^A-Za-z0-9]", RegexOptions.Compiled);
         public string ConstructName()
         {
             return AMLUtils.GeneratePriorityFromPositionInList(Priority) + "-" + ModIDFilterRegex.Replace(CurrentModData.ModID, "") + "-" + InstalledVersion + "_P.pak";

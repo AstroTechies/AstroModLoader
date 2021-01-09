@@ -112,7 +112,7 @@ namespace AstroModLoader
 
         public static void RefreshAllButtonsInControl(this Control ctrl)
         {
-            foreach(Control ctrl2 in ctrl.Controls)
+            foreach (Control ctrl2 in ctrl.Controls)
             {
                 if (ctrl2 is CoolButton butto) butto.RefreshToDefaults();
                 if (ctrl2 is ComboBox comboo)
@@ -158,6 +158,7 @@ namespace AstroModLoader
 
             basePath = Path.GetFullPath(basePath);
             if (!Directory.Exists(basePath)) return null;
+            if (!Directory.Exists(Path.Combine(basePath, "Saved"))) return null;
             return basePath;
         }
 
@@ -167,6 +168,7 @@ namespace AstroModLoader
 
             gamePath = Path.GetFullPath(gamePath);
             if (!Directory.Exists(gamePath)) return null;
+            if (!Directory.Exists(Path.Combine(gamePath, "Astro", "Content"))) return null;
             return gamePath;
         }
 
