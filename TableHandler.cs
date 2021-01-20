@@ -18,11 +18,13 @@ namespace AstroModLoader
     {
         public string Name;
         public ColumnType Type;
+        public DataGridViewAutoSizeColumnMode OverrideSizeMode;
 
-        public ColumnData(string Name, ColumnType Type)
+        public ColumnData(string Name, ColumnType Type, DataGridViewAutoSizeColumnMode OverrideSizeMode = DataGridViewAutoSizeColumnMode.NotSet)
         {
             this.Name = Name;
             this.Type = Type;
+            this.OverrideSizeMode = OverrideSizeMode;
         }
     }
 
@@ -71,7 +73,8 @@ namespace AstroModLoader
                 }
 
                 dgc.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-                if (i >= (ourColumns.Count - 1)) dgc.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                if (columnData.OverrideSizeMode != DataGridViewAutoSizeColumnMode.NotSet) dgc.AutoSizeMode = columnData.OverrideSizeMode;
+                //if (i >= (ourColumns.Count - 1)) dgc.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
 
                 dgc.SortMode = DataGridViewColumnSortMode.NotSortable;
                 GridView.Columns.Add(dgc);
@@ -125,8 +128,8 @@ namespace AstroModLoader
                 new ColumnData("Version", ColumnType.ComboBox),
                 new ColumnData("Author", ColumnType.Text),
                 new ColumnData("Game Build", ColumnType.Text),
-                ShouldContainOptionalColumn() ? new ColumnData("Optional?", ColumnType.CheckBox) : null,
-                new ColumnData("", ColumnType.Text)
+                ShouldContainOptionalColumn() ? new ColumnData("Optional?", ColumnType.CheckBox, DataGridViewAutoSizeColumnMode.ColumnHeader) : null,
+                //new ColumnData("", ColumnType.Text)
             });
 
             List<DataGridViewRow> newRows = new List<DataGridViewRow>();

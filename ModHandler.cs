@@ -486,8 +486,10 @@ namespace AstroModLoader
             }
         }
 
+        public bool CurrentlyAggregatingIndexFiles = false;
         public void AggregateIndexFiles()
         {
+            CurrentlyAggregatingIndexFiles = true;
             if (GlobalIndexFile == null) GlobalIndexFile = new Dictionary<string, IndexMod>();
             List<string> DuplicateURLs = new List<string>();
             foreach (Mod mod in Mods)
@@ -501,6 +503,7 @@ namespace AstroModLoader
             }
 
             UpdateAvailableVersionsFromIndexFiles();
+            CurrentlyAggregatingIndexFiles = false;
         }
 
         public void SortVersions()
@@ -841,7 +844,7 @@ namespace AstroModLoader
                     ModLookup[entry.Key].Priority = entry.Value.Priority;
                     ModLookup[entry.Key].IsOptional = entry.Value.IsOptional;
                     ModLookup[entry.Key].ForceLatest = entry.Value.ForceLatest;
-                    if (entry.Value.ForceLatest || !ModLookup[entry.Key].AvailableVersions.Contains(ModLookup[entry.Key].InstalledVersion))
+                    if (entry.Value.ForceLatest || !ModLookup[entry.Key].AllModData.ContainsKey(ModLookup[entry.Key].InstalledVersion))
                     {
                         ModLookup[entry.Key].InstalledVersion = ModLookup[entry.Key].AvailableVersions[0];
                     }

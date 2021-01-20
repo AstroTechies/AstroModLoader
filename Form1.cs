@@ -667,12 +667,19 @@ namespace AstroModLoader
 
             // Initial resize of the menu to fit the table if necessary
             AMLUtils.InvokeUI(ForceTableToFit);
+
             AMLUtils.InvokeUI(ForceResize);
             AMLUtils.InvokeUI(ForceResize);
         }
 
         private void playButton_Click(object sender, EventArgs e)
         {
+            if (ModManager.CurrentlyAggregatingIndexFiles)
+            {
+                this.ShowBasicButton("Please wait until online mod aggregation is complete.", "OK", null, null);
+                return;
+            }
+
             ModManager.FullUpdate();
             
             if (!Program.CommandLineOptions.ServerMode)
