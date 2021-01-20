@@ -42,7 +42,7 @@ namespace AstroModLoader
 
         public bool ShouldSerializeIsOptional()
         {
-            return Program.CommandLineOptions.ServerMode;
+            return IsOptional || TableHandler.ShouldContainOptionalColumn();
         }
 
         [JsonProperty("force_latest")]
@@ -238,6 +238,7 @@ namespace AstroModLoader
             modClone.InstalledVersion = (Version)this.InstalledVersion.Clone();
             modClone.ForceLatest = this.ForceLatest;
             modClone.Enabled = this.Enabled;
+            modClone.IsOptional = this.IsOptional;
             modClone.Priority = this.Priority;
             return modClone;
         }

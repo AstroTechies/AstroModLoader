@@ -47,6 +47,8 @@ namespace AstroModLoader
                 platformComboBox.DataSource = BaseForm.ModManager.AllPlatforms;
                 platformComboBox.SelectedIndex = platformComboBox.FindStringExact(BaseForm.ModManager.Platform.ToString());
             }
+
+            refuseMismatchedConnectionsCheckbox.Checked = ModHandler.OurIntegrator.RefuseMismatchedConnections;
         }
 
         private Form1 BaseForm;
@@ -146,6 +148,15 @@ namespace AstroModLoader
             BaseForm.ModManager.ValidPlatformTypesToPaths[PlatformType.Custom] = correctedGamePath;
             BaseForm.ModManager.CustomBasePath = correctedLocalPath;
             BaseForm.SwitchPlatform(PlatformType.Custom);
+
+            this.UpdateLabels();
+        }
+
+        private void refuseMismatchedConnectionsCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            ModHandler.OurIntegrator.RefuseMismatchedConnections = refuseMismatchedConnectionsCheckbox.Checked;
+            BaseForm.ModManager.SyncDependentConfigToDisk();
+            AMLUtils.InvokeUI(BaseForm.TableManager.Refresh);
 
             this.UpdateLabels();
         }

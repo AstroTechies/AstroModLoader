@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -17,6 +16,15 @@ namespace AstroModLoader
         public bool ShouldSerializeLaunchCommand()
         {
             return !string.IsNullOrEmpty(LaunchCommand);
+        }
+
+        [JsonProperty("refuse_mismatched_connections", DefaultValueHandling = DefaultValueHandling.Populate)]
+        [DefaultValue(true)]
+        public bool RefuseMismatchedConnections;
+
+        public bool ShouldSerializeRefuseMismatchedConnections()
+        {
+            return RefuseMismatchedConnections || Program.CommandLineOptions.ServerMode;
         }
 
         [JsonProperty("current")]

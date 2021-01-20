@@ -43,6 +43,7 @@
             this.label6 = new System.Windows.Forms.Label();
             this.setPathButton2 = new AstroModLoader.CoolButton();
             this.versionLabel = new System.Windows.Forms.Label();
+            this.refuseMismatchedConnectionsCheckbox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -210,12 +211,26 @@
             this.versionLabel.TabIndex = 14;
             this.versionLabel.Text = "1.17.89.0";
             // 
+            // refuseMismatchedConnectionsCheckbox
+            // 
+            this.refuseMismatchedConnectionsCheckbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.refuseMismatchedConnectionsCheckbox.AutoSize = true;
+            this.refuseMismatchedConnectionsCheckbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.refuseMismatchedConnectionsCheckbox.Location = new System.Drawing.Point(196, 192);
+            this.refuseMismatchedConnectionsCheckbox.Name = "refuseMismatchedConnectionsCheckbox";
+            this.refuseMismatchedConnectionsCheckbox.Size = new System.Drawing.Size(205, 19);
+            this.refuseMismatchedConnectionsCheckbox.TabIndex = 15;
+            this.refuseMismatchedConnectionsCheckbox.Text = "Refuse mismatched connections";
+            this.refuseMismatchedConnectionsCheckbox.UseVisualStyleBackColor = true;
+            this.refuseMismatchedConnectionsCheckbox.CheckedChanged += new System.EventHandler(this.refuseMismatchedConnectionsCheckbox_CheckedChanged);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(42)))), ((int)(((byte)(45)))));
             this.ClientSize = new System.Drawing.Size(413, 227);
+            this.Controls.Add(this.refuseMismatchedConnectionsCheckbox);
             this.Controls.Add(this.versionLabel);
             this.Controls.Add(this.setPathButton2);
             this.Controls.Add(this.label6);
@@ -259,5 +274,6 @@
         private System.Windows.Forms.Label label6;
         private CoolButton setPathButton2;
         private System.Windows.Forms.Label versionLabel;
+        private System.Windows.Forms.CheckBox refuseMismatchedConnectionsCheckbox;
     }
 }

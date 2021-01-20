@@ -3,6 +3,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartArguments>
     </StartArguments>
-    <StartWorkingDirectory>C:\Program Files %28x86%29\Steam\steamapps\common\ASTRONEER\</StartWorkingDirectory>
+    <StartWorkingDirectory>
+    </StartWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <StartWorkingDirectory>
+    </StartWorkingDirectory>
+    <StartArguments>
+    </StartArguments>
   </PropertyGroup>
 </Project>

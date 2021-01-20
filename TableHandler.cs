@@ -89,9 +89,10 @@ namespace AstroModLoader
             AMLUtils.InvokeUI(RefreshInternal);
         }
 
-        public bool ShouldContainOptionalColumn()
+        // While we allow clients to enable RefuseMismatchedConnections too, the average co-op player doesn't need the level of configuration that the Optional column provides
+        public static bool ShouldContainOptionalColumn()
         {
-            return Program.CommandLineOptions.ServerMode;
+            return Program.CommandLineOptions.ServerMode && ModHandler.OurIntegrator.RefuseMismatchedConnections;
         }
 
         private int? LastNumMods = 0;
@@ -191,6 +192,15 @@ namespace AstroModLoader
                 if (ShouldContainOptionalColumn())
                 {
                     row.Cells[5].Value = mod.IsOptional;
+                    if (row.Cells[5] is DataGridViewCheckBoxCell checkCell2)
+                    {
+                        if (ModManager.IsReadOnly || mod.CurrentModData.Sync != AstroModIntegrator.SyncMode.ServerAndClient)
+                        {
+                            checkCell2.ReadOnly = true;
+                            checkCell2.ThreeState = true;
+                            checkCell2.Value = 2;
+                        }
+                    }
                 }
 
                 row.ReadOnly = false;

@@ -152,6 +152,7 @@ namespace AstroModLoader
                     {
                         if (taggedMod.CannotCurrentlyUpdate) continue;
                         taggedMod.Enabled = (bool)row.Cells[0].Value;
+                        if (TableHandler.ShouldContainOptionalColumn()) taggedMod.IsOptional = (bool)row.Cells[5].Value;
                         if (row.Cells[2].Value is string strVal)
                         {
                             Version changingVer = null;
@@ -168,7 +169,6 @@ namespace AstroModLoader
 
                             SwitchVersionSync(taggedMod, changingVer);
                         }
-                        if (TableManager.ShouldContainOptionalColumn()) taggedMod.IsOptional = (bool)row.Cells[5].Value;
                     }
                 }
                 ModManager.FullUpdate();
@@ -660,6 +660,9 @@ namespace AstroModLoader
             // Force an update for good measure
             ModManager.FullUpdate();
 
+            // Initial resize of the menu to fit the table if necessary
+            if (dataGridView1.PreferredSize.Width > dataGridView1.Size.Width) this.Size = new Size(this.Width + (dataGridView1.PreferredSize.Width - dataGridView1.Size.Width), this.Height);
+
             AMLUtils.InvokeUI(ForceResize);
             AMLUtils.InvokeUI(ForceResize);
         }
@@ -785,7 +788,9 @@ namespace AstroModLoader
                     currentlySyncing = true;
                     try
                     {
-                        AstroLauncherServerInfo serverInfo = PlayFabAPI.GetAstroLauncherData(getIPPrompt.OutputText);
+                        string ourIP = getIPPrompt.OutputText.Trim();
+
+                        AstroLauncherServerInfo serverInfo = PlayFabAPI.GetAstroLauncherData(ourIP);
                         if (serverInfo == null)
                         {
                             syncErrored = true;
@@ -801,7 +806,7 @@ namespace AstroModLoader
 
                         List<Mod> allMods = serverInfo.GetAllMods();
                         string kosherServerName = serverInfo.ServerName;
-                        if (string.IsNullOrWhiteSpace(kosherServerName) || kosherServerName == "Astroneer Dedicated Server") kosherServerName = getIPPrompt.OutputText;
+                        if (string.IsNullOrWhiteSpace(kosherServerName) || kosherServerName == "Astroneer Dedicated Server") kosherServerName = ourIP;
 
                         ModProfile creatingProfile = new ModProfile();
                         creatingProfile.ProfileData = new Dictionary<string, Mod>();

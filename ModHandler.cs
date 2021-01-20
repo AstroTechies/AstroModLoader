@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -37,6 +38,7 @@ namespace AstroModLoader
         public ModHandler(Form1 baseForm)
         {
             BaseForm = baseForm;
+            OurIntegrator = new ModIntegrator();
 
             string automaticSteamPath = null;
             string automaticWin10Path = null;
@@ -658,7 +660,7 @@ namespace AstroModLoader
                 }
                 else
                 {
-                    if (Program.CommandLineOptions.ServerMode && m.CurrentModData.Sync == SyncMode.ClientOnly) continue;
+                    //if (Program.CommandLineOptions.ServerMode && m.CurrentModData.Sync == SyncMode.ClientOnly) continue;
                     if (m.Priority < 999)
                     {
                         File.Copy(modPath, Path.Combine(DownloadPath, modNameOnDisk), true);
@@ -794,6 +796,7 @@ namespace AstroModLoader
                 ProfileList = diskConfig.Profiles;
                 if (ProfileList == null) ProfileList = new Dictionary<string, ModProfile>();
                 if (!string.IsNullOrEmpty(diskConfig.LaunchCommand)) LaunchCommand = diskConfig.LaunchCommand;
+                OurIntegrator.RefuseMismatchedConnections = diskConfig.RefuseMismatchedConnections;
                 if (includeGamePath)
                 {
                     if (!string.IsNullOrEmpty(diskConfig.GamePath)) GamePath = diskConfig.GamePath;
@@ -828,6 +831,7 @@ namespace AstroModLoader
                     ModLookup[entry.Key].Enabled = entry.Value.Enabled;
                     if (entry.Value.InstalledVersion != null) ModLookup[entry.Key].InstalledVersion = entry.Value.InstalledVersion;
                     ModLookup[entry.Key].Priority = entry.Value.Priority;
+                    ModLookup[entry.Key].IsOptional = entry.Value.IsOptional;
                     ModLookup[entry.Key].ForceLatest = entry.Value.ForceLatest;
                     if (entry.Value.ForceLatest || !ModLookup[entry.Key].AvailableVersions.Contains(ModLookup[entry.Key].InstalledVersion))
                     {
@@ -873,6 +877,7 @@ namespace AstroModLoader
             var newConfig = new ModConfig();
             newConfig.GamePath = GamePath;
             newConfig.LaunchCommand = LaunchCommand;
+            newConfig.RefuseMismatchedConnections = OurIntegrator.RefuseMismatchedConnections;
             newConfig.Profiles = ProfileList;
             newConfig.ModsOnDisk = GenerateProfile();
 
@@ -888,6 +893,7 @@ namespace AstroModLoader
             });
         }
 
+        public static ModIntegrator OurIntegrator;
         public void IntegrateMods()
         {
             AMLUtils.InvokeUI(() =>
@@ -895,12 +901,14 @@ namespace AstroModLoader
                 if (IsReadOnly) return;
                 if (GamePath == null || InstallPath == null) return;
 
-                List<Metadata> optionalMods = new List<Metadata>();
+                List<string> optionalMods = new List<string>();
                 foreach (Mod mod in Mods)
                 {
-                    if (mod.Enabled && mod.IsOptional) optionalMods.Add(mod.CurrentModData);
+                    if (mod.Enabled && mod.IsOptional) optionalMods.Add(mod.CurrentModData.ModID);
                 }
-                ModIntegrator.IntegrateMods(InstallPath, Path.Combine(GamePath, "Astro", "Content", "Paks"));
+
+                if (TableHandler.ShouldContainOptionalColumn()) OurIntegrator.OptionalModIDs = optionalMods;
+                OurIntegrator.IntegrateMods(InstallPath, Path.Combine(GamePath, "Astro", "Content", "Paks"));
             });
         }
 
