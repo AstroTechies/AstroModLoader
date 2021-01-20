@@ -460,6 +460,7 @@ namespace AstroModLoader
 
         public void UpdateAvailableVersionsFromIndexFiles()
         {
+            Dictionary<Mod, Version> switchVersionInstructions = new Dictionary<Mod, Version>();
             foreach (Mod mod in Mods)
             {
                 Version latestVersion = null;
@@ -474,7 +475,14 @@ namespace AstroModLoader
                     //if (indexMod.LatestVersion != null) latestVersion = indexMod.LatestVersion;
                 }
 
-                if (mod.ForceLatest && latestVersion != null) BaseForm.SwitchVersionSync(mod, latestVersion);
+                if (mod.ForceLatest && latestVersion != null) switchVersionInstructions.Add(mod, latestVersion);
+            }
+
+            AMLUtils.InvokeUI(BaseForm.TableManager.Refresh);
+
+            foreach (KeyValuePair<Mod, Version> entry in switchVersionInstructions)
+            {
+                BaseForm.SwitchVersionSync(entry.Key, entry.Value);
             }
         }
 

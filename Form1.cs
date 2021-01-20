@@ -597,6 +597,11 @@ namespace AstroModLoader
             dataGridView1.Invalidate();
         }
 
+        public void ForceTableToFit()
+        {
+            if (dataGridView1.PreferredSize.Width > dataGridView1.Size.Width) this.Size = new Size((int)((this.Width + (dataGridView1.PreferredSize.Width - dataGridView1.Size.Width)) * 1.1f), this.Height);
+        }
+
         public void FullRefresh()
         {
             if (ModManager != null)
@@ -661,8 +666,7 @@ namespace AstroModLoader
             ModManager.FullUpdate();
 
             // Initial resize of the menu to fit the table if necessary
-            if (dataGridView1.PreferredSize.Width > dataGridView1.Size.Width) this.Size = new Size(this.Width + (dataGridView1.PreferredSize.Width - dataGridView1.Size.Width), this.Height);
-
+            AMLUtils.InvokeUI(ForceTableToFit);
             AMLUtils.InvokeUI(ForceResize);
             AMLUtils.InvokeUI(ForceResize);
         }
