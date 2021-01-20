@@ -671,15 +671,18 @@ namespace AstroModLoader
         {
             ModManager.FullUpdate();
             
-            if (ModManager.Platform == PlatformType.Steam)
+            if (!Program.CommandLineOptions.ServerMode)
             {
-                Process.Start(@"steam://run/361420");
-                return;
-            }
-            else if (ModManager.Platform == PlatformType.Win10)
-            {
-                if (!string.IsNullOrEmpty(ModManager.MicrosoftRuntimeID)) Process.Start(@"shell:appsFolder\" + ModManager.MicrosoftRuntimeID + "!ASTRONEER");
-                return;
+                if (ModManager.Platform == PlatformType.Steam)
+                {
+                    Process.Start(@"steam://run/361420");
+                    return;
+                }
+                else if (ModManager.Platform == PlatformType.Win10)
+                {
+                    if (!string.IsNullOrEmpty(ModManager.MicrosoftRuntimeID)) Process.Start(@"shell:appsFolder\" + ModManager.MicrosoftRuntimeID + "!ASTRONEER");
+                    return;
+                }
             }
 
             if ((Program.CommandLineOptions.ServerMode || AMLUtils.IsLinux || string.IsNullOrEmpty(ModManager.BinaryFilePath)) && string.IsNullOrEmpty(ModManager.LaunchCommand))
@@ -687,7 +690,7 @@ namespace AstroModLoader
                 TextPrompt initialPathPrompt = new TextPrompt
                 {
                     StartPosition = FormStartPosition.CenterScreen,
-                    DisplayText = "Select a file to run",
+                    DisplayText = "Select a file to run:",
                     AllowBrowse = true,
                     BrowseMode = BrowseMode.File
                 };

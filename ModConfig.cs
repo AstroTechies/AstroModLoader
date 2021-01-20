@@ -22,11 +22,6 @@ namespace AstroModLoader
         [DefaultValue(true)]
         public bool RefuseMismatchedConnections;
 
-        public bool ShouldSerializeRefuseMismatchedConnections()
-        {
-            return RefuseMismatchedConnections || Program.CommandLineOptions.ServerMode;
-        }
-
         [JsonProperty("current")]
         public ModProfile ModsOnDisk;
 

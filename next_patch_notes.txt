@@ -1,6 +1,7 @@
 ﻿* Upgraded the bundled AstroModIntegrator copy to 1.2.0.
 * Added automatic detection for server mode. If an executable file named AstroServer.exe is located in the current working directory, server mode is automatically enabled.
-* Added the optional mods column in server mode to accomodate for increased configuration provided by the upgraded AstroModIntegrator version.
+* Added the "Refuse mismatched connections" option, which determines whether or not a game host should kick modded clients with a mismatched set of mods.
+* Added the optional mods column in server mode, which allows dedicated servers to select which mods should be enforced.
 * Added an indicator that displays if a hash mismatch is detected with the Steam API DLL. This indicator does not affect usage of the mod loader itself.
 * Added more robust game and local data path correction and verification.
 * Fixed a bug where specific mods would fail to sync.
