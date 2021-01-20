@@ -355,7 +355,7 @@ namespace AstroModLoader
             BasePath = null;
             if (!string.IsNullOrEmpty(Program.CommandLineOptions.LocalDataPath))
             {
-                BasePath = Path.GetFullPath(Path.Combine(Program.CommandLineOptions.LocalDataPath, "Astro"));
+                BasePath = AMLUtils.FixBasePath(Path.GetFullPath(Path.Combine(Program.CommandLineOptions.LocalDataPath, "Astro")));
             }
             else
             {
@@ -894,6 +894,12 @@ namespace AstroModLoader
             {
                 if (IsReadOnly) return;
                 if (GamePath == null || InstallPath == null) return;
+
+                List<Metadata> optionalMods = new List<Metadata>();
+                foreach (Mod mod in Mods)
+                {
+                    if (mod.Enabled && mod.IsOptional) optionalMods.Add(mod.CurrentModData);
+                }
                 ModIntegrator.IntegrateMods(InstallPath, Path.Combine(GamePath, "Astro", "Content", "Paks"));
             });
         }

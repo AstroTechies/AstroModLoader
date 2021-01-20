@@ -89,9 +89,9 @@ namespace AstroModLoader
         {
             try
             {
-                if (!ModManager.GlobalIndexFile.ContainsKey(thisMod.CurrentModData.ModID)) throw new IndexFileException("Can't find index file entry for mod");
+                if (!ModManager.GlobalIndexFile.ContainsKey(thisMod.CurrentModData.ModID)) throw new IndexFileException("Can't find index file entry for mod: " + thisMod.CurrentModData.ModID);
                 Dictionary<Version, IndexVersionData> allVerData = ModManager.GlobalIndexFile[thisMod.CurrentModData.ModID].AllVersions;
-                if (!allVerData.ContainsKey(newVersion)) throw new IndexFileException("Failed to find the requested version in the mod's index file");
+                if (!allVerData.ContainsKey(newVersion)) throw new IndexFileException("Failed to find the requested version in the mod's index file: " + thisMod.CurrentModData.ModID + " v" + newVersion);
 
                 using (var wb = new WebClient())
                 {
@@ -110,7 +110,7 @@ namespace AstroModLoader
             }
             catch (Exception ex)
             {
-                if (ex is WebException || ex is IndexFileException || ex is IOException)
+                if (ex is WebException || ex is IOException || ex is IndexFileException)
                 {
                     Debug.WriteLine(ex.ToString());
                     return false;
@@ -168,6 +168,7 @@ namespace AstroModLoader
 
                             SwitchVersionSync(taggedMod, changingVer);
                         }
+                        if (TableManager.ShouldContainOptionalColumn()) taggedMod.IsOptional = (bool)row.Cells[5].Value;
                     }
                 }
                 ModManager.FullUpdate();
@@ -800,7 +801,7 @@ namespace AstroModLoader
 
                         List<Mod> allMods = serverInfo.GetAllMods();
                         string kosherServerName = serverInfo.ServerName;
-                        if (string.IsNullOrEmpty(kosherServerName) || kosherServerName == "Astroneer Dedicated Server") kosherServerName = getIPPrompt.OutputText;
+                        if (string.IsNullOrWhiteSpace(kosherServerName) || kosherServerName == "Astroneer Dedicated Server") kosherServerName = getIPPrompt.OutputText;
 
                         ModProfile creatingProfile = new ModProfile();
                         creatingProfile.ProfileData = new Dictionary<string, Mod>();
@@ -842,7 +843,7 @@ namespace AstroModLoader
                                 Mod appliedMod = null;
 
                                 // If we already have this mod downloaded, no sense in downloading it again
-                                if (ModManager.ModLookup.ContainsKey(mod.CurrentModData.ModID) && ModManager.ModLookup[mod.CurrentModData.ModID].AvailableVersions != null && ModManager.ModLookup[mod.CurrentModData.ModID].AvailableVersions.Where(m => m.ToString() == mod.InstalledVersion.ToString()).Count() > 0)
+                                if (ModManager.ModLookup.ContainsKey(mod.CurrentModData.ModID) && ModManager.ModLookup[mod.CurrentModData.ModID].AvailableVersions != null && ModManager.ModLookup[mod.CurrentModData.ModID].AllModData.Keys.Where(m => m.ToString() == mod.InstalledVersion.ToString()).Count() > 0)
                                 {
                                     appliedMod = (Mod)ModManager.ModLookup[mod.CurrentModData.ModID].Clone();
                                     appliedMod.InstalledVersion = (Version)mod.InstalledVersion.Clone();
@@ -890,7 +891,7 @@ namespace AstroModLoader
                         syncKosherProfileName = kosherProfileName;
                         syncFailedDownloadCount = failedDownloadCount;
                     }
-                    catch (WebException ex)
+                    catch (Exception ex)
                     {
                         if (ex is PlayFabException || ex is WebException)
                         {
@@ -898,7 +899,9 @@ namespace AstroModLoader
                             syncErrorMessage = "Failed to access PlayFab!";
                             return;
                         }
-                        throw;
+                        syncErrored = true;
+                        syncErrorMessage = ex.ToString();
+                        return;
                     }
                 }).ContinueWith(res =>
                 {

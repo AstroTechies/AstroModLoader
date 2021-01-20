@@ -36,6 +36,15 @@ namespace AstroModLoader
             }
         }
 
+        [JsonProperty("optional")]
+        [DefaultValue(false)]
+        public bool IsOptional;
+
+        public bool ShouldSerializeIsOptional()
+        {
+            return Program.CommandLineOptions.ServerMode;
+        }
+
         [JsonProperty("force_latest")]
         [DefaultValue(false)]
         public bool ForceLatest;
@@ -63,6 +72,7 @@ namespace AstroModLoader
         public Metadata CurrentModData {
             get
             {
+                if (!AllModData.ContainsKey(InstalledVersion)) throw new KeyNotFoundException("This mod does not have the following version: " + InstalledVersion);
                 return AllModData[InstalledVersion];
             }
         }
@@ -109,7 +119,7 @@ namespace AstroModLoader
             if (AllModData[InstalledVersion].Name.Length > 32) AllModData[InstalledVersion].Name = AllModData[InstalledVersion].Name.Substring(0, 32);
         }
 
-        public static Regex ModIDFilterRegex = new Regex(@"[^A-Za-z0-9]", RegexOptions.Compiled);
+        private static readonly Regex ModIDFilterRegex = new Regex(@"[^A-Za-z0-9]", RegexOptions.Compiled);
         public string ConstructName()
         {
             return AMLUtils.GeneratePriorityFromPositionInList(Priority) + "-" + ModIDFilterRegex.Replace(CurrentModData.ModID, "") + "-" + InstalledVersion + "_P.pak";

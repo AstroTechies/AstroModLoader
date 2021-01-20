@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace AstroModLoader
@@ -10,6 +12,18 @@ namespace AstroModLoader
         Text,
         CheckBox,
         ComboBox
+    }
+
+    internal class ColumnData
+    {
+        public string Name;
+        public ColumnType Type;
+
+        public ColumnData(string Name, ColumnType Type)
+        {
+            this.Name = Name;
+            this.Type = Type;
+        }
     }
 
     public class TableHandler
@@ -23,26 +37,27 @@ namespace AstroModLoader
             ModManager = modManager;
         }
 
-        private void AddColumns(List<Tuple<string, ColumnType>> ourColumns)
+        private void AddColumns(List<ColumnData> ourColumns)
         {
             for (int i = 0; i < ourColumns.Count; i++)
             {
-                Tuple<string, ColumnType> columnData = ourColumns[i];
+                ColumnData columnData = ourColumns[i];
+                if (columnData == null) continue;
 
                 DataGridViewColumn dgc;
-                if (columnData.Item2 == ColumnType.CheckBox)
+                if (columnData.Type == ColumnType.CheckBox)
                 {
                     dgc = new DataGridViewCheckBoxColumn
                     {
-                        HeaderText = columnData.Item1
+                        HeaderText = columnData.Name
                     };
                     dgc.ReadOnly = false;
                 }
-                else if (columnData.Item2 == ColumnType.ComboBox)
+                else if (columnData.Type == ColumnType.ComboBox)
                 {
                     dgc = new DataGridViewComboBoxColumn
                     {
-                        HeaderText = columnData.Item1
+                        HeaderText = columnData.Name
                     };
                     dgc.ReadOnly = false;
                 }
@@ -50,16 +65,13 @@ namespace AstroModLoader
                 {
                     dgc = new DataGridViewTextBoxColumn
                     {
-                        HeaderText = columnData.Item1
+                        HeaderText = columnData.Name
                     };
                     dgc.ReadOnly = true;
                 }
 
                 dgc.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-                if (i >= (ourColumns.Count - 1))
-                {
-                    dgc.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                }
+                if (i >= (ourColumns.Count - 1)) dgc.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
 
                 dgc.SortMode = DataGridViewColumnSortMode.NotSortable;
                 GridView.Columns.Add(dgc);
@@ -75,6 +87,11 @@ namespace AstroModLoader
         public void Refresh()
         {
             AMLUtils.InvokeUI(RefreshInternal);
+        }
+
+        public bool ShouldContainOptionalColumn()
+        {
+            return Program.CommandLineOptions.ServerMode;
         }
 
         private int? LastNumMods = 0;
@@ -100,13 +117,15 @@ namespace AstroModLoader
                 return;
             }
 
-            AddColumns(new List<Tuple<string, ColumnType>>
+            AddColumns(new List<ColumnData>
             {
-                Tuple.Create("", ColumnType.CheckBox),
-                Tuple.Create("Name", ColumnType.Text),
-                Tuple.Create("Version", ColumnType.ComboBox),
-                Tuple.Create("Author", ColumnType.Text),
-                Tuple.Create("Game Build", ColumnType.Text),
+                new ColumnData("", ColumnType.CheckBox),
+                new ColumnData("Name", ColumnType.Text),
+                new ColumnData("Version", ColumnType.ComboBox),
+                new ColumnData("Author", ColumnType.Text),
+                new ColumnData("Game Build", ColumnType.Text),
+                ShouldContainOptionalColumn() ? new ColumnData("Optional?", ColumnType.CheckBox) : null,
+                new ColumnData("", ColumnType.Text)
             });
 
             List<DataGridViewRow> newRows = new List<DataGridViewRow>();
@@ -167,6 +186,11 @@ namespace AstroModLoader
                         row.Cells[4].Style.ForeColor = AMLPalette.WarningColor;
                         row.Cells[4].Style.SelectionForeColor = AMLPalette.WarningColor;
                     }
+                }
+
+                if (ShouldContainOptionalColumn())
+                {
+                    row.Cells[5].Value = mod.IsOptional;
                 }
 
                 row.ReadOnly = false;
