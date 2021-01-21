@@ -125,7 +125,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
 ## AstroModIntegrator
 https://github.com/AstroTechies/AstroModIntegrator
 
-Copyright (c) 2020 AstroTechies
+Copyright (c) 2021 AstroTechies
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

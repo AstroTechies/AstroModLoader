@@ -536,8 +536,10 @@ namespace AstroModLoader
                     AdjustModInfoText("");
                     return;
                 }
-                string kosherDescription = string.IsNullOrEmpty(selectedMod.CurrentModData.Description) ? "N/A" : selectedMod.CurrentModData.Description;
-                if (kosherDescription.Length > 80) kosherDescription = kosherDescription.Substring(0, 80) + "...";
+
+                string kosherDescription = selectedMod.CurrentModData.Description;
+                if (!string.IsNullOrEmpty(kosherDescription) && kosherDescription.Length > 200) kosherDescription = kosherDescription.Substring(0, 200) + "...";
+
                 string kosherSync = "N/A";
                 switch (selectedMod.CurrentModData.Sync)
                 {
@@ -569,7 +571,14 @@ namespace AstroModLoader
                 if (knownSize >= 0) additionalData += "\nSize: " + AMLUtils.FormatFileSize(knownSize);
 
                 bool hasHomepage = !string.IsNullOrEmpty(selectedMod.CurrentModData.Homepage) && AMLUtils.IsValidUri(selectedMod.CurrentModData.Homepage);
-                AdjustModInfoText("Name: " + selectedMod.CurrentModData.Name + "\nDescription: " + kosherDescription + "\nSync: " + kosherSync + additionalData + (hasHomepage ? "\nWebsite: " : ""), hasHomepage ? selectedMod.CurrentModData.Homepage : "");
+
+                string realText = "Name: " + selectedMod.CurrentModData.Name;
+                if (!string.IsNullOrEmpty(kosherDescription)) realText += "\nDescription: " + kosherDescription;
+                realText += "\nSync: " + kosherSync;
+                realText += additionalData;
+                realText += hasHomepage ? "\nWebsite: " : "";
+
+                AdjustModInfoText(realText, hasHomepage ? selectedMod.CurrentModData.Homepage : "");
             });
         }
 
@@ -591,8 +600,15 @@ namespace AstroModLoader
             syncButton.Width = (int)(buttonHeight * 4.5);
             exitButton.Width = buttonHeight * 3;
 
+            modPanel.Height = (int)(this.ClientSize.Height - this.MinimumSize.Height * 0.45f);
+            dataGridView1.Height = modPanel.Height - dataGridView1.Location.Y - (int)(buttonHeight * 1.5);
+            modInfo.Location = new Point(modInfo.Location.X, modPanel.Location.Y + modPanel.Height + 15);
+            modInfo.MaximumSize = new Size(this.ClientSize.Width - (modInfo.Location.X * 2), modInfo.MaximumSize.Height);
+
+            refresh.Location = new Point(dataGridView1.Location.X, dataGridView1.Location.Y + dataGridView1.Height + 10);
+            loadButton.Location = new Point(refresh.Location.X + refresh.Width + 5, dataGridView1.Location.Y + dataGridView1.Height + 10);
             syncButton.Location = new Point(dataGridView1.Location.X + dataGridView1.Width - syncButton.Width, dataGridView1.Location.Y + dataGridView1.Height + 10);
-            exitButton.Location = new Point(this.Width - exitButton.Width - 30, (footerPanel.Height - exitButton.Height) / 2);
+            exitButton.Location = new Point(syncButton.Location.X + syncButton.Width - exitButton.Width, (footerPanel.Height - exitButton.Height) / 2);
 
             dataGridView1.Invalidate();
         }

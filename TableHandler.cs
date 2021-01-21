@@ -74,7 +74,6 @@ namespace AstroModLoader
 
                 dgc.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                 if (columnData.OverrideSizeMode != DataGridViewAutoSizeColumnMode.NotSet) dgc.AutoSizeMode = columnData.OverrideSizeMode;
-                //if (i >= (ourColumns.Count - 1)) dgc.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
 
                 dgc.SortMode = DataGridViewColumnSortMode.NotSortable;
                 GridView.Columns.Add(dgc);
@@ -129,7 +128,7 @@ namespace AstroModLoader
                 new ColumnData("Author", ColumnType.Text),
                 new ColumnData("Game Build", ColumnType.Text),
                 ShouldContainOptionalColumn() ? new ColumnData("Optional?", ColumnType.CheckBox, DataGridViewAutoSizeColumnMode.ColumnHeader) : null,
-                //new ColumnData("", ColumnType.Text)
+                new ColumnData("", ColumnType.Text, DataGridViewAutoSizeColumnMode.Fill) // We fill the rest of the space with an empty column so that any extra room is still highlighted for the selected row
             });
 
             List<DataGridViewRow> newRows = new List<DataGridViewRow>();

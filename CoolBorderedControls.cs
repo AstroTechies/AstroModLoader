@@ -18,7 +18,7 @@ namespace AstroModLoader
 
         private void CoolDataGridView_Scroll(object sender, ScrollEventArgs e)
         {
-            this.Invalidate();
+            for (int i = 0; i < this.Rows.Count; i++) this.InvalidateRow(i);
         }
 
         protected override void WndProc(ref Message m)
@@ -27,12 +27,14 @@ namespace AstroModLoader
             switch (m.Msg)
             {
                 case AMLUtils.WM_PAINT:
-                    Graphics g = this.CreateGraphics();
-                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.Default;
-                    Rectangle rect = ClientRectangle;
-                    using (var p = new Pen(AMLPalette.AccentColor, AMLPalette.BorderPenWidth) { Alignment = System.Drawing.Drawing2D.PenAlignment.Center })
+                    using (Graphics g = this.CreateGraphics())
                     {
-                        g.DrawRectangle(p, rect);
+                        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.Default;
+                        Rectangle rect = ClientRectangle;
+                        using (var p = new Pen(AMLPalette.AccentColor, AMLPalette.BorderPenWidth) { Alignment = System.Drawing.Drawing2D.PenAlignment.Center })
+                        {
+                            g.DrawRectangle(p, rect);
+                        }
                     }
                     break;
             }
@@ -52,12 +54,14 @@ namespace AstroModLoader
             switch (m.Msg)
             {
                 case AMLUtils.WM_PAINT:
-                    Graphics g = this.CreateGraphics();
-                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.Default;
-                    Rectangle rect = ClientRectangle;
-                    using (var p = new Pen(AMLPalette.AccentColor, AMLPalette.BorderPenWidth) { Alignment = System.Drawing.Drawing2D.PenAlignment.Center })
+                    using (Graphics g = this.CreateGraphics())
                     {
-                        g.DrawRectangle(p, rect);
+                        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.Default;
+                        Rectangle rect = ClientRectangle;
+                        using (var p = new Pen(AMLPalette.AccentColor, AMLPalette.BorderPenWidth) { Alignment = System.Drawing.Drawing2D.PenAlignment.Center })
+                        {
+                            g.DrawRectangle(p, rect);
+                        }
                     }
                     break;
             }

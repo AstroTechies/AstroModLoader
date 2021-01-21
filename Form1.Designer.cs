@@ -254,7 +254,7 @@
             this.Controls.Add(this.label1);
             this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(900, 580);
+            this.MaximumSize = new System.Drawing.Size(900, 700);
             this.MinimumSize = new System.Drawing.Size(485, 515);
             this.Name = "Form1";
             this.Text = "Form1";
