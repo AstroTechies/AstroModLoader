@@ -177,6 +177,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.listBox1);
             this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "ProfileSelector";
             this.Text = "ProfileSelector";
