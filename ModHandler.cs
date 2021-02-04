@@ -39,6 +39,7 @@ namespace AstroModLoader
         {
             BaseForm = baseForm;
             OurIntegrator = new ModIntegrator();
+            OurIntegrator.RefuseMismatchedConnections = true;
 
             string automaticSteamPath = null;
             string automaticWin10Path = null;
