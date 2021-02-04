@@ -692,7 +692,7 @@ namespace AstroModLoader
         {
             if (ModManager.CurrentlyAggregatingIndexFiles)
             {
-                this.ShowBasicButton("Please wait until online mod aggregation is complete.", "OK", null, null);
+                this.ShowBasicButton("Please wait, the mod loader is currently fetching auto-update information.", "OK", null, null);
                 return;
             }
 
@@ -780,11 +780,12 @@ namespace AstroModLoader
             selectorForm.ShowDialog(this);
         }
 
-        private bool currentlySyncing = false;
-        private bool syncErrored = false;
-        private string syncErrorMessage;
-        private int syncFailedDownloadCount;
-        private string syncKosherProfileName;
+        internal bool CurrentlySyncing = false;
+        internal bool syncErrored;
+        internal string syncErrorMessage;
+        internal int syncFailedDownloadCount;
+        internal string syncKosherProfileName;
+
         private void syncButton_Click(object sender, EventArgs e)
         {
             if (ModManager.IsReadOnly)
@@ -793,7 +794,7 @@ namespace AstroModLoader
                 return;
             }
 
-            if (currentlySyncing)
+            if (CurrentlySyncing)
             {
                 this.ShowBasicButton("Please wait, the mod loader is currently busy syncing.", "OK", null, null);
                 return;
@@ -808,150 +809,30 @@ namespace AstroModLoader
 
             if (getIPPrompt.ShowDialog(this) == DialogResult.OK)
             {
-                syncErrored = false;
-                syncErrorMessage = "";
+                ServerSyncPopup waiting = new ServerSyncPopup();
+                waiting.StartPosition = FormStartPosition.Manual;
+                waiting.Location = new Point((this.Location.X + this.Width / 2) - (waiting.Width / 2), (this.Location.Y + this.Height / 2) - (waiting.Height / 2));
+                waiting.OurIP = getIPPrompt.OutputText.Trim();
+
+                syncErrored = true;
+                syncErrorMessage = "The syncing process halted prematurely!";
                 syncFailedDownloadCount = 0;
                 syncKosherProfileName = "";
 
-                Task.Run(() =>
+                waiting.ShowDialog(this);
+
+                CurrentlySyncing = false;
+                ModManager.SyncConfigToDisk();
+                TableManager.Refresh();
+
+                if (syncErrored)
                 {
-                    currentlySyncing = true;
-                    try
-                    {
-                        string ourIP = getIPPrompt.OutputText.Trim();
-
-                        AstroLauncherServerInfo serverInfo = PlayFabAPI.GetAstroLauncherData(ourIP);
-                        if (serverInfo == null)
-                        {
-                            syncErrored = true;
-                            syncErrorMessage = "Failed to find an online AstroLauncher server with the requested address!";
-                            return;
-                        }
-
-                        if (PlayFabAPI.Dirty)
-                        {
-                            ModManager.SyncConfigToDisk();
-                            PlayFabAPI.Dirty = false;
-                        }
-
-                        List<Mod> allMods = serverInfo.GetAllMods();
-                        string kosherServerName = serverInfo.ServerName;
-                        if (string.IsNullOrWhiteSpace(kosherServerName) || kosherServerName == "Astroneer Dedicated Server") kosherServerName = ourIP;
-
-                        ModProfile creatingProfile = new ModProfile();
-                        creatingProfile.ProfileData = new Dictionary<string, Mod>();
-                        int failedDownloadCount = 0;
-
-                        // Add our current mods into the brand new profile, and specify that they are disabled
-                        ModProfile currentProf = ModManager.GenerateProfile();
-                        List<Mod> plannedOrdering = new List<Mod>();
-                        foreach (KeyValuePair<string, Mod> entry in currentProf.ProfileData)
-                        {
-                            //entry.Value.Enabled = false;
-                            entry.Value.Enabled = entry.Value.CurrentModData.Sync == SyncMode.ClientOnly;
-                            creatingProfile.ProfileData[entry.Key] = entry.Value;
-                            plannedOrdering.Add(entry.Value);
-                        }
-
-                        plannedOrdering = new List<Mod>(plannedOrdering.OrderBy(o => o.Priority).ToList());
-
-                        // Incorporate newly synced index files into the global index
-                        List<string> DuplicateURLs = new List<string>();
-                        foreach (Mod mod in allMods)
-                        {
-                            if (mod.CurrentModData.Sync == SyncMode.ServerAndClient || mod.CurrentModData.Sync == SyncMode.ClientOnly)
-                            {
-                                IndexFile thisIndexFile = mod.GetIndexFile(DuplicateURLs);
-                                if (thisIndexFile != null)
-                                {
-                                    thisIndexFile.Mods.ToList().ForEach(x => ModManager.GlobalIndexFile[x.Key] = x.Value);
-                                    DuplicateURLs.Add(thisIndexFile.OriginalURL);
-                                }
-                            }
-                        }
-
-                        // Download server mods from the newly incorporated index files
-                        foreach (Mod mod in allMods)
-                        {
-                            if (mod.CurrentModData.Sync == SyncMode.ServerAndClient || mod.CurrentModData.Sync == SyncMode.ClientOnly)
-                            {
-                                Mod appliedMod = null;
-
-                                // If we already have this mod downloaded, no sense in downloading it again
-                                if (ModManager.ModLookup.ContainsKey(mod.CurrentModData.ModID) && ModManager.ModLookup[mod.CurrentModData.ModID].AvailableVersions != null && ModManager.ModLookup[mod.CurrentModData.ModID].AllModData.Keys.Where(m => m.ToString() == mod.InstalledVersion.ToString()).Count() > 0)
-                                {
-                                    appliedMod = (Mod)ModManager.ModLookup[mod.CurrentModData.ModID].Clone();
-                                    appliedMod.InstalledVersion = (Version)mod.InstalledVersion.Clone();
-                                    creatingProfile.ProfileData[mod.CurrentModData.ModID] = appliedMod;
-                                }
-                                else
-                                {
-                                    // Otherwise, go ahead and download it
-                                    bool didDownloadMod = DownloadVersionSync(mod, mod.InstalledVersion);
-                                    if (didDownloadMod)
-                                    {
-                                        appliedMod = mod;
-                                        creatingProfile.ProfileData[mod.CurrentModData.ModID] = appliedMod;
-                                    }
-                                    else
-                                    {
-                                        failedDownloadCount++;
-                                    }
-                                }
-
-                                if (appliedMod != null)
-                                {
-                                    appliedMod.Enabled = true;
-                                    appliedMod.ForceLatest = false;
-                                    plannedOrdering.Remove(appliedMod);
-                                    plannedOrdering.Insert(0, appliedMod);
-                                }
-                            }
-                        }
-
-                        // Update available versions list to make the syncing seamless
-                        ModManager.UpdateAvailableVersionsFromIndexFiles();
-
-                        // Enforce the planned ordering in our new profile
-                        for (int i = 0; i < plannedOrdering.Count; i++)
-                        {
-                            string thisModID = plannedOrdering[i].CurrentModData.ModID;
-                            if (creatingProfile.ProfileData.ContainsKey(thisModID)) creatingProfile.ProfileData[thisModID].Priority = i + 1;
-                        }
-
-                        // Add the new profile to the list
-                        if (ModManager.ProfileList == null) ModManager.ProfileList = new Dictionary<string, ModProfile>();
-                        string kosherProfileName = kosherServerName + " Synced Mods";
-                        ModManager.ProfileList[kosherProfileName] = creatingProfile;
-                        syncKosherProfileName = kosherProfileName;
-                        syncFailedDownloadCount = failedDownloadCount;
-                    }
-                    catch (Exception ex)
-                    {
-                        if (ex is PlayFabException || ex is WebException)
-                        {
-                            syncErrored = true;
-                            syncErrorMessage = "Failed to access PlayFab!";
-                            return;
-                        }
-                        syncErrored = true;
-                        syncErrorMessage = ex.ToString();
-                        return;
-                    }
-                }).ContinueWith(res =>
+                    this.ShowBasicButton(syncErrorMessage, "OK", null, null);
+                }
+                else
                 {
-                    if (syncErrored)
-                    {
-                        this.ShowBasicButton(syncErrorMessage, "OK", null, null);
-                    }
-                    else
-                    {
-                        this.ShowBasicButton("Added a new profile named \"" + syncKosherProfileName + "\".\n" + (syncFailedDownloadCount == 0 ? "No" : syncFailedDownloadCount.ToString()) + " mod" + (syncFailedDownloadCount == 1 ? "" : "s") + " failed to sync.", "OK", null, null);
-                    }
-                    ModManager.SyncConfigToDisk();
-                    TableManager.Refresh();
-                    currentlySyncing = false;
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                    this.ShowBasicButton("Added a new profile named \"" + syncKosherProfileName + "\".\n" + (syncFailedDownloadCount == 0 ? "No" : syncFailedDownloadCount.ToString()) + " mod" + (syncFailedDownloadCount == 1 ? "" : "s") + " failed to sync.", "OK", null, null);
+                }
             }
         }
     }

@@ -1,2 +1,3 @@
 ﻿* Reworked vertical resizing so that vertical resizing of the window increases the vertical size of the grid view.
+* Added a progress bar that displays while syncing with modded servers.
 * Fixed a bug where the profile selector window could be resized to any size.

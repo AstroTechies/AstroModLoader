@@ -82,6 +82,12 @@
     <Compile Include="IndependentConfig.cs" />
     <Compile Include="IndexFile.cs" />
     <Compile Include="PlayFabAPI.cs" />
+    <Compile Include="ServerSyncPopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ServerSyncPopup.Designer.cs">
+      <DependentUpon>ServerSyncPopup.cs</DependentUpon>
+    </Compile>
     <Compile Include="Server.cs" />
     <Compile Include="TextPrompt.cs">
       <SubType>Form</SubType>
@@ -113,6 +119,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ServerSyncPopup.resx">
+      <DependentUpon>ServerSyncPopup.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TextPrompt.resx">
       <DependentUpon>TextPrompt.cs</DependentUpon>
