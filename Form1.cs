@@ -692,7 +692,7 @@ namespace AstroModLoader
         {
             if (ModManager.CurrentlyAggregatingIndexFiles)
             {
-                this.ShowBasicButton("Please wait, the mod loader is currently fetching auto-update information.", "OK", null, null);
+                this.ShowBasicButton("Please wait for a few moments, the mod loader is currently fetching auto-update information.", "OK", null, null);
                 return;
             }
 

@@ -8,8 +8,11 @@ namespace AstroModLoader
 {
     public class Options
     {
-        [Option("server", Required = false, HelpText = "Specifies whether or not AstroModLoader is being ran for a server.")]
+        [Option("server", Required = false, HelpText = "Specifies that AstroModLoader is being ran for a server.")]
         public bool ServerMode { get; set; }
+
+        [Option("client", Required = false, HelpText = "Specifies that AstroModLoader is being ran for a client.")]
+        public bool ForceClient { get; set; }
 
         [Option("data", Required = false, HelpText = "Specifies the %localappdata% folder or the local equivalent of it.")]
         public string LocalDataPath { get; set; }
@@ -35,7 +38,8 @@ namespace AstroModLoader
             .WithParsed(o =>
             {
                 CommandLineOptions = o;
-                if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "AstroServer.exe"))) CommandLineOptions.ServerMode = true;
+                if (CommandLineOptions.ForceClient) CommandLineOptions.ServerMode = false;
+                else if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "AstroServer.exe"))) CommandLineOptions.ServerMode = true;
 
                 if (Environment.OSVersion.Version.Major >= 6) SetProcessDPIAware();
                 Application.EnableVisualStyles();
