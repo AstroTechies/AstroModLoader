@@ -23,16 +23,12 @@ namespace AstroModLoader
             using (Graphics g = CreateGraphics())
             {
                 SizeF sz = g.MeasureString(mainLabel.Text, mainLabel.Font);
-                this.Width = (int)Math.Ceiling(sz.Width) + 100;
-                mainLabel.Height = (int)Math.Ceiling(sz.Height) + 16;
-                this.Height = (int)Math.Ceiling(sz.Height) + 105;
+                this.Width = (int)(Math.Ceiling(sz.Width) * 1.4f);
+                mainLabel.Height = (int)Math.Ceiling(sz.Height) * 2;
+                this.Height = (int)Math.Ceiling(sz.Height) * 7;
             }
 
-            if (this.Owner is Form1 parentForm)
-            {
-                this.Text = parentForm.Text;
-            }
-
+            if (this.Owner is Form1 parentForm) this.Text = parentForm.Text;
             this.AdjustFormPosition();
             AMLPalette.RefreshTheme(this);
 
