@@ -25,7 +25,7 @@ namespace AstroModLoader
                 SizeF sz = g.MeasureString(mainLabel.Text, mainLabel.Font);
                 this.Width = (int)(Math.Ceiling(sz.Width) * 1.4f);
                 mainLabel.Height = (int)Math.Ceiling(sz.Height) * 2;
-                this.Height = (int)Math.Ceiling(sz.Height) * 7;
+                this.Height = mainLabel.Location.Y + mainLabel.Height + button1.Height * 3;
             }
 
             if (this.Owner is Form1 parentForm) this.Text = parentForm.Text;

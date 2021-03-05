@@ -155,7 +155,7 @@ namespace AstroModLoader
                             appliedMod.Enabled = true;
                             appliedMod.ForceLatest = false;
                             plannedOrdering.Remove(appliedMod);
-                            plannedOrdering.Insert(0, appliedMod);
+                            plannedOrdering.Add(appliedMod);
                         }
                     }
                 }
