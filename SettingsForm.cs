@@ -147,6 +147,7 @@ namespace AstroModLoader
 
             BaseForm.ModManager.ValidPlatformTypesToPaths[PlatformType.Custom] = correctedGamePath;
             BaseForm.ModManager.CustomBasePath = correctedLocalPath;
+            BaseForm.ModManager.RefreshAllPlatformsList();
             BaseForm.SwitchPlatform(PlatformType.Custom);
 
             this.UpdateLabels();

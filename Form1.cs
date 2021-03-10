@@ -595,8 +595,7 @@ namespace AstroModLoader
             dataGridView1.Width = modPanel.Width - dataGridView1.Location.X;
 
             int buttonHeight = footerPanel.Height / 2;
-            syncButton.Height = buttonHeight;
-            exitButton.Height = buttonHeight;
+            this.SetHeightOfAllButtonsInControl(buttonHeight);
             syncButton.Width = (int)(buttonHeight * 4.5);
             exitButton.Width = buttonHeight * 3;
 

@@ -110,6 +110,15 @@ namespace AstroModLoader
             return basicButtonPrompt.ResultButton;
         }
 
+        public static void SetHeightOfAllButtonsInControl(this Control ctrl, int height)
+        {
+            foreach (Control ctrl2 in ctrl.Controls)
+            {
+                if (ctrl2 is CoolButton butto) butto.Height = height;
+                SetHeightOfAllButtonsInControl(ctrl2, height);
+            }
+        }
+
         public static void RefreshAllButtonsInControl(this Control ctrl)
         {
             foreach (Control ctrl2 in ctrl.Controls)
