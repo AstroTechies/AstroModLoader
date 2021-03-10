@@ -10,7 +10,9 @@ namespace AstroModLoader
         [EnumMember(Value = "dark")]
         Dark,
         [EnumMember(Value = "light")]
-        Light
+        Light,
+        [EnumMember(Value = "blue")]
+        Blue
     }
 
     public static class AMLPalette
@@ -65,11 +67,20 @@ namespace AstroModLoader
                 case ModLoaderTheme.Light:
                     BackColor = Color.FromArgb(255, 255, 255);
                     ButtonBackColor = Color.FromArgb(240, 240, 240);
-                    ForeColor = Color.FromArgb(25, 25, 25);
+                    ForeColor = Color.FromArgb(41, 41, 41);
                     FooterColor = Color.FromArgb(245, 245, 245);
                     FooterLineColor = Color.FromArgb(230, 230, 230);
                     DropDownBackgroundColor = Color.FromArgb(220, 220, 220);
                     HighlightColor = Color.FromArgb(210, 210, 210);
+                    break;
+                case ModLoaderTheme.Blue:
+                    BackColor = Color.FromArgb(37, 46, 61);
+                    ButtonBackColor = Color.FromArgb(49, 61, 81);
+                    ForeColor = Color.FromArgb(225, 225, 225);
+                    FooterColor = Color.FromArgb(31, 38, 51);
+                    FooterLineColor = Color.FromArgb(59, 73, 96);
+                    DropDownBackgroundColor = Color.FromArgb(49, 61, 81);
+                    HighlightColor = Color.FromArgb(61, 81, 112);
                     break;
             }
 

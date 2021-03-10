@@ -1,4 +1,5 @@
-﻿* Reworked vertical resizing so that vertical resizing of the window increases the vertical size of the grid view.
+﻿* Added a new mod loader theme called "Blue."
+* Reworked vertical resizing so that vertical resizing of the window increases the vertical size of the grid view.
 * Added a progress bar that displays while syncing with modded servers.
 * Added the --client parameter, which forces the mod loader to disable server mode.
 * Fixed a bug where only a portion of highlighted row would properly change color.
