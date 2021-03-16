@@ -32,8 +32,8 @@ namespace AstroModLoader
         {
             gamePathBox.Text = BaseForm.ModManager.GamePath;
             localPathBox.Text = BaseForm.ModManager.BasePath;
-            versionLabel.Text = BaseForm.ModManager.InstalledAstroBuild?.ToString() ?? "Unknown";
-            versionLabel.ForeColor = BaseForm.ModManager.MismatchedSteamworksDLL ? AMLPalette.LinkColor : AMLPalette.ForeColor;
+            versionLabel.Text = (BaseForm.ModManager.InstalledAstroBuild?.ToString() ?? "Unknown") + (BaseForm.ModManager.MismatchedSteamworksDLL ? "\n(Pirated?)" : "");
+            versionLabel.ForeColor = BaseForm.ModManager.MismatchedSteamworksDLL ? AMLPalette.WarningColor : AMLPalette.ForeColor;
 
             if (Program.CommandLineOptions.ServerMode)
             {

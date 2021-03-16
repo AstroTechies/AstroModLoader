@@ -129,7 +129,7 @@
             this.platformComboBox.FormattingEnabled = true;
             this.platformComboBox.Location = new System.Drawing.Point(153, 42);
             this.platformComboBox.Name = "platformComboBox";
-            this.platformComboBox.Size = new System.Drawing.Size(121, 21);
+            this.platformComboBox.Size = new System.Drawing.Size(151, 21);
             this.platformComboBox.TabIndex = 10;
             this.platformComboBox.SelectedIndexChanged += new System.EventHandler(this.platformComboBox_SelectedIndexChanged);
             // 
@@ -205,7 +205,7 @@
             // 
             this.versionLabel.AutoSize = true;
             this.versionLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.versionLabel.Location = new System.Drawing.Point(280, 45);
+            this.versionLabel.Location = new System.Drawing.Point(13, 9);
             this.versionLabel.Name = "versionLabel";
             this.versionLabel.Size = new System.Drawing.Size(58, 15);
             this.versionLabel.TabIndex = 14;

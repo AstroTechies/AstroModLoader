@@ -185,6 +185,7 @@ namespace AstroModLoader
         }
 
         private static Regex acfEntryReader = new Regex(@"\s+""(\w+)""\s+""([\w ]+)""", RegexOptions.Compiled);
+        private static Regex isInvalidVdfEntry = new Regex(@"[^""\d]", RegexOptions.Compiled);
         private string CheckRegistryForSteamPath(int appID)
         {
             string decidedSteamPath = null;
@@ -208,14 +209,15 @@ namespace AstroModLoader
 
             List<string> potentialInstallDirs = new List<string>();
             potentialInstallDirs.Add(decidedSteamPath);
-            using (StreamReader f = new StreamReader(Path.Combine(decidedSteamPath, "config", "config.vdf")))
+            using (StreamReader f = new StreamReader(Path.Combine(decidedSteamPath, "steamapps", "libraryfolders.vdf")))
             {
                 string vdfEntry = null;
                 while ((vdfEntry = f.ReadLine()) != null)
                 {
-                    if (vdfEntry.Contains("BaseInstallFolder_"))
+                    string[] goodEntry = vdfEntry.Trim().Replace("		", " ").Split(' ');
+                    if (goodEntry.Length == 2 && !isInvalidVdfEntry.IsMatch(goodEntry[0]))
                     {
-                        potentialInstallDirs.Add(vdfEntry.Trim().Replace("		", " ").Split(' ')[1].Replace(@"\\", @"\").Replace("\"", ""));
+                        potentialInstallDirs.Add(goodEntry[1].Replace(@"\\", @"\").Replace("\"", ""));
                     }
                 }
             }
@@ -366,15 +368,15 @@ namespace AstroModLoader
                 {
                     BasePath = Path.Combine(GamePath != null ? GamePath : Directory.GetCurrentDirectory(), "Astro");
                 }
-                else if (Environment.GetEnvironmentVariable("LocalAppData") != null)
+                else if (Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) != null)
                 {
                     switch(Platform)
                     {
                         case PlatformType.Steam:
-                            BasePath = Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Astro");
+                            BasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Astro");
                             break;
                         case PlatformType.Win10:
-                            BasePath = Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), "Packages", "SystemEraSoftworks.29415440E1269_ftk5pbg2rayv2", "LocalState", "Astro");
+                            BasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Packages", "SystemEraSoftworks.29415440E1269_ftk5pbg2rayv2", "LocalState", "Astro");
                             break;
                     }
                 }

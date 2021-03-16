@@ -208,6 +208,12 @@ namespace AstroModLoader
             this.modInfo.LinkArea = newLinkArea;
         }
 
+        public void UpdateVersionLabel()
+        {
+            headerLabel.Text = "Mods (" + (ModManager.InstalledAstroBuild?.ToString() ?? "Unknown") + (ModManager.MismatchedSteamworksDLL ? " Pirated?" : "") + "):";
+            headerLabel.ForeColor = ModManager.MismatchedSteamworksDLL ? AMLPalette.WarningColor : AMLPalette.ForeColor;
+        }
+
         public void SwitchPlatform(PlatformType newPlatform)
         {
             if (!ModManager.ValidPlatformTypesToPaths.ContainsKey(newPlatform)) return;
@@ -223,6 +229,7 @@ namespace AstroModLoader
             ModManager.SyncModsFromDisk();
             ModManager.SyncDependentConfigToDisk();
             FullRefresh();
+            UpdateVersionLabel();
         }
 
         private void Form1_DragEnter(object sender, DragEventArgs e)
@@ -685,6 +692,8 @@ namespace AstroModLoader
 
             AMLUtils.InvokeUI(ForceResize);
             AMLUtils.InvokeUI(ForceResize);
+
+            UpdateVersionLabel();
         }
 
         private void playButton_Click(object sender, EventArgs e)

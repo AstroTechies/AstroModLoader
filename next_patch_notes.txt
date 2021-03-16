@@ -1,9 +1,2 @@
-﻿* Added a new mod loader theme called "Blue."
-* Reworked vertical resizing so that vertical resizing of the window increases the vertical size of the grid view.
-* Added a progress bar that displays while syncing with modded servers.
-* Added the --client parameter, which forces the mod loader to disable server mode.
-* Fixed a bug where only a portion of highlighted row would properly change color.
-* Fixed a bug where the mod loader would crash when attempting to set a custom path for the first time.
-* Fixed a bug where the priority of synced mods would be in the wrong order.
-* Fixed a bug where the basic button popup would be an improper height on some machines.
-* Fixed a bug where the profile selector window could be resized to any size.
+﻿* Re-worked the alternate Steam library detection system.
+* Moved the game version indicator in the settings menu, and clarified the Steamworks DLL mismatch display.
