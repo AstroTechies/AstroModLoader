@@ -3,12 +3,13 @@ using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -33,7 +34,7 @@ namespace AstroModLoader
         public Dictionary<string, ModProfile> ProfileList;
         public Dictionary<string, IndexMod> GlobalIndexFile;
         public Version InstalledAstroBuild = null;
-        public bool IsReadOnly = false;
+        public volatile bool IsReadOnly = false;
 
         public ModHandler(Form1 baseForm)
         {
@@ -910,20 +911,16 @@ namespace AstroModLoader
         public static ModIntegrator OurIntegrator;
         public void IntegrateMods()
         {
-            AMLUtils.InvokeUI(() =>
+            if (IsReadOnly || GamePath == null || InstallPath == null) return;
+
+            List<string> optionalMods = new List<string>();
+            foreach (Mod mod in Mods)
             {
-                if (IsReadOnly) return;
-                if (GamePath == null || InstallPath == null) return;
+                if (mod.Enabled && mod.IsOptional) optionalMods.Add(mod.CurrentModData.ModID);
+            }
 
-                List<string> optionalMods = new List<string>();
-                foreach (Mod mod in Mods)
-                {
-                    if (mod.Enabled && mod.IsOptional) optionalMods.Add(mod.CurrentModData.ModID);
-                }
-
-                if (TableHandler.ShouldContainOptionalColumn()) OurIntegrator.OptionalModIDs = optionalMods;
-                OurIntegrator.IntegrateMods(InstallPath, Path.Combine(GamePath, "Astro", "Content", "Paks"));
-            });
+            if (TableHandler.ShouldContainOptionalColumn()) OurIntegrator.OptionalModIDs = optionalMods;
+            OurIntegrator.IntegrateMods(InstallPath, Path.Combine(GamePath, "Astro", "Content", "Paks"));
         }
 
         public void RefreshAllPriorites()
@@ -977,33 +974,37 @@ namespace AstroModLoader
             }
         }
 
-        private bool currentlyUpdating = false;
-        public void FullUpdate()
+        private volatile ManualResetEvent fullUpdateWaitHandler = new ManualResetEvent(true);
+        public Task FullUpdate()
         {
-            if (currentlyUpdating) return;
-            currentlyUpdating = true;
-
-            UpdateReadOnlyStatus();
-            try
+            return Task.Run(() =>
             {
-                Directory.CreateDirectory(DownloadPath);
-                Directory.CreateDirectory(InstallPath);
+                fullUpdateWaitHandler.WaitOne(10000);
+                fullUpdateWaitHandler.Reset();
 
-                SyncConfigToDisk();
-                SyncModsToDisk();
-                IntegrateMods();
-            }
-            catch (Exception ex)
-            {
-                currentlyUpdating = false;
-                if (ex is IOException || ex is FileNotFoundException)
+                UpdateReadOnlyStatus();
+                try
                 {
-                    IsReadOnly = true;
-                    return;
+                    Directory.CreateDirectory(DownloadPath);
+                    Directory.CreateDirectory(InstallPath);
+
+                    SyncConfigToDisk();
+                    SyncModsToDisk();
+                    IntegrateMods();
                 }
-                throw;
-            }
-            currentlyUpdating = false;
+                catch (Exception ex)
+                {
+                    fullUpdateWaitHandler.Set();
+                    if (ex is IOException || ex is FileNotFoundException)
+                    {
+                        IsReadOnly = true;
+                        return;
+                    }
+                    throw;
+                }
+
+                fullUpdateWaitHandler.Set();
+            });
         }
     }
 }

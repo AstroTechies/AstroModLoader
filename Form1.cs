@@ -376,10 +376,7 @@ namespace AstroModLoader
                     }
                 }
 
-                Task.Run(() =>
-                {
-                    ModManager.FullUpdate();
-                });
+                ModManager.FullUpdate();
 
                 AMLUtils.InvokeUI(() =>
                 {
@@ -474,11 +471,8 @@ namespace AstroModLoader
                         dataGridView1.CurrentCell = dataGridView1.Rows[newModIndex].Cells[0];
                         selectedMod = ModManager.Mods[newModIndex];
 
-                        Task.Run(() =>
-                        {
-                            foreach (Mod mod in ModManager.Mods) mod.Dirty = true; // Update all the priorities on disk to be safe
-                            ModManager.FullUpdate();
-                        });
+                        foreach (Mod mod in ModManager.Mods) mod.Dirty = true; // Update all the priorities on disk to be safe
+                        ModManager.FullUpdate();
                     });
                 }
             }
@@ -684,9 +678,6 @@ namespace AstroModLoader
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());
 
-            // Force an update for good measure
-            ModManager.FullUpdate();
-
             // Initial resize of the menu to fit the table if necessary
             AMLUtils.InvokeUI(ForceTableToFit);
 
@@ -696,7 +687,7 @@ namespace AstroModLoader
             UpdateVersionLabel();
         }
 
-        private void playButton_Click(object sender, EventArgs e)
+        private async void playButton_Click(object sender, EventArgs e)
         {
             if (ModManager.CurrentlyAggregatingIndexFiles)
             {
@@ -704,8 +695,7 @@ namespace AstroModLoader
                 return;
             }
 
-            ModManager.FullUpdate();
-            
+            await ModManager.FullUpdate();
             if (!Program.CommandLineOptions.ServerMode)
             {
                 if (ModManager.Platform == PlatformType.Steam)

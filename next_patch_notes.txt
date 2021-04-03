@@ -1,2 +1,3 @@
 ﻿* Re-worked the alternate Steam library detection system.
 * Moved the game version indicator in the settings menu, and clarified the Steamworks DLL mismatch display.
+* Upgraded the AstroModIntegrator version to 1.3.0.0.
