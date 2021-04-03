@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AstroModLoader
@@ -133,7 +134,7 @@ namespace AstroModLoader
             ForceRefreshSelectedProfile();
         }
 
-        private void ForceLoadSelectedProfile()
+        private async Task ForceLoadSelectedProfile()
         {
             if (SelectedProfile == null)
             {
@@ -141,20 +142,20 @@ namespace AstroModLoader
                 return;
             }
             OurParentForm.ModManager.ApplyProfile(SelectedProfile);
-            OurParentForm.ModManager.FullUpdate();
+            await OurParentForm.ModManager.FullUpdate();
             OurParentForm.FullRefresh();
             statusLabel.Text = "Successfully loaded from profile.";
             ForceRefreshSelectedProfile();
         }
 
-        private void listBox1_DoubleClick(object sender, EventArgs e)
+        private async void listBox1_DoubleClick(object sender, EventArgs e)
         {
-            ForceLoadSelectedProfile();
+            await ForceLoadSelectedProfile();
         }
 
-        private void okButton_Click(object sender, EventArgs e)
+        private async void okButton_Click(object sender, EventArgs e)
         {
-            ForceLoadSelectedProfile();
+            await ForceLoadSelectedProfile();
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
@@ -219,10 +220,10 @@ namespace AstroModLoader
             ForceRefreshSelectedProfile();
         }
 
-        private void listBox1_KeyDown(object sender, KeyEventArgs e)
+        private async void listBox1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Delete) ForceDeleteProfilePrompt();
-            if (e.KeyCode == Keys.Enter) ForceLoadSelectedProfile();
+            if (e.KeyCode == Keys.Enter) await ForceLoadSelectedProfile();
         }
 
         private void deleteProfileButton_Click(object sender, EventArgs e)

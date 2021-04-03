@@ -126,7 +126,7 @@ namespace AstroModLoader
             {
                 mod.Dirty = true;
             }
-            FullUpdate();
+            FullUpdateSynchronous();
             SortMods();
             RefreshAllPriorites();
             SyncConfigToDisk();
@@ -974,37 +974,40 @@ namespace AstroModLoader
             }
         }
 
-        private volatile ManualResetEvent fullUpdateWaitHandler = new ManualResetEvent(true);
+        private Semaphore ourFullUpdateSemaphore = new Semaphore(1, 1);
         public Task FullUpdate()
         {
             return Task.Run(() =>
             {
-                fullUpdateWaitHandler.WaitOne(10000);
-                fullUpdateWaitHandler.Reset();
-
-                UpdateReadOnlyStatus();
-                try
-                {
-                    Directory.CreateDirectory(DownloadPath);
-                    Directory.CreateDirectory(InstallPath);
-
-                    SyncConfigToDisk();
-                    SyncModsToDisk();
-                    IntegrateMods();
-                }
-                catch (Exception ex)
-                {
-                    fullUpdateWaitHandler.Set();
-                    if (ex is IOException || ex is FileNotFoundException)
-                    {
-                        IsReadOnly = true;
-                        return;
-                    }
-                    throw;
-                }
-
-                fullUpdateWaitHandler.Set();
+                ourFullUpdateSemaphore.WaitOne(10000);
+                FullUpdateSynchronous(true);
             });
+        }
+
+        public void FullUpdateSynchronous(bool releaseSemaphore = false)
+        {
+            UpdateReadOnlyStatus();
+            try
+            {
+                Directory.CreateDirectory(DownloadPath);
+                Directory.CreateDirectory(InstallPath);
+
+                SyncConfigToDisk();
+                SyncModsToDisk();
+                IntegrateMods();
+            }
+            catch (Exception ex)
+            {
+                if (releaseSemaphore) ourFullUpdateSemaphore.Release();
+                if (ex is IOException || ex is FileNotFoundException)
+                {
+                    IsReadOnly = true;
+                    return;
+                }
+                throw;
+            }
+
+            if (releaseSemaphore) ourFullUpdateSemaphore.Release();
         }
     }
 }

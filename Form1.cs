@@ -320,7 +320,7 @@ namespace AstroModLoader
             return outputs;
         }
 
-        private void Form1_DragDrop(object sender, DragEventArgs e)
+        private async void Form1_DragDrop(object sender, DragEventArgs e)
         {
             string[] installingModPaths = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (installingModPaths.Length > 0)
@@ -376,7 +376,7 @@ namespace AstroModLoader
                     }
                 }
 
-                ModManager.FullUpdate();
+                await ModManager.FullUpdate();
 
                 AMLUtils.InvokeUI(() =>
                 {
