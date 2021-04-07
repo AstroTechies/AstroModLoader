@@ -200,6 +200,12 @@ namespace AstroModLoader
 
         public void AdjustModInfoText(string txt, string linkText = "")
         {
+            if (txt == "")
+            {
+                AdjustModInfoText("Drop a .pak file onto this window to install a mod.\n\nOnce you're ready to use your enabled mods, press the \"Play\" button below to apply your mods and start playing.");
+                return;
+            }
+
             string newTextFull = txt + linkText;
             var newLinkArea = new LinkArea(txt.Length, linkText.Length);
             if (this.modInfo.Text == newTextFull && this.modInfo.LinkArea.Start == newLinkArea.Start && this.modInfo.LinkArea.Length == newLinkArea.Length) return; // Partial fix for winforms rendering issue
@@ -225,8 +231,8 @@ namespace AstroModLoader
             ModManager.ApplyGamePathDerivatives();
             ModManager.VerifyIntegrity();
             ModManager.SyncIndependentConfigToDisk();
-            ModManager.SyncDependentConfigFromDisk(false);
             ModManager.SyncModsFromDisk();
+            ModManager.SyncDependentConfigFromDisk(false);
             ModManager.SyncDependentConfigToDisk();
             FullRefresh();
             UpdateVersionLabel();
@@ -685,6 +691,7 @@ namespace AstroModLoader
             AMLUtils.InvokeUI(ForceResize);
 
             UpdateVersionLabel();
+            RefreshModInfoLabel();
         }
 
         private async void playButton_Click(object sender, EventArgs e)
@@ -832,6 +839,11 @@ namespace AstroModLoader
                     this.ShowBasicButton("Added a new profile named \"" + syncKosherProfileName + "\".\n" + (syncFailedDownloadCount == 0 ? "No" : syncFailedDownloadCount.ToString()) + " mod" + (syncFailedDownloadCount == 1 ? "" : "s") + " failed to sync.", "OK", null, null);
                 }
             }
+        }
+
+        private void dataGridView1_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+            if (TableManager != null) AMLUtils.InvokeUI(() => TableManager.PaintCell(sender, e));
         }
     }
 }

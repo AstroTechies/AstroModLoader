@@ -161,5 +161,29 @@ namespace AstroModLoader
 
             this.UpdateLabels();
         }
+
+        private static string AboutText;
+        private void aboutButton_Click(object sender, EventArgs e)
+        {
+            AboutText = "AstroModLoader v" + Application.ProductVersion + "\n" +
+            "By AstroTechies\n" +
+            "\nThanks to the folks in the Astroneer Modding Discord community for their contributions\n" +
+            "\nThanks to you for making this little modding venture what it is\n";
+
+            var formPopup = new AboutPopup();
+            formPopup.StartPosition = FormStartPosition.CenterParent;
+
+            formPopup.Controls.Add(new Label()
+            {
+                AutoSize = false,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Dock = DockStyle.Fill,
+                Text = AboutText,
+                Font = new Font(this.Font.FontFamily, 10)
+            });
+
+            AMLPalette.RefreshTheme(formPopup);
+            formPopup.ShowDialog(this);
+        }
     }
 }

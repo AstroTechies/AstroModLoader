@@ -58,6 +58,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AboutPopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AboutPopup.Designer.cs">
+      <DependentUpon>AboutPopup.cs</DependentUpon>
+    </Compile>
     <Compile Include="AMLPalette.cs" />
     <Compile Include="AMLUtils.cs" />
     <Compile Include="BasicButtonPopup.cs">
@@ -114,6 +120,9 @@
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="TableHandler.cs" />
+    <EmbeddedResource Include="AboutPopup.resx">
+      <DependentUpon>AboutPopup.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="BasicButtonPopup.resx">
       <DependentUpon>BasicButtonPopup.cs</DependentUpon>
     </EmbeddedResource>

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 
 namespace AstroModLoader
 {
@@ -37,6 +36,19 @@ namespace AstroModLoader
         {
             GridView = gridView;
             ModManager = modManager;
+        }
+
+        internal void PaintCell(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+            if (e.ColumnIndex > -1 && e.RowIndex > -1 && GridView.Columns[e.ColumnIndex] is DataGridViewCheckBoxColumn && GridView[e.ColumnIndex, e.RowIndex].ReadOnly && e.Value != null)
+            {
+                Size normalCheckSize = CheckBoxRenderer.GetGlyphSize(e.Graphics, CheckBoxState.CheckedNormal);
+                e.Handled = true;
+                e.PaintBackground(e.CellBounds, true);
+
+                Point newGlyphLocation = new Point(e.CellBounds.X + e.CellBounds.Width / 2 - normalCheckSize.Width / 2, e.CellBounds.Y + e.CellBounds.Height / 2 - normalCheckSize.Height / 2);
+                CheckBoxRenderer.DrawCheckBox(e.Graphics, newGlyphLocation, (bool)e.Value ? CheckBoxState.CheckedDisabled : CheckBoxState.UncheckedDisabled);
+            }
         }
 
         private void AddColumns(List<ColumnData> ourColumns)
@@ -116,7 +128,7 @@ namespace AstroModLoader
 
             if (ModManager.Mods.Count == 0)
             {
-                ModManager.BaseForm.AdjustModInfoText("You have no mods installed! Drop a .pak file onto this window to install a mod.");
+                ModManager.BaseForm.AdjustModInfoText("");
                 return;
             }
 
@@ -144,8 +156,6 @@ namespace AstroModLoader
                     if (ModManager.IsReadOnly)
                     {
                         checkCell.ReadOnly = true;
-                        checkCell.ThreeState = true;
-                        checkCell.Value = 2;
                     }
                 }
 
@@ -199,8 +209,6 @@ namespace AstroModLoader
                         if (ModManager.IsReadOnly || mod.CurrentModData.Sync != AstroModIntegrator.SyncMode.ServerAndClient)
                         {
                             checkCell2.ReadOnly = true;
-                            checkCell2.ThreeState = true;
-                            checkCell2.Value = 2;
                         }
                     }
                 }

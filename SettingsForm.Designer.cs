@@ -44,6 +44,7 @@
             this.setPathButton2 = new AstroModLoader.CoolButton();
             this.versionLabel = new System.Windows.Forms.Label();
             this.refuseMismatchedConnectionsCheckbox = new System.Windows.Forms.CheckBox();
+            this.aboutButton = new AstroModLoader.CoolButton();
             this.SuspendLayout();
             // 
             // label1
@@ -141,7 +142,7 @@
             this.exitButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.exitButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.exitButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.exitButton.Location = new System.Drawing.Point(16, 189);
+            this.exitButton.Location = new System.Drawing.Point(12, 211);
             this.exitButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.exitButton.Name = "exitButton";
             this.exitButton.Size = new System.Drawing.Size(75, 26);
@@ -213,10 +214,9 @@
             // 
             // refuseMismatchedConnectionsCheckbox
             // 
-            this.refuseMismatchedConnectionsCheckbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.refuseMismatchedConnectionsCheckbox.AutoSize = true;
             this.refuseMismatchedConnectionsCheckbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.refuseMismatchedConnectionsCheckbox.Location = new System.Drawing.Point(196, 192);
+            this.refuseMismatchedConnectionsCheckbox.Location = new System.Drawing.Point(153, 175);
             this.refuseMismatchedConnectionsCheckbox.Name = "refuseMismatchedConnectionsCheckbox";
             this.refuseMismatchedConnectionsCheckbox.Size = new System.Drawing.Size(205, 19);
             this.refuseMismatchedConnectionsCheckbox.TabIndex = 15;
@@ -224,12 +224,30 @@
             this.refuseMismatchedConnectionsCheckbox.UseVisualStyleBackColor = true;
             this.refuseMismatchedConnectionsCheckbox.CheckedChanged += new System.EventHandler(this.refuseMismatchedConnectionsCheckbox_CheckedChanged);
             // 
+            // aboutButton
+            // 
+            this.aboutButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.aboutButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
+            this.aboutButton.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(231)))), ((int)(((byte)(149)))));
+            this.aboutButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.aboutButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.aboutButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
+            this.aboutButton.Location = new System.Drawing.Point(326, 211);
+            this.aboutButton.MinimumSize = new System.Drawing.Size(0, 26);
+            this.aboutButton.Name = "aboutButton";
+            this.aboutButton.Size = new System.Drawing.Size(75, 26);
+            this.aboutButton.TabIndex = 17;
+            this.aboutButton.Text = "About...";
+            this.aboutButton.UseVisualStyleBackColor = false;
+            this.aboutButton.Click += new System.EventHandler(this.aboutButton_Click);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(42)))), ((int)(((byte)(45)))));
-            this.ClientSize = new System.Drawing.Size(413, 227);
+            this.ClientSize = new System.Drawing.Size(413, 249);
+            this.Controls.Add(this.aboutButton);
             this.Controls.Add(this.refuseMismatchedConnectionsCheckbox);
             this.Controls.Add(this.versionLabel);
             this.Controls.Add(this.setPathButton2);
@@ -275,5 +293,6 @@
         private CoolButton setPathButton2;
         private System.Windows.Forms.Label versionLabel;
         private System.Windows.Forms.CheckBox refuseMismatchedConnectionsCheckbox;
+        private CoolButton aboutButton;
     }
 }
