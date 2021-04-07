@@ -20,12 +20,21 @@ AstroModLoader includes the following features and more:
 ## Usage
 To run a local copy of AstroModLoader, visit the [Releases tab](https://github.com/AstroTechies/AstroModLoader/releases) to download the executable, or clone the repository and build AstroModLoader yourself within Visual Studio.
 
+### Mod Installation
+To install mods, drag and drop the .zip or the .pak file of your mod onto the AstroModLoader window while it is running.
+
+Alternatively, on Steam, you can also manually add mods for use with AstroModLoader by placing them into the `%localappdata%\Astro\Saved\Mods` directory.
+On the Windows Store, you can place them into the `%localappdata%\Packages\SystemEraSoftworks.29415440E1269_ftk5pbg2rayv2\LocalState\Astro\Saved\Mods` directory.
+
+You are free to join the Astroneer Modding Discord community to learn more about using or creating Astroneer mods: https://discord.gg/bBqdVYxu4k
+
 ### Usage Notes
 AstroModLoader features a fully-functional set of hotkeys to fully control your mods list. Below is a list of keyboard commands to manipulate the list of mods:
 * DEL deletes all versions of the currently selected mod.
 * ALT+DEL deletes all versions of the currently selected mod except for the newest from disk.
 * SHIFT+UP and SHIFT+DOWN adjust the position of the currently selected mod. Mods at the top of the list (low priority) are loaded by the game before mods at the bottom of the list (high priority).
-* ESC de-selects the current row in the mod list.
+
+[//]: # (* ESC de-selects the current row in the mod list.)
 
 Additionally, the following keyboard commands can be used within the profile selector:
 * DEL deletes the current profile.
@@ -34,14 +43,6 @@ Additionally, the following keyboard commands can be used within the profile sel
 Additionally, the following keyboard commands can be used within popup windows:
 * ENTER and ESC can be used within confirmation windows to select "Yes" or "No" respectively, and "OK" or "Cancel" respectively in text input windows.
 * TAB can be used to switch selection between buttons. ENTER can then be used to press the currently selected button.
-
-### Mod Installation
-To install mods, drag and drop the .zip or the .pak file of your mod onto the AstroModLoader window while it is running.
-
-Alternatively, on Steam, you can also manually add mods for use with AstroModLoader by placing them into the `%localappdata%\Astro\Saved\Mods` directory.
-On the Windows Store, you can place them into the `%localappdata%\Packages\SystemEraSoftworks.29415440E1269_ftk5pbg2rayv2\LocalState\Astro\Saved\Mods` directory.
-
-You are free to join the Astroneer Modding Discord community to learn more about using or creating Astroneer mods: https://discord.gg/bBqdVYxu4k
 
 ## Prerequisites
 * .NET Framework 4.6.1
