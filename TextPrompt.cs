@@ -75,7 +75,7 @@ namespace AstroModLoader
             }
         }
 
-        private void okButton_Click(object sender, EventArgs e)
+        private void RunOKButton()
         {
             if (AllowBrowse && !AMLUtils.IsValidPath(gamePathBox.Text))
             {
@@ -92,11 +92,33 @@ namespace AstroModLoader
             }
         }
 
-        private void cancelButton_Click(object sender, EventArgs e)
+        private void okButton_Click(object sender, EventArgs e)
+        {
+            RunOKButton();
+        }
+
+        private void RunCancelButton()
         {
             OutputText = null;
             this.DialogResult = DialogResult.Cancel;
             this.Close();
+        }
+
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
+            RunCancelButton();
+        }
+
+        private void TextPrompt_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Return)
+            {
+                RunOKButton();
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                RunCancelButton();
+            }
         }
     }
 }

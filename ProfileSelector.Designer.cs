@@ -71,7 +71,7 @@
             this.saveButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.saveButton.Name = "saveButton";
             this.saveButton.Size = new System.Drawing.Size(60, 26);
-            this.saveButton.TabIndex = 7;
+            this.saveButton.TabIndex = 3;
             this.saveButton.Text = "Save";
             this.saveButton.UseVisualStyleBackColor = false;
             this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
@@ -88,7 +88,7 @@
             this.deleteProfileButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.deleteProfileButton.Name = "deleteProfileButton";
             this.deleteProfileButton.Size = new System.Drawing.Size(61, 26);
-            this.deleteProfileButton.TabIndex = 6;
+            this.deleteProfileButton.TabIndex = 5;
             this.deleteProfileButton.Text = "Delete";
             this.deleteProfileButton.UseVisualStyleBackColor = false;
             this.deleteProfileButton.Click += new System.EventHandler(this.deleteProfileButton_Click);
@@ -105,7 +105,7 @@
             this.newProfileButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.newProfileButton.Name = "newProfileButton";
             this.newProfileButton.Size = new System.Drawing.Size(60, 26);
-            this.newProfileButton.TabIndex = 5;
+            this.newProfileButton.TabIndex = 4;
             this.newProfileButton.Text = "New...";
             this.newProfileButton.UseVisualStyleBackColor = false;
             this.newProfileButton.Click += new System.EventHandler(this.newProfileButton_Click);
@@ -122,7 +122,7 @@
             this.cancelButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(65, 26);
-            this.cancelButton.TabIndex = 3;
+            this.cancelButton.TabIndex = 6;
             this.cancelButton.Text = "Close";
             this.cancelButton.UseVisualStyleBackColor = false;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);

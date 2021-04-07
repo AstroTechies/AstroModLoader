@@ -974,12 +974,12 @@ namespace AstroModLoader
             }
         }
 
-        private Semaphore ourFullUpdateSemaphore = new Semaphore(1, 1);
+        private Semaphore fullUpdateSemaphore = new Semaphore(1, 1);
         public Task FullUpdate()
         {
             return Task.Run(() =>
             {
-                ourFullUpdateSemaphore.WaitOne(10000);
+                if (!fullUpdateSemaphore.WaitOne(10000)) return;
                 FullUpdateSynchronous(true);
             });
         }
@@ -998,7 +998,7 @@ namespace AstroModLoader
             }
             catch (Exception ex)
             {
-                if (releaseSemaphore) ourFullUpdateSemaphore.Release();
+                if (releaseSemaphore) fullUpdateSemaphore.Release();
                 if (ex is IOException || ex is FileNotFoundException)
                 {
                     IsReadOnly = true;
@@ -1007,7 +1007,7 @@ namespace AstroModLoader
                 throw;
             }
 
-            if (releaseSemaphore) ourFullUpdateSemaphore.Release();
+            if (releaseSemaphore) fullUpdateSemaphore.Release();
         }
     }
 }

@@ -9,6 +9,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -68,7 +69,6 @@ namespace AstroModLoader
             autoUpdater.RunWorkerAsync();
         }
 
-        // Async operations
         private BackgroundWorker autoUpdater;
 
         private void AutoUpdater_DoWork(object sender, DoWorkEventArgs e)
@@ -140,12 +140,14 @@ namespace AstroModLoader
             thisMod.Dirty = true;
         }
 
-        // The rest
-        private void ForceUpdateCells()
+        private Semaphore updateCellsSemaphore = new Semaphore(1, 1);
+        private async Task ForceUpdateCells()
         {
-            Task.Run(() =>
+            await Task.Run(() =>
             {
                 if (ModManager.IsReadOnly) return;
+
+                if (!updateCellsSemaphore.WaitOne(5000)) return;
                 foreach (DataGridViewRow row in this.dataGridView1.Rows)
                 {
                     if (row.Tag is Mod taggedMod)
@@ -172,10 +174,11 @@ namespace AstroModLoader
                     }
                 }
                 ModManager.FullUpdate();
+                updateCellsSemaphore.Release();
             }).ContinueWith(res =>
             {
-                TableManager.Refresh();
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+                AMLUtils.InvokeUI(TableManager.Refresh);
+            });
         }
 
         private volatile bool IsAllDirty = false;
@@ -184,12 +187,12 @@ namespace AstroModLoader
             IsAllDirty = true;
         }
 
-        private void CheckAllDirty_Tick(object sender, EventArgs e)
+        private async void CheckAllDirty_Tick(object sender, EventArgs e)
         {
             if (IsAllDirty)
             {
-                ForceUpdateCells();
                 IsAllDirty = false;
+                await ForceUpdateCells();
             }
         }
 
@@ -492,44 +495,51 @@ namespace AstroModLoader
         {
             Mod selectedMod = TableManager.GetCurrentlySelectedMod();
 
-            if (selectedMod != null && !ModManager.IsReadOnly && e.KeyCode == Keys.Delete)
+            switch(e.KeyCode)
             {
-                if (e.Alt)
-                {
-                    selectedMod.AvailableVersions.Sort();
-                    selectedMod.AvailableVersions.Reverse();
-
-                    List<Version> badVersions = new List<Version>();
-                    foreach (Version testingVersion in selectedMod.AvailableVersions)
+                case Keys.Delete:
+                    if (selectedMod != null && !ModManager.IsReadOnly)
                     {
-                        if (testingVersion != selectedMod.AvailableVersions[0] && selectedMod.AllModData.ContainsKey(testingVersion)) badVersions.Add(testingVersion);
-                    }
-                    if (badVersions.Count == 0)
-                    {
-                        this.ShowBasicButton("You have no old versions of this mod on disk to clean!", "OK", null, null);
-                    }
-                    else
-                    {
-                        int dialogRes = this.ShowBasicButton("Are you sure you want to clean \"" + selectedMod.CurrentModData.Name + "\"?\nThese versions will be deleted from disk: " + string.Join(", ", badVersions.Select(v => v.ToString()).ToArray()), "Yes", "No", null);
-                        if (dialogRes == 0)
+                        if (e.Alt)
                         {
-                            ModManager.EviscerateMod(selectedMod, badVersions);
-                            FullRefresh();
-                            selectedMod.InstalledVersion = selectedMod.AvailableVersions[0];
-                            this.ShowBasicButton("Successfully cleaned \"" + selectedMod.CurrentModData.Name + "\".", "OK", null, null);
+                            selectedMod.AvailableVersions.Sort();
+                            selectedMod.AvailableVersions.Reverse();
+
+                            List<Version> badVersions = new List<Version>();
+                            foreach (Version testingVersion in selectedMod.AvailableVersions)
+                            {
+                                if (testingVersion != selectedMod.AvailableVersions[0] && selectedMod.AllModData.ContainsKey(testingVersion)) badVersions.Add(testingVersion);
+                            }
+                            if (badVersions.Count == 0)
+                            {
+                                this.ShowBasicButton("You have no old versions of this mod on disk to clean!", "OK", null, null);
+                            }
+                            else
+                            {
+                                int dialogRes = this.ShowBasicButton("Are you sure you want to clean \"" + selectedMod.CurrentModData.Name + "\"?\nThese versions will be deleted from disk: " + string.Join(", ", badVersions.Select(v => v.ToString()).ToArray()), "Yes", "No", null);
+                                if (dialogRes == 0)
+                                {
+                                    ModManager.EviscerateMod(selectedMod, badVersions);
+                                    FullRefresh();
+                                    selectedMod.InstalledVersion = selectedMod.AvailableVersions[0];
+                                    this.ShowBasicButton("Successfully cleaned \"" + selectedMod.CurrentModData.Name + "\".", "OK", null, null);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            int dialogRes = this.ShowBasicButton("Are you sure you want to completely delete \"" + selectedMod.CurrentModData.Name + "\"?", "Yes", "No", null);
+                            if (dialogRes == 0)
+                            {
+                                ModManager.EviscerateMod(selectedMod);
+                                FullRefresh();
+                            }
                         }
                     }
-                }
-                else
-                {
-                    int dialogRes = this.ShowBasicButton("Are you sure you want to completely delete \"" + selectedMod.CurrentModData.Name + "\"?", "Yes", "No", null);
-                    if (dialogRes == 0)
-                    {
-                        ModManager.EviscerateMod(selectedMod);
-                        FullRefresh();
-                    }
-                }
-                
+                    break;
+                case Keys.Escape:
+                    dataGridView1.ClearSelection();
+                    break;
             }
         }
 

@@ -53,6 +53,7 @@
             this.gamePathBox.Name = "gamePathBox";
             this.gamePathBox.Size = new System.Drawing.Size(284, 20);
             this.gamePathBox.TabIndex = 0;
+            this.gamePathBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextPrompt_KeyDown);
             // 
             // okButton
             // 
@@ -122,6 +123,7 @@
             this.Name = "TextPrompt";
             this.Text = "InitialPathPrompt";
             this.Load += new System.EventHandler(this.InitialPathPrompt_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextPrompt_KeyDown);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -101,7 +101,7 @@
             this.themeComboBox.Location = new System.Drawing.Point(153, 121);
             this.themeComboBox.Name = "themeComboBox";
             this.themeComboBox.Size = new System.Drawing.Size(151, 21);
-            this.themeComboBox.TabIndex = 5;
+            this.themeComboBox.TabIndex = 6;
             this.themeComboBox.SelectedIndexChanged += new System.EventHandler(this.themeBox_SelectedIndexChanged);
             // 
             // label4
@@ -121,7 +121,7 @@
             this.label5.Location = new System.Drawing.Point(91, 43);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(56, 15);
-            this.label5.TabIndex = 9;
+            this.label5.TabIndex = 1;
             this.label5.Text = "Platform:";
             // 
             // platformComboBox
@@ -131,7 +131,7 @@
             this.platformComboBox.Location = new System.Drawing.Point(153, 42);
             this.platformComboBox.Name = "platformComboBox";
             this.platformComboBox.Size = new System.Drawing.Size(151, 21);
-            this.platformComboBox.TabIndex = 10;
+            this.platformComboBox.TabIndex = 1;
             this.platformComboBox.SelectedIndexChanged += new System.EventHandler(this.platformComboBox_SelectedIndexChanged);
             // 
             // exitButton
@@ -146,7 +146,7 @@
             this.exitButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.exitButton.Name = "exitButton";
             this.exitButton.Size = new System.Drawing.Size(75, 26);
-            this.exitButton.TabIndex = 8;
+            this.exitButton.TabIndex = 9;
             this.exitButton.Text = "Close";
             this.exitButton.UseVisualStyleBackColor = false;
             this.exitButton.Click += new System.EventHandler(this.exitButton_Click);
@@ -173,7 +173,7 @@
             this.localPathBox.Location = new System.Drawing.Point(153, 95);
             this.localPathBox.Name = "localPathBox";
             this.localPathBox.Size = new System.Drawing.Size(202, 20);
-            this.localPathBox.TabIndex = 11;
+            this.localPathBox.TabIndex = 4;
             // 
             // label6
             // 
@@ -197,7 +197,7 @@
             this.setPathButton2.MinimumSize = new System.Drawing.Size(0, 26);
             this.setPathButton2.Name = "setPathButton2";
             this.setPathButton2.Size = new System.Drawing.Size(40, 26);
-            this.setPathButton2.TabIndex = 13;
+            this.setPathButton2.TabIndex = 5;
             this.setPathButton2.Text = "Set";
             this.setPathButton2.UseVisualStyleBackColor = false;
             this.setPathButton2.Click += new System.EventHandler(this.UpdatePathing);
@@ -219,7 +219,7 @@
             this.refuseMismatchedConnectionsCheckbox.Location = new System.Drawing.Point(153, 175);
             this.refuseMismatchedConnectionsCheckbox.Name = "refuseMismatchedConnectionsCheckbox";
             this.refuseMismatchedConnectionsCheckbox.Size = new System.Drawing.Size(205, 19);
-            this.refuseMismatchedConnectionsCheckbox.TabIndex = 15;
+            this.refuseMismatchedConnectionsCheckbox.TabIndex = 8;
             this.refuseMismatchedConnectionsCheckbox.Text = "Refuse mismatched connections";
             this.refuseMismatchedConnectionsCheckbox.UseVisualStyleBackColor = true;
             this.refuseMismatchedConnectionsCheckbox.CheckedChanged += new System.EventHandler(this.refuseMismatchedConnectionsCheckbox_CheckedChanged);
@@ -236,7 +236,7 @@
             this.aboutButton.MinimumSize = new System.Drawing.Size(0, 26);
             this.aboutButton.Name = "aboutButton";
             this.aboutButton.Size = new System.Drawing.Size(75, 26);
-            this.aboutButton.TabIndex = 17;
+            this.aboutButton.TabIndex = 10;
             this.aboutButton.Text = "About...";
             this.aboutButton.UseVisualStyleBackColor = false;
             this.aboutButton.Click += new System.EventHandler(this.aboutButton_Click);
