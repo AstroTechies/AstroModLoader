@@ -462,8 +462,10 @@ namespace AstroModLoader
             }
         }
 
+        public ManualResetEvent IsUpdatingAvailableVersionsFromIndexFilesWaitHandler = new ManualResetEvent(true);
         public void UpdateAvailableVersionsFromIndexFiles()
         {
+            IsUpdatingAvailableVersionsFromIndexFilesWaitHandler.Reset();
             Dictionary<Mod, Version> switchVersionInstructions = new Dictionary<Mod, Version>();
             foreach (Mod mod in Mods)
             {
@@ -488,12 +490,11 @@ namespace AstroModLoader
             {
                 BaseForm.SwitchVersionSync(entry.Key, entry.Value);
             }
+            IsUpdatingAvailableVersionsFromIndexFilesWaitHandler.Set();
         }
 
-        public bool CurrentlyAggregatingIndexFiles = false;
         public void AggregateIndexFiles()
         {
-            CurrentlyAggregatingIndexFiles = true;
             if (GlobalIndexFile == null) GlobalIndexFile = new Dictionary<string, IndexMod>();
             List<string> DuplicateURLs = new List<string>();
             foreach (Mod mod in Mods)
@@ -507,7 +508,6 @@ namespace AstroModLoader
             }
 
             UpdateAvailableVersionsFromIndexFiles();
-            CurrentlyAggregatingIndexFiles = false;
         }
 
         public void SortVersions()

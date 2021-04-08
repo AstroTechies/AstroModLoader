@@ -109,9 +109,18 @@ namespace AstroModLoader
             return Program.CommandLineOptions.ServerMode && ModHandler.OurIntegrator.RefuseMismatchedConnections;
         }
 
+        private void RefreshInternal()
+        {
+            GridView.SuspendLayout();
+            GridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            RefreshInternal2();
+            GridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            GridView.ResumeLayout();
+        }
+
         private int? LastNumMods = 0;
         private int LastScrollPos = 0;
-        private void RefreshInternal()
+        private void RefreshInternal2()
         {
             LastNumMods = GridView.Rows?.Count;
             LastScrollPos = GridView.FirstDisplayedScrollingRowIndex;

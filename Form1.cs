@@ -685,7 +685,6 @@ namespace AstroModLoader
                 latestOnlineVersion = GitHubAPI.GetLatestVersionFromGitHub(GitHubRepo);
             }).ContinueWith(res =>
             {
-                //Debug.WriteLine("Latest: " + latestOnlineVersion);
                 if (latestOnlineVersion != null && latestOnlineVersion.CompareTo(Assembly.GetExecutingAssembly().GetName().Version) > 0)
                 {
                     BasicButtonPopup resultButton = this.GetBasicButton("A new version of AstroModLoader (v" + latestOnlineVersion + ") is available!", "OK", "Open in browser", null);
@@ -706,11 +705,7 @@ namespace AstroModLoader
 
         private async void playButton_Click(object sender, EventArgs e)
         {
-            if (ModManager.CurrentlyAggregatingIndexFiles)
-            {
-                this.ShowBasicButton("Please wait for a few moments, the mod loader is currently fetching auto-update information.", "OK", null, null);
-                return;
-            }
+            ModManager.IsUpdatingAvailableVersionsFromIndexFilesWaitHandler.WaitOne(3000);
 
             await ModManager.FullUpdate();
             if (!Program.CommandLineOptions.ServerMode)

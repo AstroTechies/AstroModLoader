@@ -26,7 +26,7 @@ To install mods, drag and drop the .zip or the .pak file of your mod onto the As
 Alternatively, on Steam, you can also manually add mods for use with AstroModLoader by placing them into the `%localappdata%\Astro\Saved\Mods` directory.
 On the Windows Store, you can place them into the `%localappdata%\Packages\SystemEraSoftworks.29415440E1269_ftk5pbg2rayv2\LocalState\Astro\Saved\Mods` directory.
 
-You are free to join the Astroneer Modding Discord community to learn more about using or creating Astroneer mods: https://discord.gg/bBqdVYxu4k
+Feel free to join the Astroneer Modding Discord community to learn more about using or creating Astroneer mods: https://discord.gg/bBqdVYxu4k
 
 ### Usage Notes
 AstroModLoader features a fully-functional set of hotkeys to fully control your mods list. Below is a list of keyboard commands to manipulate the list of mods:
