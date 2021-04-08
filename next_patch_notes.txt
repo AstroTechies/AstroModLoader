@@ -3,5 +3,6 @@
 * Added an "About" button and window.
 * Changed the help text to always appear below the data grid view instead of only when there are no mods installed.
 * Changed the appearance of read-only check boxes to be easier to understand.
+* Removed the infamous "the mod loader is currently fetching auto-update information" error message.
 * Fixed a bug in which priorities would not properly be loaded when switching platforms.
 * Fixed a bug in which the TAB key would not switch between buttons in the proper order in some windows.

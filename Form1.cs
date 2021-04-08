@@ -62,6 +62,7 @@ namespace AstroModLoader
 
             PeriodicCheckTimer.Enabled = true;
             CheckAllDirty.Enabled = true;
+            ForceAutoUpdateRefresh.Enabled = true;
 
             autoUpdater = new BackgroundWorker();
             autoUpdater.DoWork += new DoWorkEventHandler(AutoUpdater_DoWork);
@@ -199,6 +200,13 @@ namespace AstroModLoader
         private void PeriodicCheckTimer_Tick(object sender, EventArgs e)
         {
             ModManager.UpdateReadOnlyStatus();
+        }
+
+        // Normally this wouldn't be necessary because of the fact that all index files are refreshed when the loader boots up, but for the folks that leave the mod loader open for days on end, we should refresh it all every once in a while
+        private void ForceAutoUpdateRefresh_Tick(object sender, EventArgs e)
+        {
+            ModManager.ResetGlobalIndexFile();
+            if (!autoUpdater.IsBusy) autoUpdater.RunWorkerAsync();
         }
 
         public void AdjustModInfoText(string txt, string linkText = "")

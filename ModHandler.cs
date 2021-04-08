@@ -493,10 +493,17 @@ namespace AstroModLoader
             IsUpdatingAvailableVersionsFromIndexFilesWaitHandler.Set();
         }
 
+        private List<string> DuplicateURLs = new List<string>();
+
+        public void ResetGlobalIndexFile()
+        {
+            GlobalIndexFile = new Dictionary<string, IndexMod>();
+            DuplicateURLs = new List<string>();
+        }
+
         public void AggregateIndexFiles()
         {
             if (GlobalIndexFile == null) GlobalIndexFile = new Dictionary<string, IndexMod>();
-            List<string> DuplicateURLs = new List<string>();
             foreach (Mod mod in Mods)
             {
                 IndexFile thisIndexFile = mod.GetIndexFile(DuplicateURLs);
