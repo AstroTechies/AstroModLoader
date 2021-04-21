@@ -64,7 +64,7 @@ namespace AstroModLoader
 
                 ModProfile creatingProfile = new ModProfile();
                 creatingProfile.ProfileData = new Dictionary<string, Mod>();
-                int failedDownloadCount = 0;
+                List<string> failedDownloadMods = new List<string>();
 
                 // Add our current mods into the brand new profile, and specify that they are disabled
                 ModProfile currentProf = BaseForm.ModManager.GenerateProfile();
@@ -146,7 +146,7 @@ namespace AstroModLoader
                             }
                             else
                             {
-                                failedDownloadCount++;
+                                failedDownloadMods.Add(debugModName);
                             }
                         }
 
@@ -179,7 +179,7 @@ namespace AstroModLoader
                 string kosherProfileName = kosherServerName + " Synced Mods";
                 BaseForm.ModManager.ProfileList[kosherProfileName] = creatingProfile;
                 BaseForm.syncKosherProfileName = kosherProfileName;
-                BaseForm.syncFailedDownloadCount = failedDownloadCount;
+                BaseForm.syncFailedDownloadMods = failedDownloadMods.ToArray();
                 SetDebugText("Done!");
 
                 BaseForm.syncErrored = false;

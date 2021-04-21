@@ -202,7 +202,7 @@ namespace AstroModLoader
             ModManager.UpdateReadOnlyStatus();
         }
 
-        // Normally this wouldn't be necessary because of the fact that all index files are refreshed when the loader boots up, but for the folks that leave the mod loader open for days on end, we should refresh it all every once in a while
+        // Normally this wouldn't be necessary because of the fact that all index files are refreshed when the loader boots up, but for the folks that leave the mod loader open for days on end, we should refresh the global index file every once in a while
         private void ForceAutoUpdateRefresh_Tick(object sender, EventArgs e)
         {
             ModManager.ResetGlobalIndexFile();
@@ -801,7 +801,7 @@ namespace AstroModLoader
         internal bool CurrentlySyncing = false;
         internal bool syncErrored;
         internal string syncErrorMessage;
-        internal int syncFailedDownloadCount;
+        internal string[] syncFailedDownloadMods = null;
         internal string syncKosherProfileName;
 
         private void syncButton_Click(object sender, EventArgs e)
@@ -834,7 +834,7 @@ namespace AstroModLoader
 
                 syncErrored = true;
                 syncErrorMessage = "The syncing process halted prematurely!";
-                syncFailedDownloadCount = 0;
+                syncFailedDownloadMods = null;
                 syncKosherProfileName = "";
 
                 waiting.ShowDialog(this);
@@ -849,7 +849,15 @@ namespace AstroModLoader
                 }
                 else
                 {
-                    this.ShowBasicButton("Added a new profile named \"" + syncKosherProfileName + "\".\n" + (syncFailedDownloadCount == 0 ? "No" : syncFailedDownloadCount.ToString()) + " mod" + (syncFailedDownloadCount == 1 ? "" : "s") + " failed to sync.", "OK", null, null);
+                    int syncFailedDownloadCount = syncFailedDownloadMods.Length;
+                    if (syncFailedDownloadCount == 0)
+                    {
+                        this.ShowBasicButton("Added a new profile named \"" + syncKosherProfileName + "\".\nNo mods failed to sync.", "OK", null, null);
+                    }
+                    else
+                    {
+                        this.ShowBasicButton("Added a new profile named \"" + syncKosherProfileName + "\".\n\n" + syncFailedDownloadCount.ToString() + " mod" + (syncFailedDownloadCount == 1 ? "" : "s") + " failed to sync:\n" + string.Join("\n", syncFailedDownloadMods).Trim(), "OK", null, null);
+                    }
                 }
             }
         }
