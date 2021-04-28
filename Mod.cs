@@ -120,9 +120,9 @@ namespace AstroModLoader
         }
 
         private static readonly Regex ModIDFilterRegex = new Regex(@"[^A-Za-z0-9]", RegexOptions.Compiled);
-        public string ConstructName()
+        public string ConstructName(int forcePriority = -1)
         {
-            return AMLUtils.GeneratePriorityFromPositionInList(Priority) + "-" + ModIDFilterRegex.Replace(CurrentModData.ModID, "") + "-" + InstalledVersion + "_P.pak";
+            return AMLUtils.GeneratePriorityFromPositionInList(forcePriority >= 0 ? forcePriority : Priority) + "-" + ModIDFilterRegex.Replace(CurrentModData.ModID, "") + "-" + InstalledVersion + "_P.pak";
         }
 
         private int newPriority;

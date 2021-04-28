@@ -1,9 +1,1 @@
-﻿* Added the ability to use ESC to de-select the currently selected row in the data grid view.
-* Added the ability to use ESC and ENTER within text input windows.
-* Added an "About" button and window.
-* Changed the help text to always appear below the data grid view instead of only when there are no mods installed.
-* Changed the appearance of read-only check boxes to be easier to understand.
-* Changed the server sync menu to display which mods in particular fail to sync, if any.
-* Removed the infamous "the mod loader is currently fetching auto-update information" error message.
-* Fixed a bug in which priorities would not properly be loaded when switching platforms.
-* Fixed a bug in which the TAB key would not switch between buttons in the proper order in some windows.
+﻿* Added stricter enforcement of the metadata.json and the .pak file name formats.

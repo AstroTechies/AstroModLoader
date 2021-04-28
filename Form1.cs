@@ -103,7 +103,8 @@ namespace AstroModLoader
                     string tempDownloadFolder = Path.Combine(Path.GetTempPath(), "AstroModLoader", "Downloads");
                     Directory.CreateDirectory(tempDownloadFolder);
                     wb.DownloadFile(allVerData[newVersion].URL, Path.Combine(tempDownloadFolder, kosherFileName));
-                    InstallModFromPath(Path.Combine(tempDownloadFolder, kosherFileName), out _);
+                    InstallModFromPath(Path.Combine(tempDownloadFolder, kosherFileName), out _, out int numMalformatted);
+                    if (numMalformatted > 0) throw new FormatException(numMalformatted + " mods were malformatted");
                     ModManager.SortVersions();
                     ModManager.SortMods();
                     Directory.Delete(tempDownloadFolder, true);
@@ -260,18 +261,41 @@ namespace AstroModLoader
             ".zip"
         };
 
-        private string AdjustNewPathToBeValid(string newPath, Metadata originalModData)
+        /*private string AdjustNewPathToBeValid(string newPath, Metadata originalModData)
         {
             Mod testMod = new Mod(originalModData, Path.GetFileName(newPath));
             if (testMod.Priority >= 999) return null;
             return Path.Combine(Path.GetDirectoryName(newPath), testMod.ConstructName());
+        }*/
+
+        private bool NewPathIsValid(string newPath, Metadata originalModData)
+        {
+            if (string.IsNullOrEmpty(newPath) || originalModData == null) return false;
+
+            string normalFilePath = Path.GetFileName(newPath);
+            if (normalFilePath.Length < 6) return false;
+
+            Mod testMod = new Mod(originalModData, normalFilePath);
+            if (testMod.Priority >= 999) return false;
+
+            string desiredName = testMod.ConstructName(0);
+            string realName = "000-" + normalFilePath.Substring(4);
+            return desiredName.Equals(realName);
         }
 
-        private string AddModFromPakPath(string newInstallingMod)
+        private string AddModFromPakPath(string newInstallingMod, out bool wasMalformatted)
         {
+            wasMalformatted = false;
             try
             {
-                string newPath = AdjustNewPathToBeValid(Path.Combine(ModManager.DownloadPath, Path.GetFileName(newInstallingMod)), ModManager.ExtractMetadataFromPath(newInstallingMod));
+                string newPath = Path.Combine(ModManager.DownloadPath, Path.GetFileName(newInstallingMod));
+
+                if (!NewPathIsValid(newPath, ModManager.ExtractMetadataFromPath(newInstallingMod)))
+                {
+                    wasMalformatted = true;
+                    return null;
+                }
+
                 if (!string.IsNullOrEmpty(newPath))
                 {
                     File.Copy(newInstallingMod, newPath, true);
@@ -286,9 +310,10 @@ namespace AstroModLoader
             return null;
         }
 
-        private List<Mod> InstallModFromPath(string newInstallingMod, out int numClientOnly)
+        private List<Mod> InstallModFromPath(string newInstallingMod, out int numClientOnly, out int numMalformatted)
         {
             numClientOnly = 0;
+            numMalformatted = 0;
             string ext = Path.GetExtension(newInstallingMod);
             if (!AllowedModExtensions.Contains(ext)) return null;
 
@@ -302,7 +327,8 @@ namespace AstroModLoader
                 string[] allAccessiblePaks = Directory.GetFiles(targetFolderPath, "*.pak", SearchOption.AllDirectories); // Get all pak files that exist in the zip file
                 foreach (string zippedPakPath in allAccessiblePaks)
                 {
-                    string newPath = AddModFromPakPath(zippedPakPath);
+                    string newPath = AddModFromPakPath(zippedPakPath, out bool wasMalformatted);
+                    if (wasMalformatted) numMalformatted++;
                     if (newPath != null) newPaths.Add(newPath);
                 }
 
@@ -310,7 +336,8 @@ namespace AstroModLoader
             }
             else // Otherwise just copy the file itself
             {
-                string newPath = AddModFromPakPath(newInstallingMod);
+                string newPath = AddModFromPakPath(newInstallingMod, out bool wasMalformatted);
+                if (wasMalformatted) numMalformatted++;
                 if (newPath != null) newPaths.Add(newPath);
             }
 
@@ -344,6 +371,7 @@ namespace AstroModLoader
             {
                 Dictionary<string, List<Version>> newMods = new Dictionary<string, List<Version>>();
                 int clientOnlyCount = 0;
+                int malformattedCount = 0;
                 int invalidExtensionCount = 0;
                 int wasFolderCount = 0;
                 foreach (string newInstallingMod in installingModPaths)
@@ -359,7 +387,7 @@ namespace AstroModLoader
                         continue;
                     }
 
-                    List<Mod> resMods = InstallModFromPath(newInstallingMod, out int thisClientOnlyCount);
+                    List<Mod> resMods = InstallModFromPath(newInstallingMod, out int thisClientOnlyCount, out int thisNumMalformatted);
                     if (resMods == null) continue;
                     foreach (Mod resMod in resMods)
                     {
@@ -368,6 +396,7 @@ namespace AstroModLoader
                         newMods[resMod.CurrentModData.ModID].AddRange(resMod.AvailableVersions);
                     }
                     clientOnlyCount += thisClientOnlyCount;
+                    malformattedCount += thisNumMalformatted;
                 }
 
                 //ModManager.SyncModsFromDisk(true);
@@ -411,6 +440,11 @@ namespace AstroModLoader
                     if (clientOnlyCount > 0)
                     {
                         this.ShowBasicButton(clientOnlyCount + " mod" + (clientOnlyCount == 1 ? " is" : "s are") + " designated as \"Client only\" and " + (clientOnlyCount == 1 ? "was" : "were") + " ignored.", "OK", null, null);
+                    }
+
+                    if (malformattedCount > 0)
+                    {
+                        this.ShowBasicButton(malformattedCount + " mod" + (malformattedCount == 1 ? " was" : "s were") + " malformatted, and could not be installed.\nThe file name may be invalid, the metadata may be invalid, or both.", "OK", null, null);
                     }
                 });
             }

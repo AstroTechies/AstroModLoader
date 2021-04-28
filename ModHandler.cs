@@ -647,7 +647,7 @@ namespace AstroModLoader
             {
                 Mods = new List<Mod>();
 
-                string[] allMods = Directory.GetFiles(DownloadPath, "*.pak", SearchOption.TopDirectoryOnly);
+                string[] allMods = Directory.GetFiles(DownloadPath, "*_P.pak", SearchOption.TopDirectoryOnly);
                 ModLookup = new Dictionary<string, Mod>();
                 foreach (string modPath in allMods)
                 {
@@ -661,7 +661,7 @@ namespace AstroModLoader
                 mod.InstalledVersion = mod.AvailableVersions[0];
             }
 
-            string[] installedMods = Directory.GetFiles(InstallPath, "*.pak", SearchOption.TopDirectoryOnly);
+            string[] installedMods = Directory.GetFiles(InstallPath, "*_P.pak", SearchOption.TopDirectoryOnly);
             foreach (string modPath in installedMods)
             {
                 var modNameOnDisk = Path.GetFileName(modPath);
