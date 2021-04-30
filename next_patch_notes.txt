@@ -1,1 +1,3 @@
-﻿* Added stricter enforcement of the metadata.json and the .pak file name formats.
+﻿* Added stricter enforcement of the metadata.json and the .pak file name formats for newly installed mods. Mods that were installed with previous versions will retain their automatic corrections as to not interfere with current gameplay.
+* Fixed a bug in which some text would not have the correct color after switching themes.
+* Adjusted some bits of text to be more accurate.

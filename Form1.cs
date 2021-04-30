@@ -214,7 +214,7 @@ namespace AstroModLoader
         {
             if (txt == "")
             {
-                AdjustModInfoText("Drop a .pak file onto this window to install a mod.\n\nOnce you're ready to use your enabled mods, press the \"Play\" button below to apply your mods and start playing.");
+                AdjustModInfoText("Drop a .pak or .zip file onto this window to install a mod.\n\nOnce you're ready to use your enabled mods, press the \"Play\" button below to apply your mods and start playing.");
                 return;
             }
 
@@ -228,6 +228,7 @@ namespace AstroModLoader
 
         public void UpdateVersionLabel()
         {
+            if (ModManager == null) return;
             headerLabel.Text = "Mods (" + (ModManager.InstalledAstroBuild?.ToString() ?? "Unknown") + (ModManager.MismatchedSteamworksDLL ? " Pirated?" : "") + "):";
             headerLabel.ForeColor = ModManager.MismatchedSteamworksDLL ? AMLPalette.WarningColor : AMLPalette.ForeColor;
         }
@@ -444,7 +445,7 @@ namespace AstroModLoader
 
                     if (malformattedCount > 0)
                     {
-                        this.ShowBasicButton(malformattedCount + " mod" + (malformattedCount == 1 ? " was" : "s were") + " malformatted, and could not be installed.\nThe file name may be invalid, the metadata may be invalid, or both.", "OK", null, null);
+                        this.ShowBasicButton(malformattedCount + " mod" + (malformattedCount == 1 ? " was" : "s were") + " malformatted, and could not be installed.\nThe file name may be invalid, the metadata may be invalid, or both.\nPlease ensure that this mod meets the community-made standards.", "OK", null, null);
                     }
                 });
             }
