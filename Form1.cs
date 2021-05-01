@@ -271,7 +271,7 @@ namespace AstroModLoader
 
         private bool NewPathIsValid(string newPath, Metadata originalModData)
         {
-            if (string.IsNullOrEmpty(newPath) || originalModData == null) return false;
+            if (string.IsNullOrEmpty(newPath) || originalModData == null || string.IsNullOrEmpty(originalModData.Name) || string.IsNullOrEmpty(originalModData.ModID) || originalModData.ModVersion == null) return false;
 
             string normalFilePath = Path.GetFileName(newPath);
             if (normalFilePath.Length < 6) return false;
