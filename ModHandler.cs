@@ -44,15 +44,20 @@ namespace AstroModLoader
 
             string automaticSteamPath = null;
             string automaticWin10Path = null;
-            try
+            if (!Program.CommandLineOptions.ServerMode)
             {
-                if (!Program.CommandLineOptions.ServerMode)
+                try
                 {
                     automaticSteamPath = CheckRegistryForSteamPath(361420); // Astroneer: 361420
+                }
+                catch { }
+
+                try
+                {
                     automaticWin10Path = CheckRegistryForMicrosoftStorePath();
                 }
+                catch { }
             }
-            catch { }
 
             //automaticSteamPath = null;
             //automaticWin10Path = null;
@@ -158,7 +163,7 @@ namespace AstroModLoader
         public string MicrosoftRuntimeID = "";
         private string CheckRegistryForMicrosoftStorePath()
         {
-            RegistryKey key1 = Registry.CurrentUser.OpenSubKey(@"Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\Repository\Packages"); // SystemEraSoftworks.29415440E1269_1.16.70.0_x64__ftk5pbg2rayv2
+            RegistryKey key1 = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64).OpenSubKey(@"Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\Repository\Packages"); // SystemEraSoftworks.29415440E1269_1.16.70.0_x64__ftk5pbg2rayv2
             if (key1 == null) return null;
 
             RegistryKey goalKey = null;
@@ -190,8 +195,8 @@ namespace AstroModLoader
         private string CheckRegistryForSteamPath(int appID)
         {
             string decidedSteamPath = null;
-            RegistryKey key1 = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\Valve\Steam");
-            RegistryKey key2 = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Valve\Steam");
+            RegistryKey key1 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64).OpenSubKey(@"SOFTWARE\Wow6432Node\Valve\Steam");
+            RegistryKey key2 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(@"SOFTWARE\Valve\Steam");
             if (key1 != null)
             {
                 object o = key1.GetValue("InstallPath");
