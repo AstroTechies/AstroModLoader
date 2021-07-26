@@ -12,6 +12,12 @@ namespace AstroModLoader
         Folder
     }
 
+    public enum VerifyPathMode
+    {
+        None,
+        Base,
+        Game
+    }
 
     public partial class TextPrompt : Form
     {
@@ -19,10 +25,12 @@ namespace AstroModLoader
         public string OutputText;
         public bool AllowBrowse = true;
         public BrowseMode BrowseMode = BrowseMode.Folder;
+        public VerifyPathMode VerifyMode = VerifyPathMode.None;
 
         public TextPrompt()
         {
             InitializeComponent();
+            ShowWarning("");
         }
 
         private void InitialPathPrompt_Load(object sender, EventArgs e)
@@ -39,6 +47,11 @@ namespace AstroModLoader
                 browseButton.Hide();
                 gamePathBox.Size = new Size(this.ClientSize.Width - 24, gamePathBox.ClientSize.Height);
             }
+
+            int debugLabelEndX = this.browseButton.Location.X + this.browseButton.Width - 5;
+            this.debugLabel.ForeColor = AMLPalette.WarningColor;
+            this.debugLabel.Width = debugLabelEndX - (this.cancelButton.Location.X + this.cancelButton.Width);
+            this.debugLabel.Location = new Point(debugLabelEndX - this.debugLabel.Width, this.cancelButton.Location.Y);
         }
 
         private void browseButton_Click(object sender, EventArgs e)
@@ -75,18 +88,46 @@ namespace AstroModLoader
             }
         }
 
+        private void ShowWarning(string txt)
+        {
+            this.debugLabel.Text = txt;
+        }
+
         private void RunOKButton()
         {
             if (AllowBrowse && !AMLUtils.IsValidPath(gamePathBox.Text))
             {
-                this.ShowBasicButton("This is not a valid path!", "OK", null, null);
+                ShowWarning("This is not a valid path!");
                 return;
             }
 
             if (gamePathBox.Text != null && gamePathBox.Text.Length > 0)
             {
-                OutputText = gamePathBox.Text;
-                if (AllowBrowse && OutputText[OutputText.Length - 1] == Path.DirectorySeparatorChar) OutputText = OutputText.Substring(0, OutputText.Length - 1);
+                var doneText = gamePathBox.Text;
+                if (AllowBrowse && doneText[doneText.Length - 1] == Path.DirectorySeparatorChar) doneText = doneText.Substring(0, doneText.Length - 1);
+                switch(VerifyMode)
+                {
+                    case VerifyPathMode.Base:
+                        doneText = AMLUtils.FixBasePath(doneText);
+                        if (string.IsNullOrEmpty(doneText))
+                        {
+                            ShowWarning("This is not the correct path!");
+                            OutputText = null;
+                            return;
+                        }
+                        break;
+                    case VerifyPathMode.Game:
+                        doneText = AMLUtils.FixGamePath(doneText);
+                        if (doneText == null)
+                        {
+                            ShowWarning("This is not the correct path!");
+                            OutputText = null;
+                            return;
+                        }
+                        break;
+                }
+
+                OutputText = doneText;
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }

@@ -52,6 +52,7 @@ Additionally, the following keyboard commands can be used within popup windows:
 
 ## Prerequisites
 * .NET Framework 4.6.1
+* A copy of Astroneer
 
 ## Licensing
 AstroModLoader is licensed under the MIT license, which can be found in [the LICENSE.md file.](https://github.com/AstroTechies/AstroModLoader/blob/master/LICENSE.md) In addition, necessary licenses for the third-party material used in this software can be found in [the NOTICE.md file.](https://github.com/AstroTechies/AstroModLoader/blob/master/NOTICE.md)

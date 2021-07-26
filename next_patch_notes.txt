@@ -1,1 +1,3 @@
 ﻿* Fixed a major bug in which Microsoft Store automatic path detection would not work for users who did not also have an installed Steam copy of the game.
+* Adjusted behavior when an invalid game or base path is provided on initial setup to be more user-friendly.
+* Adjusted steam path detection to search through more locations.

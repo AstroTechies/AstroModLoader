@@ -30,9 +30,10 @@
         {
             this.mainLabel = new System.Windows.Forms.Label();
             this.gamePathBox = new System.Windows.Forms.TextBox();
-            this.okButton = new AstroModLoader.CoolButton();
+            this.debugLabel = new System.Windows.Forms.Label();
             this.browseButton = new AstroModLoader.CoolButton();
             this.cancelButton = new AstroModLoader.CoolButton();
+            this.okButton = new AstroModLoader.CoolButton();
             this.SuspendLayout();
             // 
             // mainLabel
@@ -55,22 +56,16 @@
             this.gamePathBox.TabIndex = 0;
             this.gamePathBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextPrompt_KeyDown);
             // 
-            // okButton
+            // debugLabel
             // 
-            this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.okButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
-            this.okButton.FlatAppearance.BorderColor = System.Drawing.Color.Black;
-            this.okButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.okButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.okButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.okButton.Location = new System.Drawing.Point(15, 79);
-            this.okButton.MinimumSize = new System.Drawing.Size(0, 26);
-            this.okButton.Name = "okButton";
-            this.okButton.Size = new System.Drawing.Size(49, 26);
-            this.okButton.TabIndex = 2;
-            this.okButton.Text = "OK";
-            this.okButton.UseVisualStyleBackColor = false;
-            this.okButton.Click += new System.EventHandler(this.okButton_Click);
+            this.debugLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.debugLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.debugLabel.Location = new System.Drawing.Point(153, 79);
+            this.debugLabel.Name = "debugLabel";
+            this.debugLabel.Size = new System.Drawing.Size(218, 22);
+            this.debugLabel.TabIndex = 5;
+            this.debugLabel.Text = "Invalid path!";
+            this.debugLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // browseButton
             // 
@@ -106,12 +101,30 @@
             this.cancelButton.UseVisualStyleBackColor = false;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
             // 
+            // okButton
+            // 
+            this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.okButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
+            this.okButton.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.okButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.okButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.okButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
+            this.okButton.Location = new System.Drawing.Point(15, 79);
+            this.okButton.MinimumSize = new System.Drawing.Size(0, 26);
+            this.okButton.Name = "okButton";
+            this.okButton.Size = new System.Drawing.Size(49, 26);
+            this.okButton.TabIndex = 2;
+            this.okButton.Text = "OK";
+            this.okButton.UseVisualStyleBackColor = false;
+            this.okButton.Click += new System.EventHandler(this.okButton_Click);
+            // 
             // TextPrompt
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(42)))), ((int)(((byte)(45)))));
             this.ClientSize = new System.Drawing.Size(385, 114);
+            this.Controls.Add(this.debugLabel);
             this.Controls.Add(this.browseButton);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.okButton);
@@ -136,5 +149,6 @@
         private CoolButton okButton;
         private CoolButton browseButton;
         private CoolButton cancelButton;
+        private System.Windows.Forms.Label debugLabel;
     }
 }

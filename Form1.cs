@@ -728,7 +728,7 @@ namespace AstroModLoader
                 latestOnlineVersion = GitHubAPI.GetLatestVersionFromGitHub(GitHubRepo);
             }).ContinueWith(res =>
             {
-                if (latestOnlineVersion != null && latestOnlineVersion.CompareTo(Assembly.GetExecutingAssembly().GetName().Version) > 0)
+                if (latestOnlineVersion != null && latestOnlineVersion.IsAMLVersionLower())
                 {
                     BasicButtonPopup resultButton = this.GetBasicButton("A new version of AstroModLoader (v" + latestOnlineVersion + ") is available!", "OK", "Open in browser", null);
                     resultButton.PageToVisit = GitHubAPI.GetLatestVersionURL(GitHubRepo);

@@ -48,13 +48,13 @@ namespace AstroModLoader
             {
                 try
                 {
-                    automaticSteamPath = CheckRegistryForSteamPath(361420); // Astroneer: 361420
+                    automaticSteamPath = AMLUtils.FixGamePath(CheckRegistryForSteamPath(361420)); // Astroneer: 361420
                 }
                 catch { }
 
                 try
                 {
-                    automaticWin10Path = CheckRegistryForMicrosoftStorePath();
+                    automaticWin10Path = AMLUtils.FixGamePath(CheckRegistryForMicrosoftStorePath());
                 }
                 catch { }
             }
@@ -96,30 +96,23 @@ namespace AstroModLoader
                 }
                 else
                 {
-                    bool isValidPath = false;
-                    while (!isValidPath)
+                    TextPrompt initialPathPrompt = new TextPrompt
                     {
-                        TextPrompt initialPathPrompt = new TextPrompt
-                        {
-                            StartPosition = FormStartPosition.CenterScreen,
-                            DisplayText = "Select your game installation directory"
-                        };
+                        StartPosition = FormStartPosition.CenterScreen,
+                        DisplayText = "Select your game installation directory",
+                        VerifyMode = VerifyPathMode.Game
+                    };
 
-                        if (initialPathPrompt.ShowDialog(BaseForm) == DialogResult.OK)
-                        {
-                            GamePath = AMLUtils.FixGamePath(initialPathPrompt.OutputText);
-                            if (GamePath != null)
-                            {
-                                isValidPath = true;
-                                Platform = PlatformType.Custom;
-                                ValidPlatformTypesToPaths[PlatformType.Custom] = GamePath;
-                                RefreshAllPlatformsList();
-                            }
-                        }
-                        else
-                        {
-                            Environment.Exit(0);
-                        }
+                    if (initialPathPrompt.ShowDialog(BaseForm) == DialogResult.OK)
+                    {
+                        GamePath = initialPathPrompt.OutputText;
+                        Platform = PlatformType.Custom;
+                        ValidPlatformTypesToPaths[PlatformType.Custom] = GamePath;
+                        RefreshAllPlatformsList();
+                    }
+                    else
+                    {
+                        Environment.Exit(0);
                     }
                 }
             }
@@ -195,16 +188,16 @@ namespace AstroModLoader
         private string CheckRegistryForSteamPath(int appID)
         {
             string decidedSteamPath = null;
-            RegistryKey key1 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64).OpenSubKey(@"SOFTWARE\Wow6432Node\Valve\Steam");
-            RegistryKey key2 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(@"SOFTWARE\Valve\Steam");
+            RegistryKey key1 = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64).OpenSubKey(@"SOFTWARE\Wow6432Node\Valve\Steam");
+            RegistryKey key2 = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry32).OpenSubKey(@"SOFTWARE\Valve\Steam");
             if (key1 != null)
             {
-                object o = key1.GetValue("InstallPath");
+                object o = key1.GetValue("SteamPath");
                 if (o != null) decidedSteamPath = o as string;
             }
             else if (key2 != null)
             {
-                object o = key2.GetValue("InstallPath");
+                object o = key2.GetValue("SteamPath");
                 if (o != null) decidedSteamPath = o as string;
             }
 
@@ -215,15 +208,32 @@ namespace AstroModLoader
 
             List<string> potentialInstallDirs = new List<string>();
             potentialInstallDirs.Add(decidedSteamPath);
+
             using (StreamReader f = new StreamReader(Path.Combine(decidedSteamPath, "steamapps", "libraryfolders.vdf")))
             {
                 string vdfEntry = null;
                 while ((vdfEntry = f.ReadLine()) != null)
                 {
-                    string[] goodEntry = vdfEntry.Trim().Replace("		", " ").Split(' ');
+                    string[] goodEntry = vdfEntry.Trim().Replace("\t\t", " ").Split(' ');
                     if (goodEntry.Length == 2 && !isInvalidVdfEntry.IsMatch(goodEntry[0]))
                     {
                         potentialInstallDirs.Add(goodEntry[1].Replace(@"\\", @"\").Replace("\"", ""));
+                    }
+                }
+            }
+
+            using (StreamReader f = new StreamReader(Path.Combine(decidedSteamPath, "config", "config.vdf")))
+            {
+                string vdfEntry = null;
+                while ((vdfEntry = f.ReadLine()) != null)
+                {
+                    if (vdfEntry.Contains("BaseInstallFolder_"))
+                    {
+                        string[] goodEntry = vdfEntry.Trim().Replace("\t\t", " ").Split(' ');
+                        if (goodEntry.Length == 2 && !isInvalidVdfEntry.IsMatch(goodEntry[0]))
+                        {
+                            potentialInstallDirs.Add(goodEntry[1].Replace(@"\\", @"\").Replace("\"", ""));
+                        }
                     }
                 }
             }
@@ -398,29 +408,21 @@ namespace AstroModLoader
                     }
                     else
                     {
-                        bool isValidPath = false;
-                        while (!isValidPath)
+                        TextPrompt initialPathPrompt = new TextPrompt
                         {
-                            TextPrompt initialPathPrompt = new TextPrompt
-                            {
-                                StartPosition = FormStartPosition.CenterScreen,
-                                DisplayText = "Select your local application data directory"
-                            };
+                            StartPosition = FormStartPosition.CenterScreen,
+                            DisplayText = "Select your local application data directory",
+                            VerifyMode = VerifyPathMode.Base
+                        };
 
-                            if (initialPathPrompt.ShowDialog(BaseForm) == DialogResult.OK)
-                            {
-                                CustomBasePath = AMLUtils.FixBasePath(initialPathPrompt.OutputText);
-
-                                if (!string.IsNullOrEmpty(CustomBasePath))
-                                {
-                                    isValidPath = true;
-                                    BasePath = CustomBasePath;
-                                }
-                            }
-                            else
-                            {
-                                Environment.Exit(0);
-                            }
+                        if (initialPathPrompt.ShowDialog(BaseForm) == DialogResult.OK)
+                        {
+                            CustomBasePath = initialPathPrompt.OutputText;
+                            BasePath = CustomBasePath;
+                        }
+                        else
+                        {
+                            Environment.Exit(0);
                         }
                     }
                 }

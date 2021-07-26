@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -220,6 +221,21 @@ namespace AstroModLoader
             if (!Uri.IsWellFormedUriString(uri, UriKind.Absolute)) return false;
             if (!Uri.TryCreate(uri, UriKind.Absolute, out Uri tmp)) return false;
             return tmp.Scheme == Uri.UriSchemeHttp || tmp.Scheme == Uri.UriSchemeHttps;
+        }
+
+        /*
+            AstroModLoader versions are formatted as follows: MAJOR.MINOR.BUILD.REVISION
+            * MAJOR - incremented for very big changes or backwards-incompatible changes
+            * MINOR - incremented for notable changes
+            * BUILD - incremented for bug fixes or very small improvements
+            * REVISION - incremented for test builds of the existing version
+            
+            2.0.0.0 > 1.5.0.0 > 1.4.1.0 > 1.4.0.1 > 1.4.0.0
+        */
+        public static bool IsAMLVersionLower(this Version v1)
+        {
+            Version fullAmlVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            return v1.CompareTo(fullAmlVersion) > 0;
         }
 
         public static bool AcceptablySimilar(this Version v1, Version v2)
