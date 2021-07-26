@@ -209,25 +209,12 @@ namespace AstroModLoader
             List<string> potentialInstallDirs = new List<string>();
             potentialInstallDirs.Add(decidedSteamPath);
 
-            using (StreamReader f = new StreamReader(Path.Combine(decidedSteamPath, "steamapps", "libraryfolders.vdf")))
+            try
             {
-                string vdfEntry = null;
-                while ((vdfEntry = f.ReadLine()) != null)
+                using (StreamReader f = new StreamReader(Path.Combine(decidedSteamPath, "steamapps", "libraryfolders.vdf")))
                 {
-                    string[] goodEntry = vdfEntry.Trim().Replace("\t\t", " ").Split(' ');
-                    if (goodEntry.Length == 2 && !isInvalidVdfEntry.IsMatch(goodEntry[0]))
-                    {
-                        potentialInstallDirs.Add(goodEntry[1].Replace(@"\\", @"\").Replace("\"", ""));
-                    }
-                }
-            }
-
-            using (StreamReader f = new StreamReader(Path.Combine(decidedSteamPath, "config", "config.vdf")))
-            {
-                string vdfEntry = null;
-                while ((vdfEntry = f.ReadLine()) != null)
-                {
-                    if (vdfEntry.Contains("BaseInstallFolder_"))
+                    string vdfEntry = null;
+                    while ((vdfEntry = f.ReadLine()) != null)
                     {
                         string[] goodEntry = vdfEntry.Trim().Replace("\t\t", " ").Split(' ');
                         if (goodEntry.Length == 2 && !isInvalidVdfEntry.IsMatch(goodEntry[0]))
@@ -237,6 +224,27 @@ namespace AstroModLoader
                     }
                 }
             }
+            catch (IOException) { }
+
+            try
+            {
+                using (StreamReader f = new StreamReader(Path.Combine(decidedSteamPath, "config", "config.vdf")))
+                {
+                    string vdfEntry = null;
+                    while ((vdfEntry = f.ReadLine()) != null)
+                    {
+                        if (vdfEntry.Contains("BaseInstallFolder_"))
+                        {
+                            string[] goodEntry = vdfEntry.Trim().Replace("\t\t", " ").Split(' ');
+                            if (goodEntry.Length == 2 && !isInvalidVdfEntry.IsMatch(goodEntry[0]))
+                            {
+                                potentialInstallDirs.Add(goodEntry[1].Replace(@"\\", @"\").Replace("\"", ""));
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException) { }
 
             List<string> astroInstallDirs = new List<string>();
             foreach (string installPath in potentialInstallDirs)
