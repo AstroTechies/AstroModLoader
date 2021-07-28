@@ -2,6 +2,7 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace AstroModLoader
@@ -93,8 +94,11 @@ namespace AstroModLoader
             this.debugLabel.Text = txt;
         }
 
+        private static Regex isLocalAppdata = new Regex(@"%localappdata%", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private void RunOKButton()
         {
+            gamePathBox.Text = isLocalAppdata.Replace(gamePathBox.Text, Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+
             if (AllowBrowse && !AMLUtils.IsValidPath(gamePathBox.Text))
             {
                 ShowWarning("This is not a valid path!");
