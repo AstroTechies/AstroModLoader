@@ -132,7 +132,17 @@ namespace AstroModLoader
 
         public void VerifyGamePath()
         {
-            if (GamePath != null && (!ValidPlatformTypesToPaths.ContainsValue(GamePath) || !Directory.Exists(GamePath)))
+            bool doesValidPlatformTypesToPathsContainValue = false;
+            foreach (KeyValuePair<PlatformType, string> entry in ValidPlatformTypesToPaths)
+            {
+                if (entry.Value.PathEquals(GamePath))
+                {
+                    doesValidPlatformTypesToPathsContainValue = true;
+                    break;
+                }
+            }
+
+            if (GamePath != null && (!doesValidPlatformTypesToPathsContainValue || !Directory.Exists(GamePath)))
             {
                 // Here, a game path is being provided that we can't recognize. If the set platform is Win10, that probably means there is a new update and we should just discard the one already stored; otherwise, it is custom
                 if (Platform == PlatformType.Win10 && ValidPlatformTypesToPaths.ContainsKey(PlatformType.Win10))
@@ -264,11 +274,11 @@ namespace AstroModLoader
             return null;
         }
 
-        private string CheckSteamPathForGame(int appID, string SteamPath)
+        private string CheckSteamPathForGame(int appID, string steamPath)
         {
             try
             {
-                using (StreamReader f = new StreamReader(Path.Combine(SteamPath, "steamapps", "appmanifest_" + appID + ".acf")))
+                using (StreamReader f = new StreamReader(Path.Combine(steamPath, "steamapps", "appmanifest_" + appID + ".acf")))
                 {
                     string acfEntry = null;
                     while ((acfEntry = f.ReadLine()) != null)
@@ -279,7 +289,7 @@ namespace AstroModLoader
                             string astroInstallDir = m.Groups[2].Value;
                             if (!string.IsNullOrEmpty(astroInstallDir))
                             {
-                                string decidedAnswer = Path.Combine(SteamPath, "steamapps", "common", astroInstallDir);
+                                string decidedAnswer = Path.Combine(steamPath, "steamapps", "common", astroInstallDir);
                                 if (!Directory.Exists(decidedAnswer)) return null;
                                 return decidedAnswer;
                             }

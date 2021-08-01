@@ -244,6 +244,17 @@ namespace AstroModLoader
             return v1.Major == v2.Major && v1.Minor == v2.Minor; // no sense in warning if the current version is 1.16.70.0 and the mod is for 1.16.60.0, who cares
         }
 
+        public static bool IsCurrentFileSystemProbablyCaseSensitive()
+        {
+            var tmp = Path.GetTempPath();
+            return Directory.Exists(tmp) && (!Directory.Exists(tmp.ToUpper()) || !Directory.Exists(tmp.ToLower()));
+        }
+
+        public static bool PathEquals(this string path1, string path2)
+        {
+            return Path.GetFullPath(path1).Equals(Path.GetFullPath(path2), IsCurrentFileSystemProbablyCaseSensitive() ? StringComparison.InvariantCulture : StringComparison.InvariantCultureIgnoreCase);
+        }
+
         public static T[] Subsequence<T>(this IEnumerable<T> arr, int startIndex, int length)
         {
             return arr.Skip(startIndex).Take(length).ToArray();
