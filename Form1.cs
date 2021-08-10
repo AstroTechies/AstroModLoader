@@ -349,6 +349,9 @@ namespace AstroModLoader
                         continue;
                     }
 
+                    parsingProfile.Name = string.IsNullOrWhiteSpace(parsingProfile.Name) ? "Unknown" : parsingProfile.Name;
+                    while (ModManager.ProfileList.ContainsKey(parsingProfile.Name)) parsingProfile.Name = parsingProfile.Name + "*";
+
                     List<KeyValuePair<string, Mod>> plannedOrdering = new List<KeyValuePair<string, Mod>>();
                     foreach (KeyValuePair<string, Mod> entry in parsingProfile.ProfileData)
                     {
