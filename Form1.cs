@@ -1,4 +1,5 @@
 ﻿using AstroModIntegrator;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -103,7 +104,7 @@ namespace AstroModLoader
                     string tempDownloadFolder = Path.Combine(Path.GetTempPath(), "AstroModLoader", "Downloads");
                     Directory.CreateDirectory(tempDownloadFolder);
                     wb.DownloadFile(allVerData[newVersion].URL, Path.Combine(tempDownloadFolder, kosherFileName));
-                    InstallModFromPath(Path.Combine(tempDownloadFolder, kosherFileName), out _, out int numMalformatted);
+                    InstallModFromPath(Path.Combine(tempDownloadFolder, kosherFileName), out _, out int numMalformatted, out _);
                     if (numMalformatted > 0) throw new FormatException(numMalformatted + " mods were malformatted");
                     ModManager.SortVersions();
                     ModManager.SortMods();
@@ -311,10 +312,11 @@ namespace AstroModLoader
             return null;
         }
 
-        private List<Mod> InstallModFromPath(string newInstallingMod, out int numClientOnly, out int numMalformatted)
+        private List<Mod> InstallModFromPath(string newInstallingMod, out int numClientOnly, out int numMalformatted, out int numNewProfiles)
         {
             numClientOnly = 0;
             numMalformatted = 0;
+            numNewProfiles = 0;
             string ext = Path.GetExtension(newInstallingMod);
             if (!AllowedModExtensions.Contains(ext)) return null;
 
@@ -331,6 +333,52 @@ namespace AstroModLoader
                     string newPath = AddModFromPakPath(zippedPakPath, out bool wasMalformatted);
                     if (wasMalformatted) numMalformatted++;
                     if (newPath != null) newPaths.Add(newPath);
+                }
+
+                // Any .json files included will be treated as mod profiles to add to our current list
+                string[] allAccessibleJsonFiles = Directory.GetFiles(targetFolderPath, "*.json", SearchOption.AllDirectories);
+                foreach (string jsonFilePath in allAccessibleJsonFiles)
+                {
+                    ModProfile parsingProfile = null;
+                    try
+                    {
+                        parsingProfile = JsonConvert.DeserializeObject<ModProfile>(File.ReadAllText(jsonFilePath));
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+
+                    List<KeyValuePair<string, Mod>> plannedOrdering = new List<KeyValuePair<string, Mod>>();
+                    foreach (KeyValuePair<string, Mod> entry in parsingProfile.ProfileData)
+                    {
+                        plannedOrdering.Add(entry);
+                    }
+                    plannedOrdering = new List<KeyValuePair<string, Mod>>(plannedOrdering.OrderBy(o => o.Value.Priority).ToList());
+
+                    ModProfile currentProf = ModManager.GenerateProfile();
+                    List<KeyValuePair<string, Mod>> plannedOrderingCurrent = new List<KeyValuePair<string, Mod>>();
+                    string[] parsingProfileAllIDs = parsingProfile.ProfileData.Keys.ToArray();
+                    foreach (KeyValuePair<string, Mod> entry in currentProf.ProfileData)
+                    {
+                        if (parsingProfileAllIDs.Contains(entry.Key)) continue;
+                        entry.Value.Enabled = false;
+                        plannedOrderingCurrent.Add(entry);
+                    }
+
+                    plannedOrdering.AddRange(plannedOrderingCurrent.OrderBy(o => o.Value.Priority));
+
+                    ModProfile creatingProfile = new ModProfile();
+                    creatingProfile.ProfileData = new Dictionary<string, Mod>();
+                    for (int i = 0; i < plannedOrdering.Count; i++)
+                    {
+                        plannedOrdering[i].Value.Priority = i + 1;
+                        creatingProfile.ProfileData[plannedOrdering[i].Key] = plannedOrdering[i].Value;
+                    }
+
+                    if (ModManager.ProfileList == null) ModManager.ProfileList = new Dictionary<string, ModProfile>();
+                    ModManager.ProfileList[parsingProfile.Name] = creatingProfile;
+                    numNewProfiles++;
                 }
 
                 Directory.Delete(targetFolderPath, true); // Clean up the temporary data folder
@@ -373,6 +421,7 @@ namespace AstroModLoader
                 Dictionary<string, List<Version>> newMods = new Dictionary<string, List<Version>>();
                 int clientOnlyCount = 0;
                 int malformattedCount = 0;
+                int newProfileCount = 0;
                 int invalidExtensionCount = 0;
                 int wasFolderCount = 0;
                 foreach (string newInstallingMod in installingModPaths)
@@ -388,7 +437,7 @@ namespace AstroModLoader
                         continue;
                     }
 
-                    List<Mod> resMods = InstallModFromPath(newInstallingMod, out int thisClientOnlyCount, out int thisNumMalformatted);
+                    List<Mod> resMods = InstallModFromPath(newInstallingMod, out int thisClientOnlyCount, out int thisNumMalformatted, out int thisNumNewProfiles);
                     if (resMods == null) continue;
                     foreach (Mod resMod in resMods)
                     {
@@ -398,6 +447,7 @@ namespace AstroModLoader
                     }
                     clientOnlyCount += thisClientOnlyCount;
                     malformattedCount += thisNumMalformatted;
+                    newProfileCount += thisNumNewProfiles;
                 }
 
                 //ModManager.SyncModsFromDisk(true);
@@ -446,6 +496,11 @@ namespace AstroModLoader
                     if (malformattedCount > 0)
                     {
                         this.ShowBasicButton(malformattedCount + " mod" + (malformattedCount == 1 ? " was" : "s were") + " malformatted, and could not be installed.\nThe file name may be invalid, the metadata may be invalid, or both.\nPlease ensure that this mod meets the community-made standards.", "OK", null, null);
+                    }
+
+                    if (newProfileCount > 0)
+                    {
+                        this.ShowBasicButton(newProfileCount + " new profile" + (newProfileCount == 1 ? " was" : "s were") + " included with the file" + (installingModPaths.Length == 1 ? "" : "s") + " you installed.\n" + (newProfileCount == 1 ? "It has" : "They have") + " been added to your list of profiles.", "OK", null, null);
                     }
                 });
             }

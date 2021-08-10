@@ -1,14 +1,29 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace AstroModLoader
 {
     public class ModProfile
     {
+        [JsonProperty("info")]
+        [DefaultValue("")]
+        public string Info = null;
+
+        public bool ShouldSerializeInfo()
+        {
+            return !string.IsNullOrEmpty(Info);
+        }
+
+        [JsonProperty("name")]
+        [DefaultValue("")]
+        public string Name = null;
+
+        public bool ShouldSerializeName()
+        {
+            return !string.IsNullOrEmpty(Name);
+        }
+
         [JsonProperty("mods")]
         public Dictionary<string, Mod> ProfileData;
 

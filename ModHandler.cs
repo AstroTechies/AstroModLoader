@@ -391,6 +391,9 @@ namespace AstroModLoader
 
         public void DeterminePaths()
         {
+            string normalSteamBasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Astro");
+            string normalMicrosoftStoreBasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Packages", "SystemEraSoftworks.29415440E1269_ftk5pbg2rayv2", "LocalState", "Astro");
+
             BasePath = null;
             if (!string.IsNullOrEmpty(Program.CommandLineOptions.LocalDataPath))
             {
@@ -407,10 +410,10 @@ namespace AstroModLoader
                     switch(Platform)
                     {
                         case PlatformType.Steam:
-                            BasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Astro");
+                            BasePath = normalSteamBasePath;
                             break;
                         case PlatformType.Win10:
-                            BasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Packages", "SystemEraSoftworks.29415440E1269_ftk5pbg2rayv2", "LocalState", "Astro");
+                            BasePath = normalMicrosoftStoreBasePath;
                             break;
                     }
                 }
@@ -426,10 +429,13 @@ namespace AstroModLoader
                     }
                     else
                     {
+                        // If the regular Steam or Microsoft Store base paths do exist, they're probably what the user actually wants, but we still want to give them the option to change it here so we just put it in as prefilled text
+
                         TextPrompt initialPathPrompt = new TextPrompt
                         {
                             StartPosition = FormStartPosition.CenterScreen,
                             DisplayText = "Select your local application data directory",
+                            PrefilledText = Directory.Exists(normalSteamBasePath) ? normalSteamBasePath : (Directory.Exists(normalMicrosoftStoreBasePath) ? normalMicrosoftStoreBasePath : null),
                             VerifyMode = VerifyPathMode.Base
                         };
 
@@ -726,19 +732,25 @@ namespace AstroModLoader
             Mods = new List<Mod>(Mods.OrderBy(o => o.Priority).ToList());
         }
 
-        public long GetSizeOnDisk(Mod mod)
+        public string GetPathOnDisk(Mod mod, string modID = null)
         {
+            if (string.IsNullOrEmpty(modID)) modID = mod.CurrentModData.ModID;
+
             string[] allMods = Directory.GetFiles(DownloadPath, "*.pak", SearchOption.TopDirectoryOnly);
-            string copyingPath = null;
             foreach (string modPath in allMods)
             {
                 Mod testMod = new Mod(ExtractMetadataFromPath(modPath), Path.GetFileName(modPath));
-                if ((testMod.CurrentModData.ModID == mod.CurrentModData.ModID || testMod.NameOnDisk == mod.NameOnDisk) && testMod.InstalledVersion == mod.InstalledVersion)
+                if ((testMod.CurrentModData.ModID == modID || testMod.NameOnDisk == mod.NameOnDisk) && testMod.InstalledVersion == mod.InstalledVersion)
                 {
-                    copyingPath = modPath;
-                    break;
+                    return modPath;
                 }
             }
+            return null;
+        }
+
+        public long GetSizeOnDisk(Mod mod)
+        {
+            string copyingPath = GetPathOnDisk(mod);
             if (string.IsNullOrEmpty(copyingPath)) return -1;
             return new FileInfo(copyingPath).Length;
         }

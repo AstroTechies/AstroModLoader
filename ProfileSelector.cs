@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -220,10 +224,60 @@ namespace AstroModLoader
             ForceRefreshSelectedProfile();
         }
 
+        private void ForceExportProfile()
+        {
+            if (listBox1.SelectedValue == null || SelectedProfile == null)
+            {
+                this.ShowBasicButton("Please select a profile to export it as a .zip file.", "OK", null, null);
+                return;
+            }
+
+            var dialog = new SaveFileDialog();
+            dialog.Filter = "ZIP files (*.zip)|*.zip|All files (*.*)|*.*";
+            dialog.Title = "Export a profile";
+            dialog.RestoreDirectory = true;
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                string targetFolderPath = Path.Combine(Path.GetTempPath(), "AstroModLoader", "export");
+                Directory.CreateDirectory(targetFolderPath);
+
+                ModProfile creatingProfile = new ModProfile();
+                creatingProfile.ProfileData = new Dictionary<string, Mod>();
+                creatingProfile.Name = listBox1.SelectedValue as string;
+                creatingProfile.Info = "Exported by " + AMLUtils.UserAgent + " at " + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffK");
+
+                List<KeyValuePair<string, Mod>> plannedOrdering = new List<KeyValuePair<string, Mod>>();
+                foreach (KeyValuePair<string, Mod> entry in SelectedProfile.ProfileData)
+                {
+                    if (entry.Value.Enabled) plannedOrdering.Add(entry);
+                }
+                plannedOrdering = new List<KeyValuePair<string, Mod>>(plannedOrdering.OrderBy(o => o.Value.Priority).ToList());
+
+                for (int i = 0; i < plannedOrdering.Count; i++)
+                {
+                    plannedOrdering[i].Value.Priority = i + 1;
+                    creatingProfile.ProfileData[plannedOrdering[i].Key] = plannedOrdering[i].Value;
+
+                    // Copy mod pak to the zip as well
+                    string onePathOnDisk = OurParentForm.ModManager.GetPathOnDisk(plannedOrdering[i].Value, plannedOrdering[i].Key);
+                    if (!string.IsNullOrEmpty(onePathOnDisk)) File.Copy(onePathOnDisk, Path.Combine(targetFolderPath, Path.GetFileName(onePathOnDisk)));
+                }
+
+                File.WriteAllBytes(Path.Combine(targetFolderPath, "profile1.json"), Encoding.UTF8.GetBytes(AMLUtils.SerializeObject(creatingProfile)));
+
+                ZipFile.CreateFromDirectory(targetFolderPath, dialog.FileName);
+                Directory.Delete(targetFolderPath, true);
+
+                RefreshBox();
+                statusLabel.Text = "Successfully exported profile.";
+            }
+        }
+
         private async void listBox1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Delete) ForceDeleteProfilePrompt();
             if (e.KeyCode == Keys.Enter) await ForceLoadSelectedProfile();
+            if (e.KeyCode == Keys.X) ForceExportProfile();
         }
 
         private void deleteProfileButton_Click(object sender, EventArgs e)

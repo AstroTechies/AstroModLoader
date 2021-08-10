@@ -22,8 +22,9 @@ namespace AstroModLoader
 
     public partial class TextPrompt : Form
     {
-        public string DisplayText;
-        public string OutputText;
+        public string DisplayText = null;
+        public string OutputText = null;
+        public string PrefilledText = null;
         public bool AllowBrowse = true;
         public BrowseMode BrowseMode = BrowseMode.Folder;
         public VerifyPathMode VerifyMode = VerifyPathMode.None;
@@ -53,6 +54,12 @@ namespace AstroModLoader
             this.debugLabel.ForeColor = AMLPalette.WarningColor;
             this.debugLabel.Width = debugLabelEndX - (this.cancelButton.Location.X + this.cancelButton.Width);
             this.debugLabel.Location = new Point(debugLabelEndX - this.debugLabel.Width, this.cancelButton.Location.Y);
+
+            if (!string.IsNullOrEmpty(PrefilledText))
+            {
+                gamePathBox.Text = PrefilledText;
+                PerformPathSubstitutions();
+            }
         }
 
         private void browseButton_Click(object sender, EventArgs e)
@@ -95,9 +102,14 @@ namespace AstroModLoader
         }
 
         private static Regex isLocalAppdata = new Regex(@"%localappdata%", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private void RunOKButton()
+        private void PerformPathSubstitutions()
         {
             gamePathBox.Text = isLocalAppdata.Replace(gamePathBox.Text, Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+        }
+
+        private void RunOKButton()
+        {
+            PerformPathSubstitutions();
 
             if (AllowBrowse && !AMLUtils.IsValidPath(gamePathBox.Text))
             {
