@@ -252,6 +252,7 @@ namespace AstroModLoader
 
         public static bool PathEquals(this string path1, string path2)
         {
+            if (path1 == null || path2 == null) return path1.Equals(path2);
             return Path.GetFullPath(path1).Equals(Path.GetFullPath(path2), IsCurrentFileSystemProbablyCaseSensitive() ? StringComparison.InvariantCulture : StringComparison.InvariantCultureIgnoreCase);
         }
 
