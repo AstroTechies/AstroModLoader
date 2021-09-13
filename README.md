@@ -45,6 +45,7 @@ AstroModLoader features a fully-functional set of hotkeys to fully control your 
 Additionally, the following keyboard commands can be used within the profile selector:
 * DEL deletes the current profile.
 * ENTER loads the current profile.
+* X exports the current profile as a .zip file, which other AstroModLoader users can import by dragging and dropping the .zip file onto the AstroModLoader window while it is running.
 
 Additionally, the following keyboard commands can be used within popup windows:
 * ENTER and ESC can be used within confirmation windows to select "Yes" or "No" respectively, and "OK" or "Cancel" respectively in text input windows.
