@@ -1,5 +1,6 @@
-﻿* Added the ability to import and export profiles through .zip files. Press the X key with any profile selected to export it as a zip file, and drag-and-drop a zip file onto the window to import the profile.
+﻿* Added the ability to import and export profiles through .zip files. Press the X key with any profile selected to export it as a zip file, and drag-and-drop a zip file onto the window to import any profiles within it.
 * Adjusted behavior when an invalid game or base path is provided on initial setup to be more user-friendly.
 * Adjusted the base path request window to auto-fill with what it thinks is the best option for the user.
 * Adjusted steam path detection to search through more locations.
+* Fixed a major bug in which Steam automatic path detection would fail in some specific cases.
 * Fixed a major bug in which Microsoft Store automatic path detection would not work for users who did not also have an installed Steam copy of the game.

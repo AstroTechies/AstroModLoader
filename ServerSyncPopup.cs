@@ -44,7 +44,7 @@ namespace AstroModLoader
                 if (serverInfo == null)
                 {
                     BaseForm.syncErrored = true;
-                    BaseForm.syncErrorMessage = "Failed to find an online AstroLauncher server with the requested address!";
+                    BaseForm.syncErrorMessage = "Failed to find an online AML-compatible server with the requested address!";
                     return;
                 }
 

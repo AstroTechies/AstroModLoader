@@ -194,7 +194,7 @@ namespace AstroModLoader
         }
 
         private static Regex acfEntryReader = new Regex(@"\s+""(\w+)""\s+""([\w ]+)""", RegexOptions.Compiled);
-        private static Regex isInvalidVdfEntry = new Regex(@"[^""\d]", RegexOptions.Compiled);
+        private static Regex vdfEntryReader = new Regex(@"^\s*""([^""]+)""\s*""([^""]+)""", RegexOptions.Compiled);
         private string CheckRegistryForSteamPath(int appID)
         {
             string decidedSteamPath = null;
@@ -226,10 +226,10 @@ namespace AstroModLoader
                     string vdfEntry = null;
                     while ((vdfEntry = f.ReadLine()) != null)
                     {
-                        string[] goodEntry = vdfEntry.Trim().Replace("\t\t", " ").Split(' ');
-                        if (goodEntry.Length == 2 && !isInvalidVdfEntry.IsMatch(goodEntry[0]))
+                        Match m = vdfEntryReader.Match(vdfEntry);
+                        if (m.Groups.Count == 3)
                         {
-                            potentialInstallDirs.Add(goodEntry[1].Replace(@"\\", @"\").Replace("\"", ""));
+                            potentialInstallDirs.Add(m.Groups[2].Value.Replace(@"\\", @"\").Replace("\"", ""));
                         }
                     }
                 }
@@ -243,13 +243,10 @@ namespace AstroModLoader
                     string vdfEntry = null;
                     while ((vdfEntry = f.ReadLine()) != null)
                     {
-                        if (vdfEntry.Contains("BaseInstallFolder_"))
+                        Match m = vdfEntryReader.Match(vdfEntry);
+                        if (m.Groups.Count == 3 && m.Groups[1].Value.StartsWith("BaseInstallFolder_"))
                         {
-                            string[] goodEntry = vdfEntry.Trim().Replace("\t\t", " ").Split(' ');
-                            if (goodEntry.Length == 2 && !isInvalidVdfEntry.IsMatch(goodEntry[0]))
-                            {
-                                potentialInstallDirs.Add(goodEntry[1].Replace(@"\\", @"\").Replace("\"", ""));
-                            }
+                            potentialInstallDirs.Add(m.Groups[2].Value.Replace(@"\\", @"\").Replace("\"", ""));
                         }
                     }
                 }
@@ -278,6 +275,7 @@ namespace AstroModLoader
         {
             try
             {
+                if (!Directory.Exists(steamPath)) return null;
                 using (StreamReader f = new StreamReader(Path.Combine(steamPath, "steamapps", "appmanifest_" + appID + ".acf")))
                 {
                     string acfEntry = null;
