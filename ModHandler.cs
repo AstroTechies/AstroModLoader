@@ -450,7 +450,7 @@ namespace AstroModLoader
                 }
                 else
                 {
-                    MessageBox.Show("Unable to find the local application data directory. Please specify one with the --data parameter.", "Uh oh!");
+                    MessageBox.Show("Unable to find the local application data directory. If you have never created an Astroneer save file within the game on this computer before, please do so and then re-open AstroModLoader. Otherwise, please specify a local application data directory with the --data parameter.", "Uh oh!");
                     Environment.Exit(0);
                 }
             }
