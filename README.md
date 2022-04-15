@@ -52,7 +52,7 @@ Additionally, the following keyboard commands can be used within popup windows:
 * TAB can be used to switch selection between buttons. ENTER can then be used to press the currently selected button.
 
 ## Prerequisites
-* .NET Framework 4.6.1
+* .NET Framework 4.7.2
 * A copy of Astroneer
 
 ## Licensing
